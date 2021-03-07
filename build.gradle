@@ -7,8 +7,8 @@ plugins {
 group = 'com.app'
 version = '0.0.0-SNAPSHOT'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '13'
+targetCompatibility = '13'
 
 compileJava.options.encoding = 'UTF-8'
 
