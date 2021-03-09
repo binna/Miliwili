@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Accessors(chain = true)
 @Builder
@@ -22,10 +22,10 @@ public class OrdinaryLeave extends BaseEntity {
     private Long id;
 
     @Column(name = "startDate", nullable = false)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "endDate", nullable = false)
-    private Date endDate;
+    private LocalDate endDate;
 
     @ManyToOne
     @JoinColumn(name = "schedule_id")
