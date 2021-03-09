@@ -13,7 +13,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("")
+@RequestMapping("/app")
 public class UserController {
     private final JwtService jwtService;
 
