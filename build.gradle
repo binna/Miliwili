@@ -50,6 +50,10 @@ dependencies {
 
     //querydsl
     implementation 'com.querydsl:querydsl-jpa'
+
+    //httpclient
+    implementation 'org.apache.httpcomponents:httpclient:4.5'
+
 }
 
 test {
