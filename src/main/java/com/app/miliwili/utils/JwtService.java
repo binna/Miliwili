@@ -42,10 +42,10 @@ public class JwtService {
 
     /**
      * JWT에서 userId 추출
-     * @return int
+     * @return long
      * @throws BaseException
      */
-    public int getUserId() throws BaseException {
+    public long getUserId() throws BaseException {
         // 1. JWT 추출
         String accessToken = getJwt();
         if (accessToken == null || accessToken.length() == 0) {
@@ -63,6 +63,6 @@ public class JwtService {
         }
 
         // 3. userId 추출
-        return claims.getBody().get("userId", Integer.class);
+        return claims.getBody().get("userId", Long.class);
     }
 }
