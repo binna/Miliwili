@@ -3,48 +3,54 @@ package com.app.miliwili.utils;
 import com.app.miliwili.config.BaseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.stereotype.Service;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 
 @Service
 public class GoogleService {
 
 
-    public long userIdFromGoogle(String token) throws BaseException{
-        String access_Token = token;
+    public String userIdFromGoogle(String token) throws BaseException{
 
-        long userId = 0;
+        String userId="";
+        BufferedReader in  = null;
+        InputStream is = null;
+        InputStreamReader isr = null;
+       JsonParser jsonParser = new JsonParser();
 
-        String reqURL = "https://www.googleapis.com/oauth2/v2/userinfo";
+        String reqURL = "https://oauth2.googleapis.com/tokeninfo?id_token="+token;
+        try{
+            URL url = new URL(reqURL);
+            JsonParser parser = new JsonParser();
 
 
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpGet get = new HttpGet(reqURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+             is = conn.getInputStream();
+             isr = new InputStreamReader(is, "UTF-8");
+             in = new BufferedReader(isr);
+             int responseCode = conn.getResponseCode();
+             JsonObject jsonObj = (JsonObject)jsonParser.parse(in);
 
-            JsonNode returnNode = null;
+             userId = (jsonObj.get("sub").toString());
 
-            get.addHeader("Authorization", "Bearer "+token);
 
-            try{
-                final HttpResponse response = client.execute(get);
-                final int responseCode = response.getStatusLine().getStatusCode();
-
-                ObjectMapper mapper = new ObjectMapper();
-                returnNode = mapper.readTree(response.getEntity().getContent());
-
-                System.out.println("\nSending 'GET' request to URL : " + reqURL);
-                System.out.println("Response Code : " + responseCode);
-           // BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            System.out.println(returnNode);
+             System.out.println(responseCode);
+             System.out.println(userId);
 
         }catch (IOException e){
             e.printStackTrace();

@@ -48,7 +48,7 @@ public class UserController {
      */
     @ResponseBody
     @PostMapping("/users/login-google")
-    public BaseResponse<PostLoginRes> postLoginGoogle(@RequestHeader("token") String token){
+    public BaseResponse<PostLoginRes> postLoginGoogle(@RequestHeader("X-ACCESS-TOKEN") String token){
 
         try{
             googleService.userIdFromGoogle(token);
