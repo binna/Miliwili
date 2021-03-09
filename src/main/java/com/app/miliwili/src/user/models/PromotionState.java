@@ -1,4 +1,4 @@
-package com.app.miliwili.src.calendar.models;
+package com.app.miliwili.src.user.models;
 
 import com.app.miliwili.config.BaseEntity;
 import lombok.*;
@@ -14,12 +14,21 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
-@Table(name = "ordinaryLeave")
-public class OrdinaryLeave extends BaseEntity {
+@Table(name = "promotionState")
+public class PromotionState extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "firstDate", nullable = false)
+    private LocalDate firstDate;
+
+    @Column(name = "secondDate")
+    private LocalDate secondDate;
+
+    @Column(name = "thirdDate")
+    private LocalDate thirdDate;
 
     @Column(name = "startDate", nullable = false)
     private LocalDate startDate;
@@ -27,7 +36,7 @@ public class OrdinaryLeave extends BaseEntity {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
-    @ManyToOne
-    @JoinColumn(name = "schedule_id")
-    private Schedule schedule;
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -25,20 +26,23 @@ public class DDay {
     @Column(name = "distinction", nullable = false, length = 10)
     private String distinction;
 
-    @Column(name = "title", nullable = false, length = 45)
+    @Column(name = "title", nullable = false, length = 30)
     private String title;
 
-    @Column(name = "subtitle", nullable = false, length = 90)
+    @Column(name = "subtitle", nullable = false, length = 60)
     private String subtitle;
 
     @Column(name = "startDate", nullable = false)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "endDate", nullable = false)
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "link", nullable = false, columnDefinition = "CHAR(1) default 'N'")
     private String link;
+
+    @Column(name = "choiceCalendar", length = 1, columnDefinition = "CHAR(1) default 'N'")
+    private String choiceCalendar;
 
     @Column(name = "placeLat", precision = 16, scale = 14)
     private BigDecimal placeLat;

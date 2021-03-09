@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Accessors(chain = true)
 @Builder
@@ -22,7 +22,7 @@ public class User extends BaseEntity {
     private Long id;
 
     @Column(name = "birthday", nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column(name = "serveType", nullable = false, length = 45)
     private String serveType;
@@ -52,15 +52,8 @@ public class User extends BaseEntity {
     private String goal;
 
     @Column(name = "goalDate")
-    private Date goalDate;
+    private LocalDate goalDate;
 
-    public User(String name, Date birthday, Integer roughStateIdx, String serveType,
-                String socialType, String socialId) {
-        this.name = name;
-        this.birthday = birthday;
-        this.roughStateIdx = roughStateIdx;
-        this.serveType = serveType;
-        this.socialType = socialType;
-        this.socialId = socialId;
-    }
+    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private PromotionState promotionState;
 }
