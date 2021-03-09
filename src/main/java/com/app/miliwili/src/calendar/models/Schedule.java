@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Accessors(chain = true)
@@ -25,14 +25,14 @@ public class Schedule extends BaseEntity {
     @Column(name = "distinction", nullable = false, length = 10)
     private String distinction;
 
-    @Column(name = "title", nullable = false, length = 45)
+    @Column(name = "title", nullable = false, length = 60)
     private String title;
 
     @Column(name = "startDate", nullable = false)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "endDate", nullable = false)
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "repetition", nullable = false, length = 1, columnDefinition = "CHAR(1) default 'F'")
     private String repetition;

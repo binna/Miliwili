@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Accessors(chain = true)
 @Builder
@@ -21,26 +21,17 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
+
     @Column(name = "birthday", nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column(name = "serveType", nullable = false, length = 45)
     private String serveType;
 
-    @Column(name = "roughStateIdx", nullable = false)
-    private Integer roughStateIdx;
-
-    @Column(name = "detailStateIdx", nullable = false, columnDefinition = "int default 0")
-    private Integer detailStateIdx;
-
-    @Column(name = "hobong", nullable = false, columnDefinition = "int default 1")
-    private Integer hobong;
-
-    @Column(name = "profileImg")
-    private String profileImg;
-
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    @Column(name = "stateIdx", nullable = false)
+    private Integer stateIdx;
 
     @Column(name = "socialType", nullable = false, length = 1)
     private String socialType;
@@ -52,15 +43,14 @@ public class User extends BaseEntity {
     private String goal;
 
     @Column(name = "goalDate")
-    private Date goalDate;
+    private LocalDate goalDate;
 
-    public User(String name, Date birthday, Integer roughStateIdx, String serveType,
-                String socialType, String socialId) {
-        this.name = name;
-        this.birthday = birthday;
-        this.roughStateIdx = roughStateIdx;
-        this.serveType = serveType;
-        this.socialType = socialType;
-        this.socialId = socialId;
-    }
+    @Column(name = "profileImg")
+    private String profileImg;
+
+    @Column(name = "startDate", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "endDate", nullable = false)
+    private LocalDate endDate;
 }
