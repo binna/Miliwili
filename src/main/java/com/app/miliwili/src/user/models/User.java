@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Accessors(chain = true)
 @Builder
@@ -16,57 +17,50 @@ import javax.persistence.*;
 @Table(name = "user")
 public class User extends BaseEntity {
     @Id
-    @Column(name = "no", nullable = false, updatable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long no;
+    private Long id;
 
-    @Column(name = "name", nullable = false, length = 50)
+    @Column(name = "birthday", nullable = false)
+    private Date birthday;
+
+    @Column(name = "serveType", nullable = false, length = 45)
+    private String serveType;
+
+    @Column(name = "roughStateIdx", nullable = false)
+    private Integer roughStateIdx;
+
+    @Column(name = "detailStateIdx", nullable = false, columnDefinition = "int default 0")
+    private Integer detailStateIdx;
+
+    @Column(name = "hobong", nullable = false, columnDefinition = "int default 1")
+    private Integer hobong;
+
+    @Column(name = "profileImg")
+    private String profileImg;
+
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "nickname", nullable = false, length = 50)
-    private String nickname;
+    @Column(name = "socialType", nullable = false, length = 1)
+    private String socialType;
 
-    @Column(name = "profileImageURL", columnDefinition = "TEXT")
-    private String profileImageURL;
+    @Column(name = "socialId", nullable = false, length = 1000)
+    private String socialId;
 
-    @Column(name = "phoneNumber", length = 13)
-    private String phoneNumber;
+    @Column(name = "goal", length = 100)
+    private String goal;
 
-    @Column(name = "birthday", length = 10)
-    private String birthday;
+    @Column(name = "goalDate")
+    private Date goalDate;
 
-    @Column(name = "email", length = 100)
-    private String email;
-
-    @Column(name = "gender", length = 1)
-    private String gender;
-
-    @Column(name = "snsDiv", nullable = false, length = 1)
-    private String snsDiv;
-
-    @Column(name = "role", nullable = false, columnDefinition = "integer default 1")
-    private Integer role;
-
-    @Column(name = "image_status", nullable = false, columnDefinition = "varchar(1) default 'N'")
-    private String imageStatus;
-
-    @Column(name = "id", length = 100)
-    private String id;
-
-
-    public User(String name, String nickname,String profileImageURL ,String phoneNumber,
-                String birthday,String email,String gender,String snsDiv,Integer role,String imageStatus,
-                String id) {
+    public User(String name, Date birthday, Integer roughStateIdx, String serveType,
+                String socialType, String socialId) {
         this.name = name;
-        this.nickname = nickname;
-        this.profileImageURL = profileImageURL;
-        this.phoneNumber = phoneNumber;
         this.birthday = birthday;
-        this.email = email;
-        this.gender = gender;
-        this.snsDiv = snsDiv;
-        this.role = role;
-        this.imageStatus = imageStatus;
-        this.id = id;
+        this.roughStateIdx = roughStateIdx;
+        this.serveType = serveType;
+        this.socialType = socialType;
+        this.socialId = socialId;
     }
 }
