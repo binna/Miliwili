@@ -14,8 +14,8 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
-@Table(name = "promotionState")
-public class PromotionState extends BaseEntity {
+@Table(name = "normalPromotionState")
+public class NormalPromotionState extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,12 +29,6 @@ public class PromotionState extends BaseEntity {
 
     @Column(name = "thirdDate")
     private LocalDate thirdDate;
-
-    @Column(name = "startDate", nullable = false)
-    private LocalDate startDate;
-
-    @Column(name = "endDate", nullable = false)
-    private LocalDate endDate;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
