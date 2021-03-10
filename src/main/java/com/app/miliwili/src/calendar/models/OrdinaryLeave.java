@@ -2,12 +2,10 @@ package com.app.miliwili.src.calendar.models;
 
 import com.app.miliwili.config.BaseEntity;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Accessors(chain = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)

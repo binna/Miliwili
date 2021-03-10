@@ -1,15 +1,12 @@
 package com.app.miliwili.src.calendar.models;
 
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
-@Accessors(chain = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -38,11 +35,13 @@ public class DDay {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "link", nullable = false, columnDefinition = "CHAR(1) default 'N'")
-    private String link;
+    @Column(name = "link", nullable = false, length = 1)
+    @Builder.Default
+    private String link = "N";
 
-    @Column(name = "choiceCalendar", length = 1, columnDefinition = "CHAR(1) default 'N'")
-    private String choiceCalendar;
+    @Column(name = "choiceCalendar", nullable = false, length = 1)
+    @Builder.Default
+    private String choiceCalendar = "N";
 
     @Column(name = "placeLat", precision = 16, scale = 14)
     private BigDecimal placeLat;

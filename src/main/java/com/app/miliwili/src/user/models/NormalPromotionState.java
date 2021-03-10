@@ -30,6 +30,12 @@ public class NormalPromotionState extends BaseEntity {
     @Column(name = "thirdDate")
     private LocalDate thirdDate;
 
+    @Builder.Default
+    private Integer hobong = 1;
+
+    @Builder.Default
+    private Integer stateIdx = 1;
+
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
