@@ -32,4 +32,11 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                 .where(user.socialId.eq(gsocialId), user.socialType.eq("G"), user.status.eq("Y"))
                 .fetch();
     }
+
+
+    /**
+     * 전역일 계산을 하기 위해
+     * --> mainProvider
+     */
+
 }

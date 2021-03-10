@@ -58,11 +58,11 @@ public class UserService {
             jwtToken = "";
         }
 
-
         postLoginRes = PostLoginRes.builder()
                 .isMember(isMemeber)
                 .jwt(jwtToken)
                 .build();
+
         return postLoginRes;
 
     }
