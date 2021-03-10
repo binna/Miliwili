@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -34,10 +32,13 @@ public class CalendarService {
                 .title(parameters.getTitle())
                 .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
-                .repetition(parameters.getRepetition())
-                .push(parameters.getPush())
                 .build();
-
+        if(parameters.getRepetition() != null) {
+            newSchedule.setRepetition(parameters.getRepetition());
+        }
+        if(parameters.getPush() != null) {
+            newSchedule.setRepetition(parameters.getPush());
+        }
         if(parameters.getToDoList() != null) {
             newSchedule.setToDoLists(calendarProvider.retrieveToDoList(parameters.getToDoList()));
         }
@@ -48,6 +49,8 @@ public class CalendarService {
             exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_SCHEDULE);
         }
+
+        // TODO PUSH 알람
 
         return PostScheduleRes.builder()
                 .scheduleId(newSchedule.getId())

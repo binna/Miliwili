@@ -2,12 +2,10 @@ package com.app.miliwili.src.user.models;
 
 import com.app.miliwili.config.BaseEntity;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Accessors(chain = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -30,9 +28,11 @@ public class NormalPromotionState extends BaseEntity {
     @Column(name = "thirdDate")
     private LocalDate thirdDate;
 
+    @Column(name = "hobong", nullable = false, columnDefinition = "integer default 1")
     @Builder.Default
     private Integer hobong = 1;
 
+    @Column(name = "stateIdx", nullable = false, columnDefinition = "integer default 1")
     @Builder.Default
     private Integer stateIdx = 1;
 

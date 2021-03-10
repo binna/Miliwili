@@ -21,8 +21,8 @@ public class PreparationMaterial extends BaseEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "readyState", nullable = false, length = 1)
     @Builder.Default
+    @Column(name = "readyState", nullable = false, columnDefinition = "varchar(1) default 'F'")
     private String readyState = "F";
 
     @ManyToOne

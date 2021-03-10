@@ -21,8 +21,8 @@ public class ToDoList extends BaseEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "processingStatus", length = 1, nullable = false)
     @Builder.Default
+    @Column(name = "processingStatus", nullable = false, columnDefinition = "varchar(1) default 'F'")
     private String processingStatus = "F";
 
     @ManyToOne
