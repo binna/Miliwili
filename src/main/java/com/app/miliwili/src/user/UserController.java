@@ -19,6 +19,8 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class UserController {
     private final JwtService jwtService;
     private final GoogleService googleService;
+    private final UserService userService;
+    private final UserProvider userProvider;
 
 
     /**
@@ -51,8 +53,9 @@ public class UserController {
     public BaseResponse<PostLoginRes> postLoginGoogle(@RequestHeader("X-ACCESS-TOKEN") String token){
 
         try{
-            googleService.userIdFromGoogle(token);
-            PostLoginRes returnRes = new PostLoginRes(true, "1234");
+            String socialId = googleService.userIdFromGoogle(token);
+
+            PostLoginRes returnRes = userService.createGoogleJwtToken(socialId);
             return new BaseResponse<>(SUCCESS,returnRes);
         }catch(BaseException e){
             e.printStackTrace();

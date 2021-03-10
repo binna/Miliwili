@@ -20,6 +20,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static com.app.miliwili.config.BaseResponseStatus.*;
+
 
 @Service
 public class GoogleService {
@@ -32,11 +34,12 @@ public class GoogleService {
         InputStream is = null;
         InputStreamReader isr = null;
        JsonParser jsonParser = new JsonParser();
+        JsonParser parser = new JsonParser();
 
-        String reqURL = "https://oauth2.googleapis.com/tokeninfo?id_token="+token;
         try{
+            String reqURL = "https://oauth2.googleapis.com/tokeninfo?id_token="+token;
+
             URL url = new URL(reqURL);
-            JsonParser parser = new JsonParser();
 
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -47,7 +50,9 @@ public class GoogleService {
              JsonObject jsonObj = (JsonObject)jsonParser.parse(in);
 
              userId = (jsonObj.get("sub").toString());
-
+            if(responseCode!=200){
+                throw new BaseException(INVALID_TOKEN);
+            }
 
              System.out.println(responseCode);
              System.out.println(userId);
