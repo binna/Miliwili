@@ -23,7 +23,8 @@ public class UserService {
      */
     public PostLoginRes createGoogleJwtToken(String googleSocialId) throws BaseException {
 
-        String socialId = googleSocialId;
+        String socialId = googleSocialId.substring(1,googleSocialId.length()-1);
+
         PostLoginRes postLoginRes;
         String jwtToken="";
         boolean isMemeber = true;
