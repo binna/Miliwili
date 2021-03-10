@@ -1,5 +1,10 @@
 package com.app.miliwili.src.user.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public class PostSignUpReq {
     private String name;
     private int stateIdx;

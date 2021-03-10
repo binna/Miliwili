@@ -21,7 +21,7 @@ public class AbnormalPromotionState extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "proDate", nullable = false)
+    @Column(name = "proDate")
     private LocalDate proDate;
 
     @OneToOne

@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class PostLoginRes {
-    private boolean isMemeber;
+    private boolean isMember;
     private String jwt;
 }
