@@ -24,9 +24,6 @@ public class User extends BaseEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "birthday", nullable = false)
-    private LocalDate birthday;
-
     @Column(name = "serveType", nullable = false, length = 45)
     private String serveType;
 
@@ -41,9 +38,6 @@ public class User extends BaseEntity {
 
     @Column(name = "goal", length = 100)
     private String goal;
-
-    @Column(name = "goalDate")
-    private LocalDate goalDate;
 
     @Column(name = "profileImg")
     private String profileImg;

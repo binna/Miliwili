@@ -22,7 +22,7 @@ public class JwtService {
      * @param userId
      * @return String
      */
-    public String createJwt(int userId) {
+    public String createJwt(long userId) {
         Date now = new Date();
         return Jwts.builder()
                 .claim("userId", userId)
