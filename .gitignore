@@ -64,3 +64,7 @@ out/
 
 ## 테스트 폴더 전체
 */test/*
+
+## 설정파일
+*application-test.yml
+*application-release.yml
