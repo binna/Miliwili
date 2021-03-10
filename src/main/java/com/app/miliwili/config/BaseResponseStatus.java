@@ -15,6 +15,7 @@ public enum BaseResponseStatus {
     INVALID_JWT(false, 2001, "유효하지 않은 JWT입니다."),
 
     // 3000 : Response 오류
+    FAILED_TO_POST_SCHEDULE(false, 3000, "일정 등록에 실패하였습니다."),
 
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");

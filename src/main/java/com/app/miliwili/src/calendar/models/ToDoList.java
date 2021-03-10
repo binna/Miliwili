@@ -23,7 +23,7 @@ public class ToDoList extends BaseEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "processingStatus", nullable = false, length = 1, columnDefinition = "CHAR(1) default 'F'")
+    @Column(name = "processingStatus", nullable = false, length = 1, columnDefinition = "varchar(1) default 'F'")
     private String processingStatus;
 
     @ManyToOne

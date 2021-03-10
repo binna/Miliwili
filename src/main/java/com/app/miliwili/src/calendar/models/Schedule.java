@@ -3,12 +3,12 @@ package com.app.miliwili.src.calendar.models;
 import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Accessors(chain = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -22,6 +22,9 @@ public class Schedule extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "color", nullable = false, length = 30)
+    private String color;
+
     @Column(name = "distinction", nullable = false, length = 10)
     private String distinction;
 
@@ -34,15 +37,31 @@ public class Schedule extends BaseEntity {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "repetition", nullable = false, length = 1, columnDefinition = "CHAR(1) default 'F'")
+    @Column(name = "repetition", columnDefinition = "varchar(1) default 'F'")
     private String repetition;
 
-    @Column(name = "push", nullable = false, length = 1, columnDefinition = "CHAR(1) default 'F'")
-    private String push;
+    @Column(name = "push")
+    private String push = "N";
 
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<ToDoList> toDoLists;
+//    @Column(name = "push")
+//    @ColumnDefault("'F'")
+//    private String push;
 
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<OrdinaryLeave> ordinaryLeaves;
+//    @PrePersist
+//    public void prePersist() {
+//        if (this.repetition == null) {
+//            this.repetition = "F";
+//        }
+//        if (this.push == null) {
+//            this.push = "F";
+//        }
+//    }
+
+//    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
+//    private List<ToDoList> toDoLists;
+//
+//    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
+//    private List<OrdinaryLeave> ordinaryLeaves;
+
+
 }
