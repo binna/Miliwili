@@ -35,12 +35,12 @@ public class Schedule extends BaseEntity {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "repetition", length = 1, nullable = false)
     @Builder.Default
+    @Column(name = "repetition", nullable = false, columnDefinition = "varchar(1) default 'F'")
     private String repetition = "F";
 
-    @Column(name = "push", length = 1, nullable = false)
     @Builder.Default
+    @Column(name = "push", nullable = false, columnDefinition = "varchar(1) default 'F'")
     private String push = "F";
 
     @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)

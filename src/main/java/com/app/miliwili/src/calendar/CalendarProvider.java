@@ -41,6 +41,8 @@ public class CalendarProvider {
      * @Auther shine
      */
     public List<WorkRes> retrieveWorkRes(List<ToDoList> parameters) {
+        if(parameters == null) return null;
+
         return parameters.stream().map(toDoList -> {
             return new WorkRes(toDoList.getContent(), toDoList.getProcessingStatus());
         }).collect(Collectors.toList());

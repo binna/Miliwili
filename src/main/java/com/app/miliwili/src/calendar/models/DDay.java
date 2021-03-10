@@ -35,12 +35,12 @@ public class DDay {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "link", nullable = false, length = 1)
     @Builder.Default
+    @Column(name = "link", nullable = false, columnDefinition = "varchar(1) default 'N'")
     private String link = "N";
 
-    @Column(name = "choiceCalendar", nullable = false, length = 1)
     @Builder.Default
+    @Column(name = "choiceCalendar", nullable = false, columnDefinition = "varchar(1) default 'N'")
     private String choiceCalendar = "N";
 
     @Column(name = "placeLat", precision = 16, scale = 14)
