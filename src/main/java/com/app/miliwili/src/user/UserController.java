@@ -53,9 +53,15 @@ public class UserController {
     @PostMapping("/users/login-google")
     public BaseResponse<PostLoginRes> postLoginGoogle(@RequestHeader("X-ACCESS-TOKEN") String token){
 
-        try{
-            String socialId = googleService.userIdFromGoogle(token);
+        String socialId="";
+        try {
+             socialId = googleService.userIdFromGoogle(token);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
+        }
 
+        try{
             PostLoginRes returnRes = userService.createGoogleJwtToken(socialId);
             return new BaseResponse<>(SUCCESS,returnRes);
         }catch(BaseException e){
@@ -133,17 +139,22 @@ public class UserController {
                 return new BaseResponse<>(INVALID_THIRD_DATE);
             }
 
-        }else{
+        }else{      //일반병사 아닐 때
             if(ValidationLength.isFullString(param.getProDate())) {
                 if (!ValidationRegex.isRegexDate(param.getProDate())) {
                     return new BaseResponse<>(INVALID_PRO_DATE);
                 }
             }
         }
-
+        String socialId="";
+        try {
+            socialId = googleService.userIdFromGoogle(token);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
+        }
 
         try{
-            String socialId = googleService.userIdFromGoogle(token);
             PostSignUpRes postSignUpRes = userService.createGoogleUser(param,socialId);
             return new BaseResponse<>(SUCCESS, postSignUpRes);
         }catch(BaseException e){
