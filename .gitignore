@@ -67,3 +67,4 @@ out/
 
 ## 설정파일
 *application-test.yml
+*application-release.yml
