@@ -12,6 +12,7 @@ public class GetNormalUserEndDate {
     private final String profileImg;
     private final String name;
     private final String endDate;
+    private final String startDate;
     private final String firstDate;
     private final String secondDate;
     private final String thirdDate;
