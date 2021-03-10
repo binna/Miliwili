@@ -38,14 +38,17 @@ public class GoogleService {
 
         try{
             String reqURL = "https://oauth2.googleapis.com/tokeninfo?id_token="+token;
-
             URL url = new URL(reqURL);
-
-
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-             is = conn.getInputStream();
-             isr = new InputStreamReader(is, "UTF-8");
-             in = new BufferedReader(isr);
+
+            try {
+                is = conn.getInputStream();
+                isr = new InputStreamReader(is, "UTF-8");
+                in = new BufferedReader(isr);
+            }catch (Exception e){
+                throw new BaseException(INVALID_TOKEN);
+            }
+
              int responseCode = conn.getResponseCode();
              JsonObject jsonObj = (JsonObject)jsonParser.parse(in);
 
@@ -53,9 +56,6 @@ public class GoogleService {
             if(responseCode!=200){
                 throw new BaseException(INVALID_TOKEN);
             }
-
-             System.out.println(responseCode);
-             System.out.println(userId);
 
         }catch (IOException e){
             e.printStackTrace();

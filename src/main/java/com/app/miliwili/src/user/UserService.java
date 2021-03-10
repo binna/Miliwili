@@ -59,7 +59,10 @@ public class UserService {
         }
 
 
-        postLoginRes = new PostLoginRes(isMemeber, jwtToken);
+        postLoginRes = PostLoginRes.builder()
+                .isMember(isMemeber)
+                .jwt(jwtToken)
+                .build();
         return postLoginRes;
 
     }
