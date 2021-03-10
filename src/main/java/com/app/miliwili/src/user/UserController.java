@@ -2,12 +2,14 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
+import com.app.miliwili.src.user.models.PostLoginRes;
+import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.utils.GoogleService;
 import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
+import org.springframework.web.bind.annotation.*;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -16,6 +18,10 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @RequestMapping("/app")
 public class UserController {
     private final JwtService jwtService;
+    private final GoogleService googleService;
+    private final UserService userService;
+    private final UserProvider userProvider;
+
 
     /**
      * JWT 검증 API
@@ -32,6 +38,28 @@ public class UserController {
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 로그인 --> 구글
+     * [POST]
+     * @RequestHeader token(google accessToken)
+     * @return BaseResponse<PostLoginRes>
+     * @Auther vivi
+     */
+    @ResponseBody
+    @PostMapping("/users/login-google")
+    public BaseResponse<PostLoginRes> postLoginGoogle(@RequestHeader("X-ACCESS-TOKEN") String token){
+
+        try{
+            String socialId = googleService.userIdFromGoogle(token);
+
+            PostLoginRes returnRes = userService.createGoogleJwtToken(socialId);
+            return new BaseResponse<>(SUCCESS,returnRes);
+        }catch(BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
         }
     }
 

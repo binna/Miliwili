@@ -14,8 +14,24 @@ public enum BaseResponseStatus {
     EMPTY_JWT(false, 2000, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2001, "유효하지 않은 JWT입니다."),
 
+
+
+    //vivi: 2500~
+
+    INVALID_TOKEN(false, 2500, "유효하지 않은 토큰입니다."),
+
+
+
+
+
+
     // 3000 : Response 오류
     FAILED_TO_POST_SCHEDULE(false, 3000, "일정 등록에 실패하였습니다."),
+
+
+    //vivi: 3500 ~
+    FAILED_TO_GET_USER(false, 3500, "회원 정보 조회에 실패하였습니다."),
+
 
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");
