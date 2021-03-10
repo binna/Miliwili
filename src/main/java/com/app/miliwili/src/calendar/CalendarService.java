@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -15,6 +16,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Service
 public class CalendarService {
     private final ScheduleRepository scheduleRepository;
+    private final CalendarProvider calendarProvider;
 
     /**
      * 일정 생성
@@ -26,32 +28,19 @@ public class CalendarService {
     public PostScheduleRes createSchedule(PostScheduleReq parameters) throws BaseException {
         // TODO 회원 완성되면 토근 회원인지 검사
 
-        System.out.println(parameters.toString());
-
         Schedule newSchedule = Schedule.builder()
                 .color(parameters.getColor())
                 .distinction(parameters.getDistinction())
                 .title(parameters.getTitle())
                 .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
-                .repetition(null)
-                .push(null)
+                .repetition(parameters.getRepetition())
+                .push(parameters.getPush())
                 .build();
 
-//        if(parameters.getToDoList() != null) {
-//            List<ToDoList> toDoLists = null;
-//
-//            for(WorkReq toDoList : parameters.getToDoList()) {
-//                ToDoList newToDoList = ToDoList.builder()
-//                        .content(toDoList.getContent())
-//                        .build();
-//                toDoLists.add(newToDoList);
-//            }
-//
-//            newSchedule.setToDoLists(toDoLists);
-//        }
-
-        System.out.println(newSchedule.toString());
+        if(parameters.getToDoList() != null) {
+            newSchedule.setToDoLists(calendarProvider.retrieveToDoList(parameters.getToDoList()));
+        }
 
         try {
             newSchedule = scheduleRepository.save(newSchedule);
@@ -60,8 +49,6 @@ public class CalendarService {
             throw new BaseException(FAILED_TO_POST_SCHEDULE);
         }
 
-        System.out.println(newSchedule.toString());
-
         return PostScheduleRes.builder()
                 .scheduleId(newSchedule.getId())
                 .color(newSchedule.getColor())
@@ -69,8 +56,13 @@ public class CalendarService {
                 .title(newSchedule.getTitle())
                 .startDate(newSchedule.getStartDate().format(DateTimeFormatter.ISO_DATE))
                 .endDate(newSchedule.getEndDate().format(DateTimeFormatter.ISO_DATE))
-                .repetition(newSchedule.getPush())
+                .repetition(newSchedule.getRepetition())
                 .push(newSchedule.getPush())
+                .toDoList(calendarProvider.retrieveWorkRes(newSchedule.getToDoLists()))
                 .build();
     }
+
+
+
+
 }

@@ -2,12 +2,10 @@ package com.app.miliwili.src.user.models;
 
 import com.app.miliwili.config.BaseEntity;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Accessors(chain = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -47,4 +45,12 @@ public class User extends BaseEntity {
 
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
+
+    @OneToOne
+    @JoinColumn(name = "normalPromotionState_id")
+    private NormalPromotionState normalPromotionState;
+
+    @OneToOne
+    @JoinColumn(name="abnormalPromotionState_id")
+    private AbnormalPromotionState abnormalPromotionState;
 }

@@ -2,11 +2,9 @@ package com.app.miliwili.src.calendar.models;
 
 import com.app.miliwili.config.BaseEntity;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
-@Accessors(chain = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -23,8 +21,9 @@ public class PreparationMaterial extends BaseEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "readyState", nullable = false, length = 1, columnDefinition = "CHAR(1) default 'F'")
-    private String readyState;
+    @Column(name = "readyState", nullable = false, length = 1)
+    @Builder.Default
+    private String readyState = "F";
 
     @ManyToOne
     @JoinColumn(name = "dDay_id")

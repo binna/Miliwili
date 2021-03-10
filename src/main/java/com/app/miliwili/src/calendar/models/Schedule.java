@@ -2,8 +2,6 @@ package com.app.miliwili.src.calendar.models;
 
 import com.app.miliwili.config.BaseEntity;
 import lombok.*;
-import lombok.experimental.Accessors;
-import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -37,31 +35,17 @@ public class Schedule extends BaseEntity {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "repetition", columnDefinition = "varchar(1) default 'F'")
-    private String repetition;
+    @Column(name = "repetition", length = 1, nullable = false)
+    @Builder.Default
+    private String repetition = "F";
 
-    @Column(name = "push")
-    private String push = "N";
+    @Column(name = "push", length = 1, nullable = false)
+    @Builder.Default
+    private String push = "F";
 
-//    @Column(name = "push")
-//    @ColumnDefault("'F'")
-//    private String push;
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ToDoList> toDoLists;
 
-//    @PrePersist
-//    public void prePersist() {
-//        if (this.repetition == null) {
-//            this.repetition = "F";
-//        }
-//        if (this.push == null) {
-//            this.push = "F";
-//        }
-//    }
-
-//    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
-//    private List<ToDoList> toDoLists;
-//
-//    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
-//    private List<OrdinaryLeave> ordinaryLeaves;
-
-
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<OrdinaryLeave> ordinaryLeaves;
 }
