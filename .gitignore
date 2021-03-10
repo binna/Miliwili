@@ -66,5 +66,6 @@ out/
 */test/*
 
 ## 설정파일
+*application.yml
 *application-test.yml
 *application-release.yml
