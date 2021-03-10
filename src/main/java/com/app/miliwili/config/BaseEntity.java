@@ -13,14 +13,13 @@ import java.util.Date;
 @MappedSuperclass
 public abstract class BaseEntity {
     @CreationTimestamp
-    @Column(name = "createdAt", nullable = false, updatable = false)
-    private Date createdAt;
+    @Column(name = "dateCreated", nullable = false, updatable = false)
+    private Date dateCreated;
 
     @UpdateTimestamp
-    @Column(name = "updatedAt", nullable = false)
-    private Date updatedAt;
+    @Column(name = "dateUpdated", nullable = false)
+    private Date dateUpdated;
 
-    @Setter
-    @Column(name = "status", nullable = false, length = 1, columnDefinition = "CHAR(1) default 'Y'")
-    private String status;
+    @Column(name = "status", nullable = false, length = 1)
+    private String status = "Y";
 }
