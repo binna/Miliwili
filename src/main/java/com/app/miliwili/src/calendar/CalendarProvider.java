@@ -18,7 +18,7 @@ public class CalendarProvider {
 
     /**
      * List<ToDoList> -> List<WorkRes> 변경
-     * @Param List<WorkReq> parameters
+     * @param List<WorkReq> parameters
      * @return List<ToDoList>
      * @Auther shine
      */
@@ -36,7 +36,7 @@ public class CalendarProvider {
 
     /**
      * List<ToDoList> -> List<WorkRes> 변경
-     * @Param List<ToDoList> parameters
+     * @param List<ToDoList> parameters
      * @return List<WorkRes>
      * @Auther shine
      */
