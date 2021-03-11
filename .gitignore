@@ -69,3 +69,7 @@ out/
 *application.yml
 *application-test.yml
 *application-release.yml
+
+## 파이어베이스 보안키
+*resources/firebase/firebaseServiceKey.json
+*firebaseServiceKey.json
