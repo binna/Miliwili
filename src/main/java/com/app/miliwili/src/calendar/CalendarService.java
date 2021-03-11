@@ -1,6 +1,7 @@
 package com.app.miliwili.src.calendar;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.utils.FirebaseCloudMessage;
 import com.app.miliwili.src.calendar.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class CalendarService {
     private final ScheduleRepository scheduleRepository;
     private final CalendarProvider calendarProvider;
+    private final FirebaseCloudMessage firebaseCloudMessageService;
 
     /**
      * 일정 생성
@@ -33,6 +35,7 @@ public class CalendarService {
                 .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
                 .build();
+
         if(parameters.getRepetition() != null) {
             newSchedule.setRepetition(parameters.getRepetition());
         }
@@ -46,11 +49,18 @@ public class CalendarService {
         try {
             newSchedule = scheduleRepository.save(newSchedule);
         } catch (Exception exception) {
-            exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_SCHEDULE);
         }
 
         // TODO PUSH 알람
+        System.out.println("PUSH 알람");
+        try {
+            String token = firebaseCloudMessageService.getAccessToken();
+            firebaseCloudMessageService.sendMessageTo(token, "test", "test");
+        } catch (Exception exception) {}
+
+
+
 
         return PostScheduleRes.builder()
                 .scheduleId(newSchedule.getId())
