@@ -2,11 +2,9 @@ package com.app.miliwili.src.calendar.models;
 
 import com.app.miliwili.config.BaseEntity;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
-@Accessors(chain = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -23,8 +21,9 @@ public class ToDoList extends BaseEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "processingStatus", nullable = false, length = 1, columnDefinition = "CHAR(1) default 'F'")
-    private String processingStatus;
+    @Builder.Default
+    @Column(name = "processingStatus", nullable = false, columnDefinition = "varchar(1) default 'F'")
+    private String processingStatus = "F";
 
     @ManyToOne
     @JoinColumn(name = "schedule_id")

@@ -1,11 +1,9 @@
 package com.app.miliwili.src.calendar.models;
 
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
-@Accessors(chain = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)

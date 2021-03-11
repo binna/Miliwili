@@ -45,6 +45,7 @@ public enum BaseResponseStatus {
 
 
     // 3000 : Response 오류
+    FAILED_TO_POST_SCHEDULE(false, 3000, "일정 등록에 실패하였습니다."),
 
 
     //vivi: 3500 ~
