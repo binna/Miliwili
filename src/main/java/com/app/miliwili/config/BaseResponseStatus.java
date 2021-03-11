@@ -54,6 +54,8 @@ public enum BaseResponseStatus {
     FAILED_TO_SIGNUP_USER_NORMAL_STATE(false, 3502, "회원 가입(일반병사 table)에 실패하였습니다."),
     FAILED_TO_SIGNUP_USER_ABNORMAL_STATE(false, 3503, "회원 가입(일반병사 외 table)에 실패하였습니다."),
 
+    FAILED_TO_GET_USER_STATE_IDX(false, 3510, "회원 복무 형태 조회에 실패하였습니다."),
+    FAILED_TO_GET_ABNORMAL_END(false, 3511, "부사관, 준사관, 장교 전역일 조회에 실패하였습니다."),
 
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");
