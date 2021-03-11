@@ -68,6 +68,7 @@ public class MainProvider {
 
     /**
      * GetAbnormalUserEndDate --> GetEndDayRes
+     * D-day 계산 로직 포함
      */
     public GetEndDayRes changeAbnormalToRes(GetAbnormalUserEndDate abnormal){
         //현재 날짜
