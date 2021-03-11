@@ -55,11 +55,9 @@ public class FirebaseCloudMessage {
         FcmMessageReq fcmMessage = FcmMessageReq.builder()
                 .validate_only(false)
                 .message(FcmMessageReq.Message.builder()
-                        .notification(FcmMessageReq.Notification.builder()
-                                .title(title)
-                                .body(body)
-                                .build()
-                        ).token(targetToken)
+                        .title(title)
+                        .body(body)
+                        .token(targetToken)
                         .build()
                 ).build();
 
