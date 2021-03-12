@@ -13,6 +13,10 @@ public enum BaseResponseStatus {
     // 2000 : Request 오류
     EMPTY_JWT(false, 2000, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2001, "유효하지 않은 JWT입니다."),
+    CHOOSE_BETWEEN_ABNORMAL_OR_NORMAL(false, 2002, "진급일이나 일병과 상병과 병장진급일 중 하나는 꼭 입력해주셔야 합니다."),
+
+
+
 
 
 
