@@ -3,13 +3,11 @@ package com.app.miliwili.src.user;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.src.user.models.*;
-import com.app.miliwili.utils.GoogleService;
+import com.app.miliwili.utils.SNSLogin;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.ValidationLength;
 import com.app.miliwili.utils.ValidationRegex;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -19,20 +17,20 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @RequestMapping("/app")
 public class UserController {
     private final JwtService jwtService;
-    private final GoogleService googleService;
+    private final SNSLogin SNSLogin;
     private final UserService userService;
     private final UserProvider userProvider;
 
 
     /**
      * JWT 검증 API
-     * [GET]
-     * @RequestHeader jwt
+     * [GET] /app/users/jwt
+     * @RequestHeader X-ACCESS-TOKEN
      * @return BaseResponse<Void>
      * @Auther shine
      */
     @GetMapping("/users/jwt")
-    public BaseResponse<Void> jwt(@RequestHeader(value = "jwt") String jwt) {
+    public BaseResponse<Void> jwt(@RequestHeader("X-ACCESS-TOKEN") String jwt) {
         try {
             Long userId = jwtService.getUserId();
             // TODO 중복된 회원조회 필요 -> 회원가입 API 만든 후 만들 예정
@@ -55,7 +53,7 @@ public class UserController {
 
         String socialId="";
         try {
-             socialId = googleService.userIdFromGoogle(token);
+             socialId = SNSLogin.userIdFromGoogle(token);
         }catch (BaseException e){
             e.printStackTrace();
             return new BaseResponse<>(e.getStatus());
@@ -148,7 +146,7 @@ public class UserController {
         }
         String socialId="";
         try {
-            socialId = googleService.userIdFromGoogle(token);
+            socialId = SNSLogin.userIdFromGoogle(token);
         }catch (BaseException e){
             e.printStackTrace();
             return new BaseResponse<>(e.getStatus());
@@ -162,5 +160,37 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
 
+    }
+
+    /**
+     * 카카오 로그인
+     * [POST] /app/users/login-kakao
+     * @RequestHeader X-ACCESS-TOKEN
+     * @return BaseResponse<Void>
+     * @Auther shine
+     */
+    @ResponseBody
+    @PostMapping("/users/login-kakao")
+    public BaseResponse<PostLoginRes> postLoginKakao(@RequestHeader("X-ACCESS-TOKEN") String token) {
+        // TODO 유효성 검사
+        try {
+            PostLoginRes postLoginRes = userService.login(SNSLogin.profileImgFromKakao(token));
+            return new BaseResponse<>(SUCCESS, postLoginRes);
+        } catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 카카오 회원가입
+     * [POST] /app/users/kakao
+     * @RequestHeader X-ACCESS-TOKEN
+     * @return BaseResponse<Void>
+     * @Auther shine
+     */
+    @ResponseBody
+    @PostMapping("/users/kakao")
+    public void postSignUpKakao(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody(required = false) PostSignUpReq parameters) {
+        // TODO 유효성 검사
     }
 }

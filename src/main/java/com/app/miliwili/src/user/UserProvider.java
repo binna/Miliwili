@@ -2,8 +2,10 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.user.models.GetAbnormalUserEndDate;
+import com.app.miliwili.src.user.models.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,6 +15,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Service
 public class UserProvider {
     private final UserSelectRepository userSelectRepository;
+    private final UserRepository userRepository;
 
 
 
@@ -83,4 +86,28 @@ public class UserProvider {
 
         return abnormalUserEndDate;
     }
+
+
+    /**
+     * socialId로 회원 조회
+     * @param String socialId
+     * @return List<User>
+     * @throws BaseException
+     * @Auther shine
+     */
+    @Transactional
+    public List<User> retrieveUser(String socialId) throws BaseException {
+        List<User> user = null;
+
+        try {
+            user = userRepository.findBySocialId(socialId);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_USER);
+        }
+
+        return user;
+    }
+
+
+
 }

@@ -1,7 +1,6 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.user.models.*;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.ValidationLength;
@@ -166,4 +165,26 @@ public class UserService {
 
 
     }
+
+
+
+    /**
+     * 로그인
+     * @param String socialId
+     * @return PostLoginRes
+     * @throws BaseException
+     * @Auther shine
+     */
+    public PostLoginRes login(String socialId) throws BaseException {
+        List<User> user = userProvider.retrieveUser(socialId);
+
+        if (user == null) {
+            return new PostLoginRes(false, null);
+        }
+
+        return new PostLoginRes(true, jwtService.createJwt(user.get(0).getId()));
+    }
+
+
+
 }

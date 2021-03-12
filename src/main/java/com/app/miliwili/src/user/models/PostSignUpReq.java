@@ -6,14 +6,14 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class PostSignUpReq {
-    private String name;
-    private int stateIdx;
-    private String serveType;
-    private String startDate;
-    private String endDate;
-    private String strPrivate;
-    private String strCorporal;
-    private String strSergeant;
-    private String proDate;
-    private String goal;
+    private final String name;
+    private final Integer stateIdx;
+    private final String serveType;
+    private final String startDate;
+    private final String endDate;
+    private final String strPrivate;
+    private final String strCorporal;
+    private final String strSergeant;
+    private final String proDate;
+    private final String goal;
 }
