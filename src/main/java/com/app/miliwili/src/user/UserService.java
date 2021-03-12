@@ -178,7 +178,7 @@ public class UserService {
     public PostLoginRes login(String socialId) throws BaseException {
         List<User> user = userProvider.retrieveUser(socialId);
 
-        if (user == null) {
+        if (user == null || user.isEmpty()) {
             return new PostLoginRes(false, null);
         }
 

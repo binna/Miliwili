@@ -97,11 +97,13 @@ public class UserProvider {
      */
     @Transactional
     public List<User> retrieveUser(String socialId) throws BaseException {
-        List<User> user = null;
+        List<User> user;
 
         try {
             user = userRepository.findBySocialId(socialId);
         } catch (Exception exception) {
+            System.out.println("qqqq");
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_GET_USER);
         }
 

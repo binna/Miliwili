@@ -174,7 +174,7 @@ public class UserController {
     public BaseResponse<PostLoginRes> postLoginKakao(@RequestHeader("X-ACCESS-TOKEN") String token) {
         // TODO 유효성 검사
         try {
-            PostLoginRes postLoginRes = userService.login(SNSLogin.profileImgFromKakao(token));
+            PostLoginRes postLoginRes = userService.login(SNSLogin.userIdFromKakao(token));
             return new BaseResponse<>(SUCCESS, postLoginRes);
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
