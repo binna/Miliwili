@@ -50,9 +50,11 @@ public enum BaseResponseStatus {
     KAKAO_CONNECTION_2(false, 3002, "카카오 Response 에러 : 액세스 토큰 정보가 올바른 형식으로 요청했는지 확인해주세요."),
     KAKAO_CONNECTION_401(false, 3003, "카카오 Response 에러 : 유효하지 않은 앱키나 액세스 토큰으로 요청하였습니다."),
     KAKAO_CONNECTION_ETC(false, 3004, "카카오 Response 에러가 발생하였습니다."),
+    NOT_FOUND_USER(false, 3005, "존재하지 않는 회원입니다."),
+    FAILED_TO_POST_SCHEDULE(false, 3006, "일정 등록에 실패하였습니다."),
+    SYSTEM_FAILED_TO_GET_USER(false, 3007, "시스템상 회원 정보 조회에 에러가 발생하였습니다."),
 
 
-    FAILED_TO_POST_SCHEDULE(false, 3000, "일정 등록에 실패하였습니다."),
 
 
 

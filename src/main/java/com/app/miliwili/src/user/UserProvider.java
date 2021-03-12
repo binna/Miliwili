@@ -87,28 +87,46 @@ public class UserProvider {
         return abnormalUserEndDate;
     }
 
+    /**
+     * userId로 유효한 회원만 조회
+     * @param Long userId
+     * @return List<User>
+     * @throws BaseException
+     * @Auther shine
+     */
+    @Transactional
+    public List<User> retrieveUserByIdAndStatusY(Long userId) throws BaseException {
+        List<User> user;
+
+        try {
+            user = userRepository.findByIdAndStatus(userId, "Y");
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_USER);
+        }
+
+        return user;
+    }
 
     /**
-     * socialId로 회원 조회
+     * socialId로 유효한 회원만 조회
      * @param String socialId
      * @return List<User>
      * @throws BaseException
      * @Auther shine
      */
     @Transactional
-    public List<User> retrieveUser(String socialId) throws BaseException {
+    public List<User> retrieveUserBySocialIdAndStatusY(String socialId) throws BaseException {
         List<User> user;
 
         try {
-            user = userRepository.findBySocialId(socialId);
+            user = userRepository.findBySocialIdAndStatus(socialId, "Y");
         } catch (Exception exception) {
-            System.out.println("qqqq");
-            exception.printStackTrace();
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
         return user;
     }
+
 
 
 

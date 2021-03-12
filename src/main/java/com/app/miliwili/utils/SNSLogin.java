@@ -115,7 +115,6 @@ public class SNSLogin {
                     .build();
             Response response = client.newCall(request).execute();
             jsonObj = (JsonObject)jsonParser.parse(response.body().string());
-            System.out.println(jsonObj.toString());
         } catch (Exception exception) {
             throw new BaseException(KAKAO_CONNECTION);
         }
