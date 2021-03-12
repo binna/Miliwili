@@ -16,6 +16,13 @@ public class FcmMessageReq {
     @Getter
     public static class Message {
         private String token;
+        private Data data;
+    }
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    public static class Data {
         private String title;
         private String body;
     }

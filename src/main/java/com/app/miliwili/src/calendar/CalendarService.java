@@ -40,7 +40,7 @@ public class CalendarService {
             newSchedule.setRepetition(parameters.getRepetition());
         }
         if(parameters.getPush() != null) {
-            newSchedule.setRepetition(parameters.getPush());
+            newSchedule.setPush(parameters.getPush());
         }
         if(parameters.getToDoList() != null) {
             newSchedule.setToDoLists(calendarProvider.retrieveToDoList(parameters.getToDoList()));
@@ -52,15 +52,19 @@ public class CalendarService {
             throw new BaseException(FAILED_TO_POST_SCHEDULE);
         }
 
-        // TODO PUSH 알람
-        System.out.println("PUSH 알람");
-        try {
-            String token = firebaseCloudMessageService.getAccessToken();
-            firebaseCloudMessageService.sendMessageTo(token, "test", "test");
-        } catch (Exception exception) {}
-
-
-
+        // TODO PUSH 알람, 쓰레드로 관리할지 좀 더 고민해보자
+        if(newSchedule.getPush().equals("Y")) {
+            System.out.println("PUSH 알람");
+            try {
+                String token = firebaseCloudMessageService.getAccessToken();
+                firebaseCloudMessageService.sendMessageTo(
+                        token,
+                        "test " + newSchedule.getTitle(),
+                        "test " + newSchedule.getTitle() + " 일정 하루 전날입니다.\n준비해주세요!");
+            } catch (Exception exception) {
+                // TODO 에러 처리
+            }
+        }
 
         return PostScheduleRes.builder()
                 .scheduleId(newSchedule.getId())

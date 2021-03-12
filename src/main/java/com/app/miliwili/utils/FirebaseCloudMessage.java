@@ -55,10 +55,12 @@ public class FirebaseCloudMessage {
         FcmMessageReq fcmMessage = FcmMessageReq.builder()
                 .validate_only(false)
                 .message(FcmMessageReq.Message.builder()
-                        .title(title)
-                        .body(body)
                         .token(targetToken)
-                        .build()
+                        .data(FcmMessageReq.Data.builder()
+                                .title(title)
+                                .body(body)
+                                .build()
+                        ).build()
                 ).build();
 
         return objectMapper.writeValueAsString(fcmMessage);
