@@ -195,7 +195,59 @@ public class UserController {
     @PostMapping("/users/kakao")
     public BaseResponse<PostSignUpRes> postSignUpKakao(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                        @RequestBody(required = false) PostSignUpReq parameters) {
-        // TODO 유효성 검사
+        if(parameters.getName() == null || parameters.getName().length() == 0) {
+            return new BaseResponse<>(EMPTY_NAME);
+        }
+        if(parameters.getStateIdx() == null) {
+            return new BaseResponse<>(EMPTY_STATEIDX);
+        }
+        if(1 <= parameters.getStateIdx() || parameters.getStateIdx() <= 4) {
+            return new BaseResponse<>(INVALID_STATEIDX);
+        }
+        if(parameters.getStartDate() == null || parameters.getStartDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_START_DATE);
+        }
+        if(!ValidationRegex.isRegexDate((parameters.getStartDate()))) {
+            return new BaseResponse<>(INVALID_START_DATE);
+        }
+        if(parameters.getEndDate() == null || parameters.getEndDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_END_DATE);
+        }
+        if(!ValidationRegex.isRegexDate((parameters.getEndDate()))) {
+            return new BaseResponse<>(INVALID_END_DATE);
+        }
+        if(parameters.getProDate() == null || parameters.getStrPrivate() == null || parameters.getStrCorporal() == null || parameters.getStrSergeant() == null) {
+            return new BaseResponse<>(CHOOSE_BETWEEN_ABNORMAL_OR_NORMAL);
+        }
+        if(parameters.getProDate() == null) {
+            if (parameters.getStrPrivate() == null || parameters.getStrPrivate().length() == 0) {
+                return new BaseResponse<>(EMPTY_FIRST_DATE);
+            }
+            if(!ValidationRegex.isRegexDate((parameters.getStrPrivate()))) {
+                return new BaseResponse<>(INVALID_FIRST_DATE);
+            }
+            if (parameters.getStrCorporal() == null || parameters.getStrCorporal().length() == 0) {
+                return new BaseResponse<>(EMPTY_SECOND_DATE);
+            }
+            if(!ValidationRegex.isRegexDate((parameters.getStrCorporal()))) {
+                return new BaseResponse<>(INVALID_SECOND_DATE);
+            }
+            if (parameters.getStrSergeant() == null || parameters.getStrSergeant().length() == 0) {
+                return new BaseResponse<>(EMPTY_THIRD_DATE);
+            }
+            if(!ValidationRegex.isRegexDate((parameters.getStrSergeant()))) {
+                return new BaseResponse<>(INVALID_THIRD_DATE);
+            }
+        }
+        if(parameters.getStrPrivate() == null || parameters.getStrCorporal() == null || parameters.getStrSergeant() == null) {
+            if (parameters.getProDate() == null || parameters.getProDate().length() == 0) {
+                return new BaseResponse<>(EMPTY_PRO_DATE);
+            }
+            if(!ValidationRegex.isRegexDate((parameters.getProDate()))) {
+                return new BaseResponse<>(INVALID_PRO_DATE);
+            }
+        }
+        
         try {
             PostSignUpRes postSignUpRes = userService.createUser(parameters, SNSLogin.userIdFromKakao(token), "K", token);
             return new BaseResponse<>(SUCCESS, postSignUpRes);

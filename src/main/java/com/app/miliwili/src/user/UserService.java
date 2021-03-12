@@ -192,7 +192,7 @@ public class UserService {
 
     /**
      * 회원가입
-     * @param
+     * @param PostSignUpReq parameters, String socialId, String socialType, String token
      * @return PostSignUpRes
      * @throws BaseException
      * @Auther shine
@@ -249,7 +249,7 @@ public class UserService {
         try {
             newUser = userRepository.save(newUser);
         } catch (Exception exception) {
-            // TODO
+            throw new BaseException(FAILED_TO_SIGNUP_USER);
         }
 
         return new PostSignUpRes(newUser.getId(), jwtService.createJwt(newUser.getId()));
