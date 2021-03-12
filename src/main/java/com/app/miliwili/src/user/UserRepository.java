@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
-    List<User> findBySocialId(String socialId);
+    List<User> findBySocialIdAndStatus(String socialId, String status);
+    List<User> findByIdAndStatus(Long id, String status);
 }

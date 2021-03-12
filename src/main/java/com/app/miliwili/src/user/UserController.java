@@ -10,6 +10,8 @@ import com.app.miliwili.utils.ValidationRegex;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
@@ -20,7 +22,6 @@ public class UserController {
     private final SNSLogin SNSLogin;
     private final UserService userService;
     private final UserProvider userProvider;
-
 
     /**
      * JWT 검증 API
@@ -33,7 +34,10 @@ public class UserController {
     public BaseResponse<Void> jwt(@RequestHeader("X-ACCESS-TOKEN") String jwt) {
         try {
             Long userId = jwtService.getUserId();
-            // TODO 중복된 회원조회 필요 -> 회원가입 API 만든 후 만들 예정
+            List<User> user = userProvider.retrieveUserByIdAndStatusY(userId);
+            if (user == null || user.isEmpty()) {
+                return new BaseResponse<>(NOT_FOUND_USER);
+            }
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -166,13 +170,12 @@ public class UserController {
      * 카카오 로그인
      * [POST] /app/users/login-kakao
      * @RequestHeader X-ACCESS-TOKEN
-     * @return BaseResponse<Void>
+     * @return BaseResponse<PostLoginRes>
      * @Auther shine
      */
     @ResponseBody
     @PostMapping("/users/login-kakao")
     public BaseResponse<PostLoginRes> postLoginKakao(@RequestHeader("X-ACCESS-TOKEN") String token) {
-        // TODO 유효성 검사
         try {
             PostLoginRes postLoginRes = userService.login(SNSLogin.userIdFromKakao(token));
             return new BaseResponse<>(SUCCESS, postLoginRes);
@@ -190,7 +193,23 @@ public class UserController {
      */
     @ResponseBody
     @PostMapping("/users/kakao")
-    public void postSignUpKakao(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody(required = false) PostSignUpReq parameters) {
+    public BaseResponse<PostSignUpRes> postSignUpKakao(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                       @RequestBody(required = false) PostSignUpReq parameters) {
         // TODO 유효성 검사
+        try {
+            PostSignUpRes postSignUpRes = userService.createUser(parameters, SNSLogin.userIdFromKakao(token), "K", token);
+            return new BaseResponse<>(SUCCESS, postSignUpRes);
+        } catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 테스트용 jwt 생성, 나중에 삭제할거
+     * [post] /api/jwt
+     */
+    @PostMapping("/jwt/{id}")
+    public String postJWT(@PathVariable Long id) {
+        return jwtService.createJwt(id);
     }
 }

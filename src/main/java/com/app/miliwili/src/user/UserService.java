@@ -3,6 +3,7 @@ package com.app.miliwili.src.user;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.user.models.*;
 import com.app.miliwili.utils.JwtService;
+import com.app.miliwili.utils.SNSLogin;
 import com.app.miliwili.utils.ValidationLength;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Service
 public class UserService {
     private final UserProvider userProvider;
+    private final SNSLogin snsLogin;
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final AbnormalPromotionStateRepository abnormalPromotionStateRepository;
@@ -176,13 +178,81 @@ public class UserService {
      * @Auther shine
      */
     public PostLoginRes login(String socialId) throws BaseException {
-        List<User> user = userProvider.retrieveUser(socialId);
+        List<User> user = userProvider.retrieveUserBySocialIdAndStatusY(socialId);
 
-        if (user == null || user.isEmpty()) {
+        if (user == null || user.isEmpty() || user.size() <= 0) {
             return new PostLoginRes(false, null);
+        }
+        if(user.size() > 1) {
+            throw new BaseException(SYSTEM_FAILED_TO_GET_USER);
         }
 
         return new PostLoginRes(true, jwtService.createJwt(user.get(0).getId()));
+    }
+
+    /**
+     * 회원가입
+     * @param
+     * @return PostSignUpRes
+     * @throws BaseException
+     * @Auther shine
+     */
+    public PostSignUpRes createUser(PostSignUpReq parameters,
+                                    String socialId, String socialType, String token) throws BaseException {
+        AbnormalPromotionState abnormalPromotionState;
+        NormalPromotionState normalPromotionState;
+        
+        // TODO 회원 중복 검사
+
+        User newUser = User.builder()
+                .name(parameters.getName())
+                .serveType(parameters.getServeType())
+                .stateIdx(parameters.getStateIdx())
+                .socialType(socialType)
+                .socialId(socialId)
+                .goal(parameters.getGoal())
+                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
+                .build();
+
+        if(newUser.getStateIdx() == 1) {
+            normalPromotionState = NormalPromotionState.builder()
+                    .firstDate(LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE))
+                    .secondDate(LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE))
+                    .thirdDate(LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE))
+                    .user(newUser)
+                    .build();
+
+            // TODO 호봉 계산과 계급 계산 메서드 만들고 여기에 추가해줄 예정
+
+            newUser.setNormalPromotionState(normalPromotionState);
+        } else {
+            abnormalPromotionState = AbnormalPromotionState.builder()
+                    .proDate(LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE))
+                    .user(newUser)
+                    .build();
+            newUser.setAbnormalPromotionState(abnormalPromotionState);
+        }
+
+        if(socialType.equals("K")) {
+            String img = snsLogin.profileImgFromKakao(token);
+
+            if(img.isEmpty() || img.length() <= 0) {
+                newUser.setProfileImg("https://miliwili-storage.s3.ap-northeast-2.amazonaws.com/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2021-03-10+%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE+7.21.24.png");
+            } else {
+                newUser.setProfileImg(img);
+            }
+        } else {
+            newUser.setProfileImg("https://miliwili-storage.s3.ap-northeast-2.amazonaws.com/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2021-03-10+%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE+7.21.24.png");
+        }
+
+        try {
+            newUser = userRepository.save(newUser);
+        } catch (Exception exception) {
+            // TODO
+        }
+
+        return new PostSignUpRes(newUser.getId(), jwtService.createJwt(newUser.getId()));
     }
 
 

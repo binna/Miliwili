@@ -46,11 +46,9 @@ public class User extends BaseEntity {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
-    @OneToOne
-    @JoinColumn(name = "normalPromotionState_id")
+    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private NormalPromotionState normalPromotionState;
 
-    @OneToOne
-    @JoinColumn(name="abnormalPromotionState_id")
+    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private AbnormalPromotionState abnormalPromotionState;
 }
