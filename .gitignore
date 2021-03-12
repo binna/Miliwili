@@ -73,3 +73,6 @@ out/
 ## 파이어베이스 보안키
 *resources/firebase/firebaseServiceKey.json
 *firebaseServiceKey.json
+
+## 기타 보안키 모음
+*Secret.java
