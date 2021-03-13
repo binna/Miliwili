@@ -44,13 +44,6 @@ public class FirebaseCloudMessage {
         System.out.println(message);
     }
 
-    /**
-     * 파이어베이스 FCM 메시지 생성
-     * @param String targetToken, String title, String body
-     * @return String
-     * @throws JsonProcessingException
-     * @Auther shine
-     */
     private String makeMessage(String targetToken, String title, String body) throws JsonProcessingException {
         FcmMessageReq fcmMessage = FcmMessageReq.builder()
                 .validate_only(false)

@@ -14,7 +14,12 @@ public enum BaseResponseStatus {
     EMPTY_JWT(false, 2000, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2001, "유효하지 않은 JWT입니다."),
     CHOOSE_BETWEEN_ABNORMAL_OR_NORMAL(false, 2002, "진급일이나 일병과 상병과 병장진급일 중 하나는 꼭 입력해주셔야 합니다."),
-
+    FASTER_THAN_START_DATE(false, 2003, "전역일은 입대일보다 빠를 수 없습니다."),
+    FASTER_THAN_FIRST_DATE(false, 2003, "입대일은 상병진급일보다 빠를 수 없습니다."),
+    FASTER_THAN_SECOND_DATE(false, 2003, "상병진급일은 병장진급일보다  빠를 수 없습니다."),
+    FASTER_THAN_THIRD_DATE(false, 2003, "병장진급일은 상병진급일보다 빠를 수 없습니다."),
+    FASTER_THAN_END_DATE(false, 2003, "상병진급일은 전역일보다 빠를 수 없습니다."),
+    FASTER_THAN_PRO_DATE(false, 2003, "진급심사일은 입대일보다 빠를 수 없습니다."),
 
 
 
@@ -55,8 +60,8 @@ public enum BaseResponseStatus {
     KAKAO_CONNECTION_401(false, 3003, "카카오 Response 에러 : 유효하지 않은 앱키나 액세스 토큰으로 요청하였습니다."),
     KAKAO_CONNECTION_ETC(false, 3004, "카카오 Response 에러가 발생하였습니다."),
     NOT_FOUND_USER(false, 3005, "존재하지 않는 회원입니다."),
-    FAILED_TO_POST_SCHEDULE(false, 3006, "일정 등록에 실패하였습니다."),
-    SYSTEM_FAILED_TO_GET_USER(false, 3007, "시스템상 회원 정보 조회에 에러가 발생하였습니다."),
+    DUPLICATED_USER(false, 3006, "이미 존재하는 회원입니다."),
+    FAILED_TO_POST_SCHEDULE(false, 3007, "일정 등록에 실패하였습니다."),
 
 
 

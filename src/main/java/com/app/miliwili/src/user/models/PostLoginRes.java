@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@Getter
 @AllArgsConstructor
 @Builder
+@Getter
 public class PostLoginRes {
-    private Boolean isMember;
-    private String jwt;
+    private final Boolean isMember;
+    private final String jwt;
 }

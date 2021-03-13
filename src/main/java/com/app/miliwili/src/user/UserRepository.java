@@ -5,9 +5,11 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
-    List<User> findBySocialIdAndStatus(String socialId, String status);
-    List<User> findByIdAndStatus(Long id, String status);
+    Optional<User> findByIdAndStatus(Long id, String status);
+    Optional<User> findBySocialIdAndStatus(String socialId, String status);
+    boolean existsBySocialIdAndStatus(String socialId, String status);
 }
