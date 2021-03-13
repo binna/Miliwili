@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@Getter
 @AllArgsConstructor
 @Builder
+@Getter
 public class PostSignUpRes {
-    private Long userId;
-    private String jwt;
+    private final Long userId;
+    private final String jwt;
 }
