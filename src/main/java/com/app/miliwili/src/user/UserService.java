@@ -31,7 +31,7 @@ public class UserService {
      */
     public PostLoginRes createGoogleJwtToken(String googleSocialId) throws BaseException {
 
-        String socialId = googleSocialId.substring(1, googleSocialId.length() - 1);
+        String socialId = googleSocialId;
 
         PostLoginRes postLoginRes;
         String jwtToken = "";
@@ -52,6 +52,7 @@ public class UserService {
         } else {
             id = userIdList.get(0);
         }
+
 
 
         if (isMemeber == true) { //회원일 떄
@@ -197,25 +198,24 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
-    public PostSignUpRes createUser(PostSignUpReq parameters,
-                                    String socialId, String socialType, String token) throws BaseException {
-        if(userProvider.isUserBySocialId(socialId)) {
-            throw new BaseException(DUPLICATED_USER);
-        }
-
+    public PostSignUpRes createUser(PostSignUpReq parameters, String token) throws BaseException {
         User newUser = User.builder()
                 .name(parameters.getName())
                 .serveType(parameters.getServeType())
                 .stateIdx(parameters.getStateIdx())
-                .socialType(socialType)
-                .socialId(socialId)
                 .goal(parameters.getGoal())
                 .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
                 .build();
+        System.out.println(parameters.getSocialType()+"2");
+        setSocial(parameters.getSocialType(), token,  newUser);
         setUserPromotionState(parameters, newUser);
-        setProfileImg(socialType, token, newUser);
+        System.out.println(newUser.getSocialType() +"3");
+        setProfileImg(newUser.getSocialType(), token, newUser);
 
+        if(userProvider.isUserBySocialId(newUser.getSocialId())) {
+            throw new BaseException(DUPLICATED_USER);
+        }
         try {
             User savedUser = userRepository.save(newUser);
             return new PostSignUpRes(savedUser.getId(), jwtService.createJwt(savedUser.getId()));
@@ -224,7 +224,18 @@ public class UserService {
         }
     }
 
+    private void setSocial(String socialType, String token, User newUser) throws BaseException {
+        if(socialType.equals("K")) {
+             newUser.setSocialType(socialType);
+             newUser.setSocialId(snsLogin.userIdFromKakao(token));
+             return;
+        }
+        newUser.setSocialType(socialType);
+        newUser.setSocialId(snsLogin.userIdFromGoogle(token.replaceAll("\"", "")));
+    }
+
     private void setProfileImg(String socialType, String token, User newUser) throws BaseException {
+        System.out.println(socialType+"1");
         if (socialType.equals("K")) {
             String img = snsLogin.getProfileImgFromKakao(token);
             if (!img.isEmpty()) {

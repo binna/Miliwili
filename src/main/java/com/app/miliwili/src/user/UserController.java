@@ -75,98 +75,6 @@ public class UserController {
     }
 
 
-    /**
-     * 회원가입 --> 구글
-     *
-     * @return BaseResponse<PostLoginRes>
-     * @RequestHeader token(google accessToken)
-     * @Auther vivi
-     */
-    @ResponseBody
-    @PostMapping("/users/google")
-    public BaseResponse<PostSignUpRes> postSignUpGoogle(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                        @RequestBody PostSignUpReq param) {
-        //이름 check
-        if (!Validation.isFullString(param.getName())) {
-            return new BaseResponse<>(EMPTY_NAME);
-
-        }
-
-        //복무형태 check  (일반병사, 부사관, 준사관, 장교)
-        if (param.getStateIdx() > 5 || param.getStateIdx() < 1) {
-            return new BaseResponse<>(INVALID_STATEIDX);
-        }
-
-        //하위 복무형태 check(육군, 해군)
-        if (!Validation.isFullString(param.getServeType())) {
-            return new BaseResponse<>(EMPTY_SERVE_TYPE);
-        }
-
-
-        //입대일 check
-        if (!Validation.isFullString(param.getStartDate())) {
-            return new BaseResponse<>(EMPTY_START_DATE);
-        }
-        if (!Validation.isRegexDate(param.getStartDate())) {
-            return new BaseResponse<>(INVALID_START_DATE);
-        }
-
-
-        //전역일 check
-        if (!Validation.isFullString(param.getEndDate())) {
-            return new BaseResponse<>(EMPTY_END_DATE);
-        }
-        if (!Validation.isRegexDate(param.getEndDate())) {
-            return new BaseResponse<>(INVALID_END_DATE);
-        }
-
-
-        if (param.getStateIdx() == 1) {   //일반병사일 떄
-            if (!Validation.isFullString(param.getStrPrivate())) {
-                return new BaseResponse<>(EMPTY_FIRST_DATE);
-            }
-            if (!Validation.isRegexDate(param.getStrPrivate())) {
-                return new BaseResponse<>(INVALID_END_DATE);
-            }
-
-            if (!Validation.isFullString(param.getStrCorporal())) {
-                return new BaseResponse<>(EMPTY_SECOND_DATE);
-            }
-            if (!Validation.isRegexDate(param.getStrCorporal())) {
-                return new BaseResponse<>(INVALID_SECOND_DATE);
-            }
-
-            if (!Validation.isFullString(param.getStrSergeant())) {
-                return new BaseResponse<>(EMPTY_THIRD_DATE);
-            }
-            if (!Validation.isRegexDate(param.getStrSergeant())) {
-                return new BaseResponse<>(INVALID_THIRD_DATE);
-            }
-
-        } else {      //일반병사 아닐 때
-            if (Validation.isFullString(param.getProDate())) {
-                if (!Validation.isRegexDate(param.getProDate())) {
-                    return new BaseResponse<>(INVALID_PRO_DATE);
-                }
-            }
-        }
-        String socialId = "";
-        try {
-            socialId = SNSLogin.userIdFromGoogle(token);
-        } catch (BaseException e) {
-            e.printStackTrace();
-            return new BaseResponse<>(e.getStatus());
-        }
-
-        try {
-            PostSignUpRes postSignUpRes = userService.createGoogleUser(param, socialId);
-            return new BaseResponse<>(SUCCESS, postSignUpRes);
-        } catch (BaseException e) {
-            e.printStackTrace();
-            return new BaseResponse<>(e.getStatus());
-        }
-
-    }
 
     /**
      * 카카오 로그인
@@ -188,15 +96,15 @@ public class UserController {
     }
 
     /**
-     * 카카오 회원가입
-     * [POST] /app/users/kakao
+     * 회원가입
+     * [POST] /app/users
      *
      * @return BaseResponse<Void>
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
      */
     @ResponseBody
-    @PostMapping("/users/kakao")
+    @PostMapping("/users")
     public BaseResponse<PostSignUpRes> postSignUpKakao(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                        @RequestBody(required = false) PostSignUpReq parameters) {
         if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
@@ -268,7 +176,7 @@ public class UserController {
             }
         } else {
             if (Objects.isNull(parameters.getStrPrivate()) || Objects.isNull(parameters.getStrCorporal()) || Objects.isNull(parameters.getStrSergeant())) {
-                if (parameters.getProDate() == null || parameters.getProDate().length() == 0) {
+                if (Objects.isNull(parameters.getProDate()) || parameters.getProDate().length() == 0) {
                     return new BaseResponse<>(EMPTY_PRO_DATE);
                 }
                 if (!Validation.isRegexDate((parameters.getProDate()))) {
@@ -282,7 +190,7 @@ public class UserController {
         }
 
         try {
-            PostSignUpRes postSignUpRes = userService.createUser(parameters, SNSLogin.userIdFromKakao(token), "K", token);
+            PostSignUpRes postSignUpRes = userService.createUser(parameters, token);
             return new BaseResponse<>(SUCCESS, postSignUpRes);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());

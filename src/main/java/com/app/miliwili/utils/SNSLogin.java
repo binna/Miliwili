@@ -30,11 +30,14 @@ public class SNSLogin {
         InputStreamReader isr = null;
         JsonParser jsonParser = new JsonParser();
         JsonParser parser = new JsonParser();
+        String socialId = token.replaceAll("\"", "");
 
         try {
-            String reqURL = "https://oauth2.googleapis.com/tokeninfo?id_token=" + token;
+            String reqURL = "https://oauth2.googleapis.com/tokeninfo?id_token=" + socialId;
             URL url = new URL(reqURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            System.out.println("?");
 
             try {
                 is = conn.getInputStream();
@@ -43,6 +46,7 @@ public class SNSLogin {
             } catch (Exception e) {
                 throw new BaseException(INVALID_TOKEN);
             }
+            System.out.println("??");
 
             int responseCode = conn.getResponseCode();
             JsonObject jsonObj = (JsonObject) jsonParser.parse(in);
