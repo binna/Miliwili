@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -198,7 +199,7 @@ public class UserService {
      */
     public PostSignUpRes createUser(PostSignUpReq parameters,
                                     String socialId, String socialType, String token) throws BaseException {
-        if(!userProvider.isUserBySocialId(socialId)) {
+        if(userProvider.isUserBySocialId(socialId)) {
             throw new BaseException(DUPLICATED_USER);
         }
 
@@ -243,8 +244,7 @@ public class UserService {
                     .user(newUser)
                     .build();
             setStateIdx(parameters, normalPromotionState);
-            // TODO 호봉
-
+            setHobong(parameters, normalPromotionState);
             newUser.setNormalPromotionState(normalPromotionState);
             return;
         }
@@ -253,6 +253,32 @@ public class UserService {
                 .user(newUser)
                 .build();
         newUser.setAbnormalPromotionState(abnormalPromotionState);
+    }
+
+    private void setHobong(PostSignUpReq parameters, NormalPromotionState normalPromotionState) {
+        LocalDate nowDay = LocalDate.now();
+
+        if(normalPromotionState.getStateIdx() == 0) {
+            LocalDate startDay = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
+            Long hobong = ChronoUnit.MONTHS.between(startDay, nowDay) + 1;
+            normalPromotionState.setHobong(hobong.intValue());
+            return;
+        }
+        if(normalPromotionState.getStateIdx() == 1) {
+            LocalDate strPrivate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
+            Long hobong = ChronoUnit.MONTHS.between(strPrivate, nowDay) + 1;
+            normalPromotionState.setHobong(hobong.intValue());
+            return;
+        }
+        if(normalPromotionState.getStateIdx() == 2) {
+            LocalDate strCorporal = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
+            Long hobong = ChronoUnit.MONTHS.between(strCorporal, nowDay) + 1;
+            normalPromotionState.setHobong(hobong.intValue());
+            return;
+        }
+        LocalDate strSergeant = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
+        Long hobong = ChronoUnit.MONTHS.between(strSergeant, nowDay) + 1;
+        normalPromotionState.setHobong(hobong.intValue());
     }
 
     private void setStateIdx(PostSignUpReq parameters, NormalPromotionState normalPromotionState) {

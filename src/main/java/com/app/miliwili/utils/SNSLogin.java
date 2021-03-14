@@ -104,7 +104,7 @@ public class SNSLogin {
     public String getProfileImgFromKakao(String token) throws BaseException {
         JsonParser jsonParser = new JsonParser();
         JsonObject responseJsonObj = null;
-        String kakaoProfileImageURL = "";
+        String profileImageURL = "";
 
         try {
             OkHttpClient client = new OkHttpClient();
@@ -120,11 +120,11 @@ public class SNSLogin {
         }
 
         try {
-            kakaoProfileImageURL = responseJsonObj.get("profileImageURL").toString();
+            profileImageURL = responseJsonObj.get("profileImageURL").toString();
         } catch (Exception exception1) {
             checkKakaoResError(responseJsonObj);
         }
-        return kakaoProfileImageURL.replaceAll("\"", "");
+        return profileImageURL.replaceAll("\"", "");
     }
 
     private void checkKakaoResError(JsonObject responseJsonObj) throws BaseException {

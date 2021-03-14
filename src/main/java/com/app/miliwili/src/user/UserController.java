@@ -208,6 +208,9 @@ public class UserController {
         if (1 > parameters.getStateIdx() || parameters.getStateIdx() > 4) {
             return new BaseResponse<>(INVALID_STATEIDX);
         }
+        if(Objects.isNull(parameters.getServeType()) || parameters.getServeType().length() == 0) {
+            return new BaseResponse<>(EMPTY_SERVE_TYPE);
+        }
         if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
             return new BaseResponse<>(EMPTY_START_DATE);
         }

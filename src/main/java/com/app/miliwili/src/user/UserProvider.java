@@ -102,6 +102,7 @@ public class UserProvider {
 
     /**
      * socialId로 유효한 회원 존재여부 체크
+     * (존재하면 true, 존재하지 않으면 false)
      *
      * @param String socialId
      * @return Boolean
