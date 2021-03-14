@@ -167,24 +167,27 @@ public class UserService {
 
         if (normalPromotionState.getStateIdx() == 0) {
             LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE), normalPromotionState);
-            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay) + 1;
+            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
             normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
             return;
         }
         if (normalPromotionState.getStateIdx() == 1) {
             LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE), normalPromotionState);
-            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay) + 1;
+            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
             normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
             return;
         }
         if (normalPromotionState.getStateIdx() == 2) {
             LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE), normalPromotionState);
-            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay) + 1;
+            System.out.println(settingDay);
+            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
+            System.out.println(hobong);
+            System.out.println(normalPromotionState.getHobong());
             normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
             return;
         }
         LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE), normalPromotionState);
-        hobong = ChronoUnit.MONTHS.between(settingDay, nowDay) + 1;
+        hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
         normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
     }
 
@@ -192,8 +195,9 @@ public class UserService {
         if (settingDay.getDayOfMonth() == 1) {
             return settingDay;
         }
+        normalPromotionState.setHobong(1);
         if (settingDay.getMonthValue() == 12) {
-            normalPromotionState.setHobong(1);
+            normalPromotionState.setHobong(normalPromotionState.getHobong() + 1);
             return LocalDate.parse((settingDay.getYear() + 1) + "-01-01");
         }
         if (settingDay.getMonthValue() >= 9) {
