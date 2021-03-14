@@ -6,11 +6,13 @@ import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -268,28 +270,45 @@ public class UserService {
 
     private void setHobong(PostSignUpReq parameters, NormalPromotionState normalPromotionState) {
         LocalDate nowDay = LocalDate.now();
+        Long hobong = Long.valueOf(0);
 
         if(normalPromotionState.getStateIdx() == 0) {
-            LocalDate startDay = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
-            Long hobong = ChronoUnit.MONTHS.between(startDay, nowDay) + 1;
+            LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE), hobong);
+            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay) + 1;
             normalPromotionState.setHobong(hobong.intValue());
             return;
         }
         if(normalPromotionState.getStateIdx() == 1) {
             LocalDate strPrivate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
-            Long hobong = ChronoUnit.MONTHS.between(strPrivate, nowDay) + 1;
+            hobong = ChronoUnit.MONTHS.between(strPrivate, nowDay) + 1;
             normalPromotionState.setHobong(hobong.intValue());
             return;
         }
         if(normalPromotionState.getStateIdx() == 2) {
             LocalDate strCorporal = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
-            Long hobong = ChronoUnit.MONTHS.between(strCorporal, nowDay) + 1;
+            hobong = ChronoUnit.MONTHS.between(strCorporal, nowDay) + 1;
             normalPromotionState.setHobong(hobong.intValue());
             return;
         }
         LocalDate strSergeant = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
-        Long hobong = ChronoUnit.MONTHS.between(strSergeant, nowDay) + 1;
+         hobong = ChronoUnit.MONTHS.between(strSergeant, nowDay) + 1;
         normalPromotionState.setHobong(hobong.intValue());
+    }
+
+
+    private LocalDate setSettingDay(LocalDate startDay, Long hobong) {
+        if (startDay.getDayOfMonth() == 1) {
+            return startDay;
+        }
+        hobong++;
+        if(startDay.getMonthValue() == 12) {
+            return LocalDate.parse((startDay.getYear() + 1) + "-01-01");
+        }
+        if(startDay.getMonthValue() >=9){
+            return LocalDate.parse(startDay.getYear()+ "-"+ (startDay.getMonthValue() +1) + "-01");
+        }
+        return LocalDate.parse(startDay.getYear()+ "-0"+ (startDay.getMonthValue() +1) + "-01");
+
     }
 
     private void setStateIdx(PostSignUpReq parameters, NormalPromotionState normalPromotionState) {
