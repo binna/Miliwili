@@ -16,6 +16,7 @@ public class PostScheduleReq {
     private String endDate;
     private String repetition;
     private String push;
+    private String pushDeviceToken;
     private List<OrdinaryLeaveReq> ordinaryLeave;
     private List<WorkReq> toDoList;
 }

@@ -13,20 +13,20 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 
-@Component
 @RequiredArgsConstructor
+@Component
 public class FirebaseCloudMessage {
     private final String API_URL = "https://fcm.googleapis.com/v1/projects/milliewillie-dev/messages:send";
     private final ObjectMapper objectMapper;
 
     /**
      * FCM 메시지 보내기
-     * @param  String targetToken, String title, String body
+     * @param  String deviceToken, String title, String body
      * @return IOException
      * @Auther shine
      */
-    public void sendMessageTo(String targetToken, String title, String body) throws IOException {
-        String message = makeMessage(targetToken, title, body);
+    public void sendMessageTo(String deviceToken, String title, String body) throws IOException {
+        String message = makeMessage(deviceToken, title, body);
 
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody
@@ -39,17 +39,14 @@ public class FirebaseCloudMessage {
                 .build();
 
         Response response = client.newCall(request).execute();
-
-        System.out.println(request.toString());
-        System.out.println(message);
     }
 
-    private String makeMessage(String targetToken, String title, String body) throws JsonProcessingException {
+    private String makeMessage(String deviceToken, String title, String body) throws JsonProcessingException {
         FcmMessageReq fcmMessage = FcmMessageReq.builder()
                 .validate_only(false)
                 .message(FcmMessageReq.Message.builder()
-                        .token(targetToken)
-                        .data(FcmMessageReq.Data.builder()
+                        .token(deviceToken)
+                        .notification(FcmMessageReq.Notification.builder()
                                 .title(title)
                                 .body(body)
                                 .build()
@@ -59,13 +56,7 @@ public class FirebaseCloudMessage {
         return objectMapper.writeValueAsString(fcmMessage);
     }
 
-    /**
-     * 파이어베이스 접근 토큰 생성
-     * @return String
-     * @throws IOException
-     * @Auther shine
-     */
-    public String getAccessToken() throws IOException {
+    private String getAccessToken() throws IOException {
         String firebaseConfigPath = "firebase/firebaseServiceKey.json";
 
         GoogleCredentials googleCredentials = GoogleCredentials
