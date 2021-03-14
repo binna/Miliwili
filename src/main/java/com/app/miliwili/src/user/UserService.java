@@ -209,10 +209,8 @@ public class UserService {
                 .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
                 .build();
-        System.out.println(parameters.getSocialType()+"2");
         setSocial(parameters.getSocialType(), token,  newUser);
         setUserPromotionState(parameters, newUser);
-        System.out.println(newUser.getSocialType() +"3");
         setProfileImg(newUser.getSocialType(), token, newUser);
 
         if(userProvider.isUserBySocialId(newUser.getSocialId())) {
@@ -271,6 +269,8 @@ public class UserService {
     private void setHobong(PostSignUpReq parameters, NormalPromotionState normalPromotionState) {
         LocalDate nowDay = LocalDate.now();
         Long hobong = Long.valueOf(0);
+        System.out.println(parameters.getStateIdx());
+//        System.out.println(nowDay.isAfter(parameters.getStrCorporal()) && nowDay.isBefore(strSergeant));
 
         if(normalPromotionState.getStateIdx() == 0) {
             LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE), hobong);
@@ -279,35 +279,41 @@ public class UserService {
             return;
         }
         if(normalPromotionState.getStateIdx() == 1) {
-            LocalDate strPrivate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
-            hobong = ChronoUnit.MONTHS.between(strPrivate, nowDay) + 1;
+            LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE), hobong);
+            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay) + 1;
             normalPromotionState.setHobong(hobong.intValue());
             return;
         }
         if(normalPromotionState.getStateIdx() == 2) {
-            LocalDate strCorporal = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
-            hobong = ChronoUnit.MONTHS.between(strCorporal, nowDay) + 1;
+            LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE), hobong);
+            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay) + 1;
             normalPromotionState.setHobong(hobong.intValue());
             return;
         }
-        LocalDate strSergeant = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
-         hobong = ChronoUnit.MONTHS.between(strSergeant, nowDay) + 1;
+
+        System.out.println("들어와?");
+        LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE), hobong);
+        System.out.println(settingDay+"@");
+        System.out.println(ChronoUnit.MONTHS.between(settingDay, nowDay)+"@@");
+        hobong = ChronoUnit.MONTHS.between(settingDay, nowDay) + 1;
+        System.out.println((ChronoUnit.MONTHS.between(settingDay, nowDay) + 1) + "@@@");
         normalPromotionState.setHobong(hobong.intValue());
     }
 
 
-    private LocalDate setSettingDay(LocalDate startDay, Long hobong) {
-        if (startDay.getDayOfMonth() == 1) {
-            return startDay;
+    private LocalDate setSettingDay(LocalDate settingDay, Long hobong) {
+        if (settingDay.getDayOfMonth() == 1) {
+            return settingDay;
         }
         hobong++;
-        if(startDay.getMonthValue() == 12) {
-            return LocalDate.parse((startDay.getYear() + 1) + "-01-01");
+        if(settingDay.getMonthValue() == 12) {
+            System.out.println("1");
+            return LocalDate.parse((settingDay.getYear() + 1) + "-01-01");
         }
-        if(startDay.getMonthValue() >=9){
-            return LocalDate.parse(startDay.getYear()+ "-"+ (startDay.getMonthValue() +1) + "-01");
+        if(settingDay.getMonthValue() >=9){
+            return LocalDate.parse(settingDay.getYear()+ "-"+ (settingDay.getMonthValue() +1) + "-01");
         }
-        return LocalDate.parse(startDay.getYear()+ "-0"+ (startDay.getMonthValue() +1) + "-01");
+        return LocalDate.parse(settingDay.getYear()+ "-0"+ (settingDay.getMonthValue() +1) + "-01");
 
     }
 
@@ -316,12 +322,15 @@ public class UserService {
         LocalDate strPrivate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
         LocalDate strCorporal = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
         LocalDate strSergeant = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
-
+        System.out.println(nowDay.isAfter(strPrivate) && nowDay.isBefore(strCorporal));
+        System.out.println(nowDay.isAfter(strCorporal) && nowDay.isBefore(strSergeant));
         if (nowDay.isBefore(strPrivate)) {
             normalPromotionState.setStateIdx(0);
             return;
         }
         if (nowDay.isAfter(strPrivate) && nowDay.isBefore(strCorporal)) {
+            System.out.println(nowDay.isAfter(strPrivate) && nowDay.isBefore(strCorporal));
+            System.out.println(nowDay.isAfter(strCorporal) && nowDay.isBefore(strSergeant));
             normalPromotionState.setStateIdx(1);
             return;
         }
