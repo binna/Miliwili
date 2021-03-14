@@ -192,15 +192,14 @@ public class UserService {
         if (settingDay.getDayOfMonth() == 1) {
             return settingDay;
         }
-        normalPromotionState.setHobong(1);
         if (settingDay.getMonthValue() == 12) {
+            normalPromotionState.setHobong(1);
             return LocalDate.parse((settingDay.getYear() + 1) + "-01-01");
         }
         if (settingDay.getMonthValue() >= 9) {
             return LocalDate.parse(settingDay.getYear() + "-" + (settingDay.getMonthValue() + 1) + "-01");
         }
         return LocalDate.parse(settingDay.getYear() + "-0" + (settingDay.getMonthValue() + 1) + "-01");
-
     }
 
     private void setStateIdx(PostSignUpReq parameters, NormalPromotionState normalPromotionState) {
