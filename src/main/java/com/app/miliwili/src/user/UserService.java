@@ -4,7 +4,6 @@ import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.user.models.*;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
-import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -195,6 +194,7 @@ public class UserService {
         if (settingDay.getDayOfMonth() == 1) {
             return settingDay;
         }
+
         normalPromotionState.setHobong(1);
         if (settingDay.getMonthValue() == 12) {
             normalPromotionState.setHobong(normalPromotionState.getHobong() + 1);
