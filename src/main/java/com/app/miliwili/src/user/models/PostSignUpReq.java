@@ -17,4 +17,6 @@ public class PostSignUpReq {
     private String strSergeant;
     private String proDate;
     private String goal;
+
+    private String socialType;
 }
