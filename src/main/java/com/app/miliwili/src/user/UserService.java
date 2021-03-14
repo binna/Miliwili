@@ -178,10 +178,7 @@ public class UserService {
         }
         if (normalPromotionState.getStateIdx() == 2) {
             LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE), normalPromotionState);
-            System.out.println(settingDay);
             hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
-            System.out.println(hobong);
-            System.out.println(normalPromotionState.getHobong());
             normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
             return;
         }
