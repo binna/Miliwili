@@ -1,7 +1,7 @@
 package com.app.miliwili.utils;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.secret.Secret;
+import com.app.miliwili.config.secret.Secret;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;

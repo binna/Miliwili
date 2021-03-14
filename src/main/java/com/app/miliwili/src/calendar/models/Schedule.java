@@ -43,6 +43,9 @@ public class Schedule extends BaseEntity {
     @Column(name = "push", nullable = false, columnDefinition = "varchar(1) default 'F'")
     private String push = "F";
 
+    @Column(name = "pushDeviceToken", columnDefinition = "TEXT")
+    private String pushDeviceToken;
+
     @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ToDoList> toDoLists;
 
