@@ -36,8 +36,8 @@ public class Schedule extends BaseEntity {
     private LocalDate endDate;
 
     @Builder.Default
-    @Column(name = "repetition", nullable = false, columnDefinition = "varchar(1) default 'F'")
-    private String repetition = "F";
+    @Column(name = "repetition", nullable = false, columnDefinition = "varchar(1) default 'N'")
+    private String repetition = "N";
 
     @Builder.Default
     @Column(name = "push", nullable = false, columnDefinition = "varchar(1) default 'F'")
@@ -48,7 +48,4 @@ public class Schedule extends BaseEntity {
 
     @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ToDoList> toDoLists;
-
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<OrdinaryLeave> ordinaryLeaves;
 }

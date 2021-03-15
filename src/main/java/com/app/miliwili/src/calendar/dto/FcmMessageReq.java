@@ -1,11 +1,11 @@
-package com.app.miliwili.src.calendar.models;
+package com.app.miliwili.src.calendar.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@Builder
 @AllArgsConstructor
+@Builder
 @Getter
 public class FcmMessageReq {
     private boolean validate_only;

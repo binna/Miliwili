@@ -62,6 +62,8 @@ public enum BaseResponseStatus {
     NOT_FOUND_USER(false, 3005, "존재하지 않는 회원입니다."),
     DUPLICATED_USER(false, 3006, "이미 존재하는 회원입니다."),
     FAILED_TO_POST_SCHEDULE(false, 3007, "일정 등록에 실패하였습니다."),
+    FAILED_TO_POST_D_DAY(false, 3007, "D-Day 등록에 실패하였습니다."),
+    FAILED_TO_POST_ORDINARY_LEAVE(false, 3007, "정기휴가 등록에 실패하였습니다."),
 
 
 

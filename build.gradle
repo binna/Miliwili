@@ -5,7 +5,6 @@ plugins {
     //for querydsl
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 
-
     id 'java'
 }
 
@@ -71,7 +70,6 @@ test {
 }
 
 //querydsl설정
-
 def querydslDir = "$buildDir/generated/querydsl"
 
 querydsl {

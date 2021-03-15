@@ -1,14 +1,15 @@
-package com.app.miliwili.src.calendar.models;
+package com.app.miliwili.src.calendar.dto;
 
+import com.app.miliwili.src.user.dto.PostOrdinaryLeaveRes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
-@Getter
-@Builder
 @AllArgsConstructor
+@Builder
+@Getter
 public class PostScheduleRes {
     private final Long scheduleId;
     private final String color;
@@ -18,6 +19,6 @@ public class PostScheduleRes {
     private final String endDate;
     private final String repetition;
     private final String push;
-    private final List<OrdinaryLeaveRes> ordinaryLeave;
+    private final List<PostOrdinaryLeaveRes> ordinaryLeave;
     private final List<WorkRes> toDoList;
 }

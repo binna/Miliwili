@@ -1,6 +1,6 @@
 package com.app.miliwili.src.user;
 
-import com.app.miliwili.src.user.models.GetAbnormalUserEndDate;
+import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
 import com.app.miliwili.src.user.models.QAbnormalPromotionState;
 import com.app.miliwili.src.user.models.QUser;
 import com.app.miliwili.src.user.models.User;

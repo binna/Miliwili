@@ -71,7 +71,7 @@ public class SNSLogin {
      * @throws BaseException
      * @Auther shine
      */
-    public String userIdFromKakao(String token) throws BaseException {
+    public String getUserIdFromKakao(String token) throws BaseException {
         JsonParser jsonParser = new JsonParser();
         JsonObject responseJsonObj = null;
         String kakaoUserId = "";

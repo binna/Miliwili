@@ -1,6 +1,10 @@
 package com.app.miliwili.src.calendar;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.src.calendar.dto.PostDDayReq;
+import com.app.miliwili.src.calendar.dto.PostDDayRes;
+import com.app.miliwili.src.calendar.dto.PostScheduleReq;
+import com.app.miliwili.src.calendar.dto.PostScheduleRes;
 import com.app.miliwili.utils.FirebaseCloudMessage;
 import com.app.miliwili.src.calendar.models.*;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -15,6 +20,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Service
 public class CalendarService {
     private final ScheduleRepository scheduleRepository;
+    private final DDayRepository dDayRepository;
     private final CalendarProvider calendarProvider;
     private final FirebaseCloudMessage firebaseCloudMessageService;
 
@@ -36,20 +42,14 @@ public class CalendarService {
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
                 .build();
 
-        if(parameters.getRepetition() != null) {
+        if(!Objects.isNull(parameters.getRepetition())) {
             newSchedule.setRepetition(parameters.getRepetition());
         }
-        if(parameters.getPush() != null) {
+        if(!Objects.isNull(parameters.getPush())) {
             newSchedule.setPush(parameters.getPush());
         }
-        if(parameters.getToDoList() != null) {
+        if(!Objects.isNull(parameters.getToDoList())) {
             newSchedule.setToDoLists(calendarProvider.retrieveToDoList(parameters.getToDoList()));
-        }
-
-        try {
-            newSchedule = scheduleRepository.save(newSchedule);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_SCHEDULE);
         }
 
         // TODO PUSH 알람 -> 스케줄러로 결정
@@ -66,19 +66,70 @@ public class CalendarService {
             }
         }
 
-        return PostScheduleRes.builder()
-                .scheduleId(newSchedule.getId())
-                .color(newSchedule.getColor())
-                .distinction(newSchedule.getDistinction())
-                .title(newSchedule.getTitle())
-                .startDate(newSchedule.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                .endDate(newSchedule.getEndDate().format(DateTimeFormatter.ISO_DATE))
-                .repetition(newSchedule.getRepetition())
-                .push(newSchedule.getPush())
-                .toDoList(calendarProvider.retrieveWorkRes(newSchedule.getToDoLists()))
-                .build();
+        try {
+            Schedule savedSchedule = scheduleRepository.save(newSchedule);
+            return PostScheduleRes.builder()
+                    .scheduleId(savedSchedule.getId())
+                    .color(savedSchedule.getColor())
+                    .distinction(savedSchedule.getDistinction())
+                    .title(savedSchedule.getTitle())
+                    .startDate(savedSchedule.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(savedSchedule.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .repetition(savedSchedule.getRepetition())
+                    .push(savedSchedule.getPush())
+                    .toDoList(calendarProvider.retrieveWorkRes(savedSchedule.getToDoLists()))
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_POST_SCHEDULE);
+        }
     }
 
+    /**
+     * D-Day 생성
+     * @param
+     * @return
+     * @throws BaseException
+     * @Auther shine
+     */
+    public PostDDayRes createDDay(PostDDayReq parameters) throws BaseException {
+        // TODO 회원 완성되면 토근 회원인지 검사
+
+        DDay dDay = DDay.builder()
+                .distinction(parameters.getDistinction())
+                .title(parameters.getTitle())
+                .subtitle(parameters.getSubTitle())
+                .startDay(LocalDate.parse(parameters.getStartDay(), DateTimeFormatter.ISO_DATE))
+                .endDay(LocalDate.parse(parameters.getEndDay(), DateTimeFormatter.ISO_DATE))
+                .placeLat(parameters.getPlaceLat())
+                .placeLon(parameters.getPlaceLon())
+                .build();
+
+        if (!Objects.isNull(parameters.getLink())) {
+            dDay.setLink(parameters.getLink());
+        }
+        if (!Objects.isNull(parameters.getChoiceCalendar())) {
+            dDay.setChoiceCalendar(parameters.getChoiceCalendar());
+        }
+
+        try {
+            DDay savedDDay = dDayRepository.save(dDay);
+            return PostDDayRes.builder()
+                    .dDayId(savedDDay.getId())
+                    .distinction(savedDDay.getDistinction())
+                    .title(savedDDay.getTitle())
+                    .subtitle(savedDDay.getSubtitle())
+                    .startDay(savedDDay.getStartDay().format(DateTimeFormatter.ISO_DATE))
+                    .endDay(savedDDay.getEndDay().format(DateTimeFormatter.ISO_DATE))
+                    .link(savedDDay.getLink())
+                    .choiceCalendar(savedDDay.getChoiceCalendar())
+                    .placeLat(savedDDay.getPlaceLat())
+                    .placeLon(savedDDay.getPlaceLon())
+                    //.supplies()
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_POST_D_DAY);
+        }
+    }
 
 
 

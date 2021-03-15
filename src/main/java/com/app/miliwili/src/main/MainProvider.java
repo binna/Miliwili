@@ -1,18 +1,14 @@
 package com.app.miliwili.src.main;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.main.model.GetEndDayRes;
 import com.app.miliwili.src.user.UserProvider;
-import com.app.miliwili.src.user.models.GetAbnormalUserEndDate;
+import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 

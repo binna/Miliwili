@@ -1,6 +1,6 @@
 package com.app.miliwili.utils;
 
-import com.app.miliwili.src.calendar.models.FcmMessageReq;
+import com.app.miliwili.src.calendar.dto.FcmMessageReq;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
