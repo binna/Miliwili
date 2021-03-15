@@ -1,6 +1,5 @@
 package com.app.miliwili.src.user.models;
 
-import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;

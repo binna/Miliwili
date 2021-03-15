@@ -91,7 +91,7 @@ public class SNSLogin {
 
         try {
             kakaoUserId = responseJsonObj.get("id").toString();
-        } catch (Exception exception1) {
+        } catch (Exception exception) {
             checkKakaoResError(responseJsonObj);
         }
         return kakaoUserId;
@@ -125,7 +125,7 @@ public class SNSLogin {
 
         try {
             profileImageURL = responseJsonObj.get("profileImageURL").toString();
-        } catch (Exception exception1) {
+        } catch (Exception exception) {
             checkKakaoResError(responseJsonObj);
         }
         return profileImageURL.replaceAll("\"", "");
@@ -134,12 +134,13 @@ public class SNSLogin {
     private void checkKakaoResError(JsonObject responseJsonObj) throws BaseException {
         if (responseJsonObj.get("code").toString().equals("-1")) {
             throw new BaseException(KAKAO_CONNECTION_1);
-        } else if (responseJsonObj.get("code").toString().equals("-2")) {
-            throw new BaseException(KAKAO_CONNECTION_2);
-        } else if (responseJsonObj.get("code").toString().equals("-401")) {
-            throw new BaseException(KAKAO_CONNECTION_401);
-        } else {
-            throw new BaseException(KAKAO_CONNECTION_ETC);
         }
+        if (responseJsonObj.get("code").toString().equals("-2")) {
+            throw new BaseException(KAKAO_CONNECTION_2);
+        }
+        if (responseJsonObj.get("code").toString().equals("-401")) {
+            throw new BaseException(KAKAO_CONNECTION_401);
+        }
+        throw new BaseException(KAKAO_CONNECTION_ETC);
     }
 }

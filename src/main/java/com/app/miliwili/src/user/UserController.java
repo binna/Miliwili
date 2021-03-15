@@ -256,25 +256,8 @@ public class UserController {
      */
     @PatchMapping("/users/ordinary-leave")
     public BaseResponse<PatchOrdinaryLeaveRes> postOrdinaryLeave(PatchOrdinaryLeaveReq parameters) {
-        if(Objects.isNull(parameters.getOrdinaryLeaveId())) {
-            return new BaseResponse<>(EMPTY_PRIMARY);
-        }
-        if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
-        }
-        if(!Validation.isRegexDate(parameters.getStartDate())) {
-            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_START_DATE);
-        }
-        if(Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_ORDINARY_END_DATE);
-        }
-        if(!Validation.isRegexDate(parameters.getEndDate())) {
-            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_END_DATE);
-        }
-        if (LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE)
-                .isAfter(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))) {
-            return new BaseResponse<>(FASTER_THAN_ORDINARY_LEAVE_START_DATE);
-        }
+
+        // TODO
 
         try {
             PatchOrdinaryLeaveRes ordinaryLeaveRes = userService.updateOrdinaryLeave(parameters);
@@ -292,4 +275,7 @@ public class UserController {
     public String postJWT(@PathVariable Long id) {
         return jwtService.createJwt(id);
     }
+
+
+
 }
