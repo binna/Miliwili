@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PostSignUpReq {
+public class PatchUserReq {
     private String name;
     private Integer stateIdx;
     private String serveType;
@@ -17,5 +17,4 @@ public class PostSignUpReq {
     private String strSergeant;
     private String proDate;
     private String goal;
-    private String socialType;
 }

@@ -124,6 +124,122 @@ public class UserService {
         }
     }
 
+    /**
+     * 사용자 정보 수정
+     *
+     * @param
+     * @return
+     * @throws BaseException
+     * @Auther shine
+     */
+    public PatchUserRes updateUser(PatchUserReq parameters) throws BaseException {
+
+        User user = User.builder()
+                .id(jwtService.getUserId())
+                .name(parameters.getName())
+                .serveType(parameters.getServeType())
+                .stateIdx(parameters.getStateIdx())
+                .goal(parameters.getGoal())
+                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
+                .build();
+
+        try {
+            User savedUser = userRepository.save(user);
+            return PatchUserRes.builder()
+                    .userId(savedUser.getId())
+                    .name(savedUser.getName())
+                    .serveType(savedUser.getServeType())
+                    .stateIdx(savedUser.getStateIdx())
+                    .startDate(savedUser.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(savedUser.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .goal(savedUser.getGoal())
+                    .profileImg(savedUser.getProfileImg())
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_PATCH_USER);
+        }
+    }
+
+    /**
+     * 정기휴가 생성
+     *
+     * @param PostOrdinaryLeaveReq parameters
+     * @return PostOrdinaryLeaveRes
+     * @throws BaseException
+     * @Auther shine
+     */
+    public PostOrdinaryLeaveRes createOrdinaryLeave(PostOrdinaryLeaveReq parameters) throws BaseException {
+        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+
+        OrdinaryLeave newOrdinaryLeave = OrdinaryLeave.builder()
+                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
+                .user(user)
+                .build();
+
+        try {
+            OrdinaryLeave savedOrdinaryLeave = ordinaryLeaveRepository.save(newOrdinaryLeave);
+            return PostOrdinaryLeaveRes.builder()
+                    .ordinaryLeaveId(savedOrdinaryLeave.getId())
+                    .startDate(savedOrdinaryLeave.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(savedOrdinaryLeave.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_POST_ORDINARY_LEAVE);
+        }
+    }
+
+    /**
+     * 정기휴가 수정
+     *
+     * @param
+     * @return
+     * @throws BaseException
+     * @Auther shine
+     */
+    public PatchOrdinaryLeaveRes updateOrdinaryLeave(PatchOrdinaryLeaveReq parameters) throws BaseException {
+        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+
+        OrdinaryLeave newOrdinaryLeave = OrdinaryLeave.builder()
+                .id(parameters.getOrdinaryLeaveId())
+                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
+                .user(user)
+                .build();
+
+        try {
+            OrdinaryLeave savedOrdinaryLeave = ordinaryLeaveRepository.save(newOrdinaryLeave);
+            return PatchOrdinaryLeaveRes.builder()
+                    .ordinaryLeaveId(savedOrdinaryLeave.getId())
+                    .startDate(savedOrdinaryLeave.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(savedOrdinaryLeave.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_PATCH_ORDINARY_LEAVE);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private void setSocial(String socialType, String token, User newUser) throws BaseException {
         if (socialType.equals("K")) {
             newUser.setSocialType(socialType);
@@ -229,32 +345,6 @@ public class UserService {
         normalPromotionState.setStateIdx(3);
     }
 
-    /**
-     * 정기휴가 생성
-     *
-     * @param PostOrdinaryLeaveReq parameters
-     * @return PostOrdinaryLeaveRes
-     * @throws BaseException
-     * @Auther shine
-     */
-    public PostOrdinaryLeaveRes createOrdinaryLeave(PostOrdinaryLeaveReq parameters) throws BaseException {
-        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        OrdinaryLeave newOrdinaryLeave = OrdinaryLeave.builder()
-                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
-                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
-                .user(user)
-                .build();
-
-        try {
-            OrdinaryLeave savedOrdinaryLeave = ordinaryLeaveRepository.save(newOrdinaryLeave);
-            return PostOrdinaryLeaveRes.builder()
-                    .startDate(savedOrdinaryLeave.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                    .endDate(savedOrdinaryLeave.getEndDate().format(DateTimeFormatter.ISO_DATE))
-                    .build();
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_ORDINARY_LEAVE);
-        }
-    }
 
 }

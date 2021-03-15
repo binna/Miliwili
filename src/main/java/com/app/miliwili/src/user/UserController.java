@@ -44,8 +44,8 @@ public class UserController {
     }
 
     /**
-     * 로그인 --> 구글
-     * [POST]
+     * 구글 로그인 API
+     * [POST] /app/users/login-google
      *
      * @return BaseResponse<PostLoginRes>
      * @RequestHeader token(google accessToken)
@@ -194,28 +194,95 @@ public class UserController {
     }
 
     /**
+     * 회원정보 수정 API
+     * [PATCH]
+     *
+     * @return
+     * @Auther shine
+     */
+    @PatchMapping("/users")
+    public BaseResponse<PatchUserRes> postOrdinaryLeave(PatchUserReq parameters) {
+
+        // TODO
+
+        try {
+            PatchUserRes userRes = userService.updateUser(parameters);
+            return new BaseResponse<>(SUCCESS, userRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
      * 정기휴가 생성 API
      * [POST]
      *
      * @return
      * @Auther shine
      */
-    @GetMapping("/users/ordinary-leave")
+    @PostMapping("/users/ordinary-leave")
     public BaseResponse<PostOrdinaryLeaveRes> postOrdinaryLeave(PostOrdinaryLeaveReq parameters) {
-        // TODO req 입력 받은 값 유효성 검사
+        if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
+        }
+        if(!Validation.isRegexDate(parameters.getStartDate())) {
+            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_START_DATE);
+        }
+        if(Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_ORDINARY_END_DATE);
+        }
+        if(!Validation.isRegexDate(parameters.getEndDate())) {
+            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_END_DATE);
+        }
+        if (LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE)
+                .isAfter(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))) {
+            return new BaseResponse<>(FASTER_THAN_ORDINARY_LEAVE_START_DATE);
+        }
 
         try {
             PostOrdinaryLeaveRes ordinaryLeaveRes = userService.createOrdinaryLeave(parameters);
             return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 
+    /**
+     * 정기휴가 수정 API
+     * [PATCH]
+     *
+     * @return
+     * @Auther shine
+     */
+    @PatchMapping("/users/ordinary-leave")
+    public BaseResponse<PatchOrdinaryLeaveRes> postOrdinaryLeave(PatchOrdinaryLeaveReq parameters) {
+        if(Objects.isNull(parameters.getOrdinaryLeaveId())) {
+            return new BaseResponse<>(EMPTY_PRIMARY);
+        }
+        if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
+        }
+        if(!Validation.isRegexDate(parameters.getStartDate())) {
+            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_START_DATE);
+        }
+        if(Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_ORDINARY_END_DATE);
+        }
+        if(!Validation.isRegexDate(parameters.getEndDate())) {
+            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_END_DATE);
+        }
+        if (LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE)
+                .isAfter(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))) {
+            return new BaseResponse<>(FASTER_THAN_ORDINARY_LEAVE_START_DATE);
+        }
 
-
-
-
+        try {
+            PatchOrdinaryLeaveRes ordinaryLeaveRes = userService.updateOrdinaryLeave(parameters);
+            return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
     /**
      * 테스트용 jwt 생성, 나중에 삭제할거

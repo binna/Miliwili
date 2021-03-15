@@ -28,10 +28,10 @@ public class User extends BaseEntity {
     @Column(name = "stateIdx", nullable = false)
     private Integer stateIdx;
 
-    @Column(name = "socialType", nullable = false, length = 1)
+    @Column(name = "socialType", nullable = false, length = 1, updatable = false)
     private String socialType;
 
-    @Column(name = "socialId", nullable = false, length = 1000)
+    @Column(name = "socialId", nullable = false, length = 1000, updatable = false)
     private String socialId;
 
     @Column(name = "goal", length = 100)
