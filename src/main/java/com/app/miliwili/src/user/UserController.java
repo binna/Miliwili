@@ -411,7 +411,7 @@ public class UserController {
 
     /**
      * 테스트용 jwt 생성, 나중에 삭제할거
-     * [post] /api/jwt/:id
+     * [post] /app/jwt/:id
      */
     @PostMapping("/jwt/{id}")
     public String postJWT(@PathVariable Long id) {
