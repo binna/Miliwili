@@ -22,11 +22,11 @@ public class User extends BaseEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "stateIdx", nullable = false, updatable = false)
+    private Integer stateIdx;
+
     @Column(name = "serveType", nullable = false, length = 45)
     private String serveType;
-
-    @Column(name = "stateIdx", nullable = false)
-    private Integer stateIdx;
 
     @Column(name = "socialType", nullable = false, length = 1, updatable = false)
     private String socialType;

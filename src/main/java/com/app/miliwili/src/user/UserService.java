@@ -95,7 +95,7 @@ public class UserService {
     /**
      * 회원가입
      *
-     * @param PostSignUpReq parameters, String socialId, String socialType, String token
+     * @param PostSignUpReq parameters, String token
      * @return PostSignUpRes
      * @throws BaseException
      * @Auther shine
@@ -110,12 +110,13 @@ public class UserService {
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
                 .build();
         setSocial(parameters.getSocialType(), token, newUser);
-        setUserPromotionState(parameters, newUser);
+        setUserPromotionState(parameters.getStrPrivate(), parameters.getStrCorporal(), parameters.getStrSergeant(), parameters.getProDate(), newUser);
         setProfileImg(newUser.getSocialType(), token, newUser);
 
         if (userProvider.isUserBySocialId(newUser.getSocialId())) {
             throw new BaseException(DUPLICATED_USER);
         }
+
         try {
             User savedUser = userRepository.save(newUser);
             return new PostSignUpRes(savedUser.getId(), jwtService.createJwt(savedUser.getId()));
@@ -127,25 +128,26 @@ public class UserService {
     /**
      * 사용자 정보 수정
      *
-     * @param
-     * @return
+     * @param PatchUserReq parameters
+     * @return PatchUserRes
      * @throws BaseException
      * @Auther shine
      */
     public PatchUserRes updateUser(PatchUserReq parameters) throws BaseException {
-
         User user = User.builder()
                 .id(jwtService.getUserId())
                 .name(parameters.getName())
                 .serveType(parameters.getServeType())
-                .stateIdx(parameters.getStateIdx())
                 .goal(parameters.getGoal())
+                .profileImg(parameters.getProfileImg())
                 .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
                 .build();
+        setUserPromotionState(parameters.getStrPrivate(), parameters.getStrCorporal(), parameters.getStrSergeant(), parameters.getProDate(), user);
 
         try {
             User savedUser = userRepository.save(user);
+            // TODO 리턴은 좀더 고민하기
             return PatchUserRes.builder()
                     .userId(savedUser.getId())
                     .name(savedUser.getName())
@@ -158,6 +160,24 @@ public class UserService {
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_PATCH_USER);
+        }
+    }
+
+    /**
+     * 회원 삭제
+     *
+     * @return void
+     * @throws BaseException
+     * @Auther shine
+     */
+    public void deleteUser() throws BaseException {
+        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+        user.setStatus("N");
+
+        try {
+            userRepository.save(user);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_USER);
         }
     }
 
@@ -193,15 +213,15 @@ public class UserService {
     /**
      * 정기휴가 수정
      *
-     * @param
-     * @return
+     * @param PatchOrdinaryLeaveReq parameters
+     * @return PatchOrdinaryLeaveRes
      * @throws BaseException
      * @Auther shine
      */
     public PatchOrdinaryLeaveRes updateOrdinaryLeave(PatchOrdinaryLeaveReq parameters) throws BaseException {
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        OrdinaryLeave newOrdinaryLeave = OrdinaryLeave.builder()
+        OrdinaryLeave ordinaryLeave = OrdinaryLeave.builder()
                 .id(parameters.getOrdinaryLeaveId())
                 .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
@@ -209,7 +229,7 @@ public class UserService {
                 .build();
 
         try {
-            OrdinaryLeave savedOrdinaryLeave = ordinaryLeaveRepository.save(newOrdinaryLeave);
+            OrdinaryLeave savedOrdinaryLeave = ordinaryLeaveRepository.save(ordinaryLeave);
             return PatchOrdinaryLeaveRes.builder()
                     .ordinaryLeaveId(savedOrdinaryLeave.getId())
                     .startDate(savedOrdinaryLeave.getStartDate().format(DateTimeFormatter.ISO_DATE))
@@ -220,90 +240,95 @@ public class UserService {
         }
     }
 
+    /**
+     * 정기휴가 삭제
+     *
+     * @param Long ordinaryLeaveId
+     * @return void
+     * @throws BaseException
+     * @Auther shine
+     */
+    public void deleteOrdinaryLeave(Long ordinaryLeaveId) throws BaseException {
+        OrdinaryLeave ordinaryLeave = ordinaryLeaveRepository.findById(ordinaryLeaveId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_ORDINARY_LEAVE));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private void setSocial(String socialType, String token, User newUser) throws BaseException {
-        if (socialType.equals("K")) {
-            newUser.setSocialType(socialType);
-            newUser.setSocialId(snsLogin.getUserIdFromKakao(token));
-            return;
+        try {
+            ordinaryLeaveRepository.delete(ordinaryLeave);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_ORDINARY_LEAVE);
         }
-        newUser.setSocialType(socialType);
-        newUser.setSocialId(snsLogin.userIdFromGoogle(token.replaceAll("\"", "")));
     }
 
-    private void setProfileImg(String socialType, String token, User newUser) throws BaseException {
+
+
+    private void setSocial(String socialType, String token, User user) throws BaseException {
+        if (socialType.equals("K")) {
+            user.setSocialType(socialType);
+            user.setSocialId(snsLogin.getUserIdFromKakao(token));
+            return;
+        }
+        user.setSocialType(socialType);
+        user.setSocialId(snsLogin.userIdFromGoogle(token.replaceAll("\"", "")));
+    }
+
+    private void setProfileImg(String socialType, String token, User user) throws BaseException {
         if (socialType.equals("K")) {
             String img = snsLogin.getProfileImgFromKakao(token);
             if (!img.isEmpty()) {
-                newUser.setProfileImg(img);
+                user.setProfileImg(img);
                 return;
             }
         }
-        newUser.setProfileImg("https://miliwili-storage.s3.ap-northeast-2.amazonaws.com/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2021-03-10+%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE+7.21.24.png");
+        user.setProfileImg("https://miliwili-storage.s3.ap-northeast-2.amazonaws.com/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2021-03-10+%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE+7.21.24.png");
     }
 
-    private void setUserPromotionState(PostSignUpReq parameters, User newUser) {
-        if (newUser.getStateIdx() == 1) {
+    private void setUserPromotionState(String strPrivate, String strCorporal, String strSergeant,
+                                       String proDate,
+                                       User user) {
+        if (user.getStateIdx() == 1) {
             NormalPromotionState normalPromotionState = NormalPromotionState.builder()
-                    .firstDate(LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE))
-                    .secondDate(LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE))
-                    .thirdDate(LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE))
-                    .user(newUser)
+                    .firstDate(LocalDate.parse(strPrivate, DateTimeFormatter.ISO_DATE))
+                    .secondDate(LocalDate.parse(strCorporal, DateTimeFormatter.ISO_DATE))
+                    .thirdDate(LocalDate.parse(strSergeant, DateTimeFormatter.ISO_DATE))
+                    .user(user)
                     .build();
-            setStateIdx(parameters, normalPromotionState);
-            setHobong(parameters, normalPromotionState);
-            newUser.setNormalPromotionState(normalPromotionState);
+            setStateIdx(strPrivate, strCorporal, strSergeant, normalPromotionState);
+            setHobong(user.getStateIdx(), user.getStartDate().format(DateTimeFormatter.ISO_DATE), strPrivate, strCorporal, strSergeant, normalPromotionState);
+            user.setNormalPromotionState(normalPromotionState);
             return;
         }
         AbnormalPromotionState abnormalPromotionState = AbnormalPromotionState.builder()
-                .proDate(LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE))
-                .user(newUser)
+                .proDate(LocalDate.parse(proDate, DateTimeFormatter.ISO_DATE))
+                .user(user)
                 .build();
-        newUser.setAbnormalPromotionState(abnormalPromotionState);
+        user.setAbnormalPromotionState(abnormalPromotionState);
     }
 
-    private void setHobong(PostSignUpReq parameters, NormalPromotionState normalPromotionState) {
+    private void setHobong(Integer stateIdx,
+                           String startDate, String strPrivate, String strCorporal, String strSergeant,
+                           NormalPromotionState normalPromotionState) {
         LocalDate nowDay = LocalDate.now();
         Long hobong = Long.valueOf(0);
 
-        if (normalPromotionState.getStateIdx() == 0) {
-            LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE), normalPromotionState);
+        if (stateIdx == 0) {
+            LocalDate settingDay = setSettingDay(LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE), normalPromotionState);
             hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
             normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
             return;
         }
-        if (normalPromotionState.getStateIdx() == 1) {
-            LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE), normalPromotionState);
+        if (stateIdx == 1) {
+            LocalDate settingDay = setSettingDay(LocalDate.parse(strPrivate, DateTimeFormatter.ISO_DATE), normalPromotionState);
             hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
             normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
             return;
         }
-        if (normalPromotionState.getStateIdx() == 2) {
-            LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE), normalPromotionState);
+        if (stateIdx == 2) {
+            LocalDate settingDay = setSettingDay(LocalDate.parse(strCorporal, DateTimeFormatter.ISO_DATE), normalPromotionState);
             hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
             normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
             return;
         }
-        LocalDate settingDay = setSettingDay(LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE), normalPromotionState);
+        LocalDate settingDay = setSettingDay(LocalDate.parse(strSergeant, DateTimeFormatter.ISO_DATE), normalPromotionState);
         hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
         normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
     }
@@ -324,27 +349,24 @@ public class UserService {
         return LocalDate.parse(settingDay.getYear() + "-0" + (settingDay.getMonthValue() + 1) + "-01");
     }
 
-    private void setStateIdx(PostSignUpReq parameters, NormalPromotionState normalPromotionState) {
+    private void setStateIdx(String strPrivate, String strCorporal, String strSergeant, NormalPromotionState normalPromotionState) {
         LocalDate nowDay = LocalDate.now();
-        LocalDate strPrivate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
-        LocalDate strCorporal = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
-        LocalDate strSergeant = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
+        LocalDate strPrivateDate = LocalDate.parse(strPrivate, DateTimeFormatter.ISO_DATE);
+        LocalDate strCorporalDate = LocalDate.parse(strCorporal, DateTimeFormatter.ISO_DATE);
+        LocalDate strSergeantDate = LocalDate.parse(strSergeant, DateTimeFormatter.ISO_DATE);
 
-        if (nowDay.isBefore(strPrivate)) {
+        if (nowDay.isBefore(strPrivateDate)) {
             normalPromotionState.setStateIdx(0);
             return;
         }
-        if (nowDay.isAfter(strPrivate) && nowDay.isBefore(strCorporal)) {
+        if (nowDay.isAfter(strPrivateDate) && nowDay.isBefore(strCorporalDate)) {
             normalPromotionState.setStateIdx(1);
             return;
         }
-        if (nowDay.isAfter(strCorporal) && nowDay.isBefore(strSergeant)) {
+        if (nowDay.isAfter(strCorporalDate) && nowDay.isBefore(strSergeantDate)) {
             normalPromotionState.setStateIdx(2);
             return;
         }
         normalPromotionState.setStateIdx(3);
     }
-
-
-
 }
