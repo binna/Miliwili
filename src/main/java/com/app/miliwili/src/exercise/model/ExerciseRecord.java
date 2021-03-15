@@ -17,6 +17,7 @@ public class ExerciseRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(name = "routineId", nullable = false, updatable = false)
     private Long routineId;
 
