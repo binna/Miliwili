@@ -95,8 +95,9 @@ public class UserController {
      * 회원가입 API
      * [POST] /app/users
      *
-     * @return BaseResponse<Void>
+     * @return BaseResponse<PostSignUpRes>
      * @RequestHeader X-ACCESS-TOKEN
+     * @RequestBody PostSignUpReq parameters
      * @Auther shine
      */
     @ResponseBody
@@ -185,6 +186,10 @@ public class UserController {
             }
         }
 
+        if(Objects.isNull(parameters.getSocialType()) || parameters.getSocialType().length() == 0) {
+            return new BaseResponse<>(EMPTY_SOCIAL_TYPE);
+        }
+
         try {
             PostSignUpRes postSignUpRes = userService.createUser(parameters, token);
             return new BaseResponse<>(SUCCESS, postSignUpRes);
@@ -195,15 +200,96 @@ public class UserController {
 
     /**
      * 회원정보 수정 API
-     * [PATCH]
+     * [PATCH] /app/users
      *
-     * @return
+     * @RequestBody PatchUserReq parameters
+     * @return BaseResponse<PatchUserRes>
      * @Auther shine
      */
+    @ResponseBody
     @PatchMapping("/users")
-    public BaseResponse<PatchUserRes> postOrdinaryLeave(PatchUserReq parameters) {
+    public BaseResponse<PatchUserRes> updateUser(@RequestBody(required = false) PatchUserReq parameters) {
+        if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
+            return new BaseResponse<>(EMPTY_NAME);
+        }
+        if (Objects.isNull(parameters.getStateIdx())) {
+            return new BaseResponse<>(EMPTY_STATEIDX);
+        }
+        if (1 > parameters.getStateIdx() || parameters.getStateIdx() > 4) {
+            return new BaseResponse<>(INVALID_STATEIDX);
+        }
+        if(Objects.isNull(parameters.getServeType()) || parameters.getServeType().length() == 0) {
+            return new BaseResponse<>(EMPTY_SERVE_TYPE);
+        }
+        if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_START_DATE);
+        }
+        if (!Validation.isRegexDate((parameters.getStartDate()))) {
+            return new BaseResponse<>(INVALID_START_DATE);
+        }
+        if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_END_DATE);
+        }
+        if (!Validation.isRegexDate((parameters.getEndDate()))) {
+            return new BaseResponse<>(INVALID_END_DATE);
+        }
 
-        // TODO
+        LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
+        if (startDate.isAfter(endDate)) {
+            return new BaseResponse<>(FASTER_THAN_START_DATE);
+        }
+
+        if (parameters.getStateIdx() == 1) {
+            if (Objects.isNull(parameters.getStrPrivate()) || parameters.getStrPrivate().length() == 0) {
+                return new BaseResponse<>(EMPTY_FIRST_DATE);
+            }
+            if (!Validation.isRegexDate((parameters.getStrPrivate()))) {
+                return new BaseResponse<>(INVALID_FIRST_DATE);
+            }
+            LocalDate firstDate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
+            if (startDate.isAfter(firstDate)) {
+                return new BaseResponse<>(FASTER_THAN_FIRST_DATE);
+            }
+
+            if (Objects.isNull(parameters.getStrCorporal()) || parameters.getStrCorporal().length() == 0) {
+                return new BaseResponse<>(EMPTY_SECOND_DATE);
+            }
+            if (!Validation.isRegexDate((parameters.getStrCorporal()))) {
+                return new BaseResponse<>(INVALID_SECOND_DATE);
+            }
+            LocalDate secondDate = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
+            if (firstDate.isAfter(secondDate)) {
+                return new BaseResponse<>(FASTER_THAN_SECOND_DATE);
+            }
+
+            if (Objects.isNull(parameters.getStrSergeant()) || parameters.getStrSergeant().length() == 0) {
+                return new BaseResponse<>(EMPTY_THIRD_DATE);
+            }
+            LocalDate thirdDate = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
+            if (!Validation.isRegexDate((parameters.getStrSergeant()))) {
+                return new BaseResponse<>(INVALID_THIRD_DATE);
+            }
+            if (secondDate.isAfter(thirdDate)) {
+                return new BaseResponse<>(FASTER_THAN_THIRD_DATE);
+            }
+            if (thirdDate.isAfter(endDate)) {
+                return new BaseResponse<>(FASTER_THAN_END_DATE);
+            }
+        } else {
+            if (Objects.isNull(parameters.getStrPrivate()) || Objects.isNull(parameters.getStrCorporal()) || Objects.isNull(parameters.getStrSergeant())) {
+                if (Objects.isNull(parameters.getProDate()) || parameters.getProDate().length() == 0) {
+                    return new BaseResponse<>(EMPTY_PRO_DATE);
+                }
+                if (!Validation.isRegexDate((parameters.getProDate()))) {
+                    return new BaseResponse<>(INVALID_PRO_DATE);
+                }
+                LocalDate proDate = LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE);
+                if (startDate.isAfter(proDate)) {
+                    return new BaseResponse<>(FASTER_THAN_PRO_DATE);
+                }
+            }
+        }
 
         try {
             PatchUserRes userRes = userService.updateUser(parameters);
@@ -215,13 +301,15 @@ public class UserController {
 
     /**
      * 정기휴가 생성 API
-     * [POST]
+     * [POST] /app/users/ordinary-leave
      *
-     * @return
+     * @RequestBody PostOrdinaryLeaveReq parameters
+     * @return BaseResponse<PostOrdinaryLeaveRes>
      * @Auther shine
      */
+    @ResponseBody
     @PostMapping("/users/ordinary-leave")
-    public BaseResponse<PostOrdinaryLeaveRes> postOrdinaryLeave(PostOrdinaryLeaveReq parameters) {
+    public BaseResponse<PostOrdinaryLeaveRes> postOrdinaryLeave(@RequestBody(required = false) PostOrdinaryLeaveReq parameters) {
         if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
             return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
         }
@@ -249,15 +337,34 @@ public class UserController {
 
     /**
      * 정기휴가 수정 API
-     * [PATCH]
+     * [PATCH] /app/users/ordinary-leave
      *
-     * @return
+     * @RequestBody PatchOrdinaryLeaveReq parameters
+     * @return BaseResponse<PatchOrdinaryLeaveRes>
      * @Auther shine
      */
+    @ResponseBody
     @PatchMapping("/users/ordinary-leave")
-    public BaseResponse<PatchOrdinaryLeaveRes> postOrdinaryLeave(PatchOrdinaryLeaveReq parameters) {
-
-        // TODO
+    public BaseResponse<PatchOrdinaryLeaveRes> updateOrdinaryLeave(@RequestBody(required = false) PatchOrdinaryLeaveReq parameters) {
+        if(Objects.isNull(parameters.getOrdinaryLeaveId())){
+            return new BaseResponse<>(EMPTY_PRIMARY);
+        }
+        if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
+        }
+        if(!Validation.isRegexDate(parameters.getStartDate())) {
+            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_START_DATE);
+        }
+        if(Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_ORDINARY_END_DATE);
+        }
+        if(!Validation.isRegexDate(parameters.getEndDate())) {
+            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_END_DATE);
+        }
+        if (LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE)
+                .isAfter(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))) {
+            return new BaseResponse<>(FASTER_THAN_ORDINARY_LEAVE_START_DATE);
+        }
 
         try {
             PatchOrdinaryLeaveRes ordinaryLeaveRes = userService.updateOrdinaryLeave(parameters);
@@ -268,14 +375,46 @@ public class UserController {
     }
 
     /**
+     * 회원탈퇴 API
+     * [DELETE] /app/users
+     *
+     * @return BaseResponse<Void>
+     * @Auther shine
+     */
+    @DeleteMapping("/users")
+    public BaseResponse<Void> deleteUser() {
+        try {
+            userService.deleteUser();
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 정기휴가 삭제 API
+     * [DELETE] /app/users/ordinary-leave/:ordinaryLeaveId
+     *
+     * @PathVariable Long ordinaryLeaveId
+     * @return BaseResponse<Void>
+     * @Auther shine
+     */
+    @DeleteMapping("/users/ordinary-leave/{ordinaryLeaveId}")
+    public BaseResponse<Void> deleteOrdinaryLeave(@PathVariable Long ordinaryLeaveId) {
+        try {
+            userService.deleteOrdinaryLeave(ordinaryLeaveId);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
      * 테스트용 jwt 생성, 나중에 삭제할거
-     * [post] /api/jwt
+     * [post] /api/jwt/:id
      */
     @PostMapping("/jwt/{id}")
     public String postJWT(@PathVariable Long id) {
         return jwtService.createJwt(id);
     }
-
-
-
 }
