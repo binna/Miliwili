@@ -252,6 +252,10 @@ public class UserService {
         OrdinaryLeave ordinaryLeave = ordinaryLeaveRepository.findById(ordinaryLeaveId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_ORDINARY_LEAVE));
 
+        if(ordinaryLeave.getUser().getId() == jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
         try {
             ordinaryLeaveRepository.delete(ordinaryLeave);
         } catch (Exception exception) {

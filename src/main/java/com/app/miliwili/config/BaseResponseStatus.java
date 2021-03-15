@@ -70,6 +70,7 @@ public enum BaseResponseStatus {
     KAKAO_CONNECTION_ETC(false, 3004, "카카오 Response 에러가 발생하였습니다."),
     NOT_FOUND_USER(false, 3005, "존재하지 않는 회원입니다."),
     DUPLICATED_USER(false, 3006, "이미 존재하는 회원입니다."),
+    DO_NOT_AUTH_USER(false, 3120, "권한이 없는 사용자입니다."),
     FAILED_TO_PATCH_USER(false, 3007, "회원정보 변경에 실패하였습니다."),
     FAILED_TO_DELETE_USER(false, 3007, "회원 탈퇴에 실패하였습니다."),
     NOT_FOUND_ORDINARY_LEAVE(false, 3005, "존재하지 않는 정기휴가입니다."),
