@@ -1,8 +1,8 @@
 package com.app.miliwili.src.calendar;
 
 import com.app.miliwili.src.calendar.models.ToDoList;
-import com.app.miliwili.src.calendar.models.WorkReq;
-import com.app.miliwili.src.calendar.models.WorkRes;
+import com.app.miliwili.src.calendar.dto.WorkReq;
+import com.app.miliwili.src.calendar.dto.WorkRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

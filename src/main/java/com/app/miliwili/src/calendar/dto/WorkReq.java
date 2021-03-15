@@ -1,4 +1,4 @@
-package com.app.miliwili.src.calendar.models;
+package com.app.miliwili.src.calendar.dto;
 
 import lombok.AccessLevel;
 import lombok.Getter;

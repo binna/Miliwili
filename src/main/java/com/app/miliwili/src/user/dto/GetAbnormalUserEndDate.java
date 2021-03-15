@@ -1,4 +1,4 @@
-package com.app.miliwili.src.user.models;
+package com.app.miliwili.src.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

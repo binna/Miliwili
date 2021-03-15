@@ -1,4 +1,4 @@
-package com.app.miliwili.src.calendar.models;
+package com.app.miliwili.src.user.dto;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class OrdinaryLeaveReq {
+public class PostOrdinaryLeaveReq {
     private String startDate;
     private String endDate;
 }

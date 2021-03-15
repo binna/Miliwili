@@ -1,7 +1,11 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.user.models.*;
+import com.app.miliwili.src.user.dto.*;
+import com.app.miliwili.src.user.models.AbnormalPromotionState;
+import com.app.miliwili.src.user.models.NormalPromotionState;
+import com.app.miliwili.src.user.models.OrdinaryLeave;
+import com.app.miliwili.src.user.models.User;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,7 @@ public class UserService {
     private final SNSLogin snsLogin;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final OrdinaryLeaveRepository ordinaryLeaveRepository;
 
     /**
      * [로그인 - 구글 ]
@@ -122,7 +127,7 @@ public class UserService {
     private void setSocial(String socialType, String token, User newUser) throws BaseException {
         if (socialType.equals("K")) {
             newUser.setSocialType(socialType);
-            newUser.setSocialId(snsLogin.userIdFromKakao(token));
+            newUser.setSocialId(snsLogin.getUserIdFromKakao(token));
             return;
         }
         newUser.setSocialType(socialType);
@@ -223,4 +228,33 @@ public class UserService {
         }
         normalPromotionState.setStateIdx(3);
     }
+
+    /**
+     * 정기휴가 생성
+     *
+     * @param PostOrdinaryLeaveReq parameters
+     * @return PostOrdinaryLeaveRes
+     * @throws BaseException
+     * @Auther shine
+     */
+    public PostOrdinaryLeaveRes createOrdinaryLeave(PostOrdinaryLeaveReq parameters) throws BaseException {
+        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+
+        OrdinaryLeave newOrdinaryLeave = OrdinaryLeave.builder()
+                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
+                .user(user)
+                .build();
+
+        try {
+            OrdinaryLeave savedOrdinaryLeave = ordinaryLeaveRepository.save(newOrdinaryLeave);
+            return PostOrdinaryLeaveRes.builder()
+                    .startDate(savedOrdinaryLeave.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(savedOrdinaryLeave.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_POST_ORDINARY_LEAVE);
+        }
+    }
+
 }

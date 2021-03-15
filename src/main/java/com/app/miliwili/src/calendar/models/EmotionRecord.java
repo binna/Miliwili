@@ -1,5 +1,6 @@
 package com.app.miliwili.src.calendar.models;
 
+import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "emotionRecord")
-public class EmotionRecord {
+public class EmotionRecord extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

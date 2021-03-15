@@ -4,7 +4,6 @@ import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Builder
 @AllArgsConstructor
@@ -12,20 +11,21 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
-@Table(name = "ordinaryLeave")
-public class OrdinaryLeave extends BaseEntity {
+@Table(name = "supplies")
+public class Supplies extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "startDate", nullable = false)
-    private LocalDate startDate;
+    @Column(name = "content", nullable = false)
+    private String content;
 
-    @Column(name = "endDate", nullable = false)
-    private LocalDate endDate;
+    @Builder.Default
+    @Column(name = "readyState", nullable = false, columnDefinition = "varchar(1) default 'F'")
+    private String readyState = "F";
 
     @ManyToOne
-    @JoinColumn(name = "schedule_id")
-    private Schedule schedule;
+    @JoinColumn(name = "dDay_id")
+    private DDay dDay;
 }

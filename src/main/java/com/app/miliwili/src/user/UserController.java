@@ -2,9 +2,7 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
-import com.app.miliwili.src.user.models.PostLoginRes;
-import com.app.miliwili.src.user.models.PostSignUpReq;
-import com.app.miliwili.src.user.models.PostSignUpRes;
+import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
 import com.app.miliwili.utils.Validation;
@@ -75,7 +73,7 @@ public class UserController {
     }
 
     /**
-     * 카카오 로그인
+     * 카카오 로그인 API
      * [POST] /app/users/login-kakao
      *
      * @return BaseResponse<PostLoginRes>
@@ -86,7 +84,7 @@ public class UserController {
     @PostMapping("/users/login-kakao")
     public BaseResponse<PostLoginRes> postLoginKakao(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try {
-            PostLoginRes postLoginRes = userService.loginUser(SNSLogin.userIdFromKakao(token));
+            PostLoginRes postLoginRes = userService.loginUser(SNSLogin.getUserIdFromKakao(token));
             return new BaseResponse<>(SUCCESS, postLoginRes);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
@@ -94,7 +92,7 @@ public class UserController {
     }
 
     /**
-     * 회원가입
+     * 회원가입 API
      * [POST] /app/users
      *
      * @return BaseResponse<Void>
@@ -194,6 +192,30 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    /**
+     * 정기휴가 생성 API
+     * [POST]
+     *
+     * @return
+     * @Auther shine
+     */
+    @GetMapping("/users/ordinary-leave")
+    public BaseResponse<PostOrdinaryLeaveRes> postOrdinaryLeave(PostOrdinaryLeaveReq parameters) {
+        // TODO req 입력 받은 값 유효성 검사
+
+        try {
+            PostOrdinaryLeaveRes ordinaryLeaveRes = userService.createOrdinaryLeave(parameters);
+            return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+
+
+
+
 
     /**
      * 테스트용 jwt 생성, 나중에 삭제할거

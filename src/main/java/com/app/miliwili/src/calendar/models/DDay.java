@@ -1,5 +1,6 @@
 package com.app.miliwili.src.calendar.models;
 
+import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,7 +15,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "dDay")
-public class DDay {
+public class DDay extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +30,11 @@ public class DDay {
     @Column(name = "subtitle", nullable = false, length = 60)
     private String subtitle;
 
-    @Column(name = "startDate", nullable = false)
-    private LocalDate startDate;
+    @Column(name = "startDay", nullable = false)
+    private LocalDate startDay;
 
-    @Column(name = "endDate", nullable = false)
-    private LocalDate endDate;
+    @Column(name = "endDay", nullable = false)
+    private LocalDate endDay;
 
     @Builder.Default
     @Column(name = "link", nullable = false, columnDefinition = "varchar(1) default 'N'")
@@ -50,5 +51,5 @@ public class DDay {
     private BigDecimal placeLon;
 
     @OneToMany(mappedBy = "dDay", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<PreparationMaterial> preparationMaterials;
+    private List<Supplies> supplies;
 }
