@@ -317,7 +317,7 @@ public class UserController {
      */
     @ApiOperation(value = "정기휴가 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PostMapping("/users/ordinary-leave")
+    @PostMapping("/users/ordinary-leaves")
     public BaseResponse<PostOrdinaryLeaveRes> postOrdinaryLeave(@RequestBody(required = false) PostOrdinaryLeaveReq parameters) {
         if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
             return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
@@ -354,7 +354,7 @@ public class UserController {
      */
     @ApiOperation(value = "정기휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PatchMapping("/users/ordinary-leave")
+    @PatchMapping("/users/ordinary-leaves")
     public BaseResponse<PatchOrdinaryLeaveRes> updateOrdinaryLeave(@RequestBody(required = false) PatchOrdinaryLeaveReq parameters) {
         if(Objects.isNull(parameters.getOrdinaryLeaveId())){
             return new BaseResponse<>(EMPTY_PRIMARY);
@@ -411,7 +411,7 @@ public class UserController {
      * @Auther shine
      */
     @ApiOperation(value = "정기휴가 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
-    @DeleteMapping("/users/ordinary-leave/{ordinaryLeaveId}")
+    @DeleteMapping("/users/ordinary-leaves/{ordinaryLeaveId}")
     public BaseResponse<Void> deleteOrdinaryLeave(@PathVariable Long ordinaryLeaveId) {
         try {
             userService.deleteOrdinaryLeave(ordinaryLeaveId);
