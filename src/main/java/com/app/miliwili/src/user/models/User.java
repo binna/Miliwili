@@ -1,6 +1,7 @@
 package com.app.miliwili.src.user.models;
 
 import com.app.miliwili.config.BaseEntity;
+import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import lombok.*;
 
 import javax.persistence.*;
@@ -51,4 +52,7 @@ public class User extends BaseEntity {
 
     @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private AbnormalPromotionState abnormalPromotionState;
+
+    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private ExerciseInfo exerciseInfo;
 }
