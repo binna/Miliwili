@@ -6,8 +6,10 @@ import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
 import com.app.miliwili.utils.Validation;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +19,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @RestController
+@EnableSwagger2
 @RequestMapping("/app")
 public class UserController {
     private final JwtService jwtService;
@@ -32,8 +35,9 @@ public class UserController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
      */
+    @ApiOperation(value = "jwt 검증", notes = "X-ACCESS-TOKEN jwt 필요")
     @GetMapping("/users/jwt")
-    public BaseResponse<Void> jwt(@RequestHeader("X-ACCESS-TOKEN") String jwt) {
+    public BaseResponse<Void> jwt() {
         try {
             Long userId = jwtService.getUserId();
             userProvider.retrieveUserByIdAndStatusY(userId);
@@ -51,6 +55,7 @@ public class UserController {
      * @RequestHeader token(google accessToken)
      * @Auther vivi
      */
+    @ApiOperation(value = "구글 로그인", notes = "X-ACCESS-TOKEN 구글 엑세스 토큰 필요")
     @ResponseBody
     @PostMapping("/users/login-google")
     public BaseResponse<PostLoginRes> postLoginGoogle(@RequestHeader("X-ACCESS-TOKEN") String token) {
@@ -80,6 +85,7 @@ public class UserController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
      */
+    @ApiOperation(value = "카카오 로그인", notes = "X-ACCESS-TOKEN 카카오 엑세스 토큰 필요")
     @ResponseBody
     @PostMapping("/users/login-kakao")
     public BaseResponse<PostLoginRes> postLoginKakao(@RequestHeader("X-ACCESS-TOKEN") String token) {
@@ -100,6 +106,7 @@ public class UserController {
      * @RequestBody PostSignUpReq parameters
      * @Auther shine
      */
+    @ApiOperation(value = "회원가입", notes = "X-ACCESS-TOKEN 구글 혹은 카카오 토큰 필요")
     @ResponseBody
     @PostMapping("/users")
     public BaseResponse<PostSignUpRes> postSignUpKakao(@RequestHeader("X-ACCESS-TOKEN") String token,
@@ -206,6 +213,7 @@ public class UserController {
      * @return BaseResponse<PatchUserRes>
      * @Auther shine
      */
+    @ApiOperation(value = "회원정보 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/users")
     public BaseResponse<PatchUserRes> updateUser(@RequestBody(required = false) PatchUserReq parameters) {
@@ -301,14 +309,15 @@ public class UserController {
 
     /**
      * 정기휴가 생성 API
-     * [POST] /app/users/ordinary-leave
+     * [POST] /app/users/ordinary-leaves
      *
      * @RequestBody PostOrdinaryLeaveReq parameters
      * @return BaseResponse<PostOrdinaryLeaveRes>
      * @Auther shine
      */
+    @ApiOperation(value = "정기휴가 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PostMapping("/users/ordinary-leave")
+    @PostMapping("/users/ordinary-leaves")
     public BaseResponse<PostOrdinaryLeaveRes> postOrdinaryLeave(@RequestBody(required = false) PostOrdinaryLeaveReq parameters) {
         if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
             return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
@@ -337,14 +346,15 @@ public class UserController {
 
     /**
      * 정기휴가 수정 API
-     * [PATCH] /app/users/ordinary-leave
+     * [PATCH] /app/users/ordinary-leaves
      *
      * @RequestBody PatchOrdinaryLeaveReq parameters
      * @return BaseResponse<PatchOrdinaryLeaveRes>
      * @Auther shine
      */
+    @ApiOperation(value = "정기휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PatchMapping("/users/ordinary-leave")
+    @PatchMapping("/users/ordinary-leaves")
     public BaseResponse<PatchOrdinaryLeaveRes> updateOrdinaryLeave(@RequestBody(required = false) PatchOrdinaryLeaveReq parameters) {
         if(Objects.isNull(parameters.getOrdinaryLeaveId())){
             return new BaseResponse<>(EMPTY_PRIMARY);
@@ -381,6 +391,7 @@ public class UserController {
      * @return BaseResponse<Void>
      * @Auther shine
      */
+    @ApiOperation(value = "회원탈퇴", notes = "X-ACCESS-TOKEN jwt 필요")
     @DeleteMapping("/users")
     public BaseResponse<Void> deleteUser() {
         try {
@@ -393,13 +404,14 @@ public class UserController {
 
     /**
      * 정기휴가 삭제 API
-     * [DELETE] /app/users/ordinary-leave/:ordinaryLeaveId
+     * [DELETE] /app/users/ordinary-leaves/:ordinaryLeaveId
      *
      * @PathVariable Long ordinaryLeaveId
      * @return BaseResponse<Void>
      * @Auther shine
      */
-    @DeleteMapping("/users/ordinary-leave/{ordinaryLeaveId}")
+    @ApiOperation(value = "정기휴가 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
+    @DeleteMapping("/users/ordinary-leaves/{ordinaryLeaveId}")
     public BaseResponse<Void> deleteOrdinaryLeave(@PathVariable Long ordinaryLeaveId) {
         try {
             userService.deleteOrdinaryLeave(ordinaryLeaveId);
@@ -413,6 +425,7 @@ public class UserController {
      * 테스트용 jwt 생성, 나중에 삭제할거
      * [post] /app/jwt/:id
      */
+    @ApiOperation(value = "테스트용 jwt 생성", notes = "삭제할 예정")
     @PostMapping("/jwt/{id}")
     public String postJWT(@PathVariable Long id) {
         return jwtService.createJwt(id);
