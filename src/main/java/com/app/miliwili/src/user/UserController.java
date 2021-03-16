@@ -309,7 +309,7 @@ public class UserController {
 
     /**
      * 정기휴가 생성 API
-     * [POST] /app/users/ordinary-leave
+     * [POST] /app/users/ordinary-leaves
      *
      * @RequestBody PostOrdinaryLeaveReq parameters
      * @return BaseResponse<PostOrdinaryLeaveRes>
@@ -346,7 +346,7 @@ public class UserController {
 
     /**
      * 정기휴가 수정 API
-     * [PATCH] /app/users/ordinary-leave
+     * [PATCH] /app/users/ordinary-leaves
      *
      * @RequestBody PatchOrdinaryLeaveReq parameters
      * @return BaseResponse<PatchOrdinaryLeaveRes>
@@ -404,7 +404,7 @@ public class UserController {
 
     /**
      * 정기휴가 삭제 API
-     * [DELETE] /app/users/ordinary-leave/:ordinaryLeaveId
+     * [DELETE] /app/users/ordinary-leaves/:ordinaryLeaveId
      *
      * @PathVariable Long ordinaryLeaveId
      * @return BaseResponse<Void>
