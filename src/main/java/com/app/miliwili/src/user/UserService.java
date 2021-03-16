@@ -271,6 +271,70 @@ public class UserService {
         }
     }
 
+    /**
+     * stateIdx 계산
+     *
+     * @param String strPrivate, String strCorporal, String strSergeant, NormalPromotionState normalPromotionState
+     * @return void
+     * @Auther shine
+     */
+    public void setStateIdx(String strPrivate, String strCorporal, String strSergeant, NormalPromotionState normalPromotionState) {
+        LocalDate nowDay = LocalDate.now();
+        LocalDate strPrivateDate = LocalDate.parse(strPrivate, DateTimeFormatter.ISO_DATE);
+        LocalDate strCorporalDate = LocalDate.parse(strCorporal, DateTimeFormatter.ISO_DATE);
+        LocalDate strSergeantDate = LocalDate.parse(strSergeant, DateTimeFormatter.ISO_DATE);
+
+        if (nowDay.isBefore(strPrivateDate)) {
+            normalPromotionState.setStateIdx(0);
+            return;
+        }
+        if (nowDay.isAfter(strPrivateDate) && nowDay.isBefore(strCorporalDate)) {
+            normalPromotionState.setStateIdx(1);
+            return;
+        }
+        if (nowDay.isAfter(strCorporalDate) && nowDay.isBefore(strSergeantDate)) {
+            normalPromotionState.setStateIdx(2);
+            return;
+        }
+        normalPromotionState.setStateIdx(3);
+    }
+
+    /**
+     * 호봉 계산기
+     *
+     * @param Integer stateIdx, String startDate, String strPrivate, String strCorporal, String strSergeant, NormalPromotionState normalPromotionState
+     * @return void
+     * @Auther shine
+     */
+    public void setHobong(Integer stateIdx,
+                          String startDate, String strPrivate, String strCorporal, String strSergeant,
+                          NormalPromotionState normalPromotionState) {
+        LocalDate nowDay = LocalDate.now();
+        Long hobong = Long.valueOf(0);
+
+        if (stateIdx == 0) {
+            LocalDate settingDay = setSettingDay(LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE), normalPromotionState);
+            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
+            normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
+            return;
+        }
+        if (stateIdx == 1) {
+            LocalDate settingDay = setSettingDay(LocalDate.parse(strPrivate, DateTimeFormatter.ISO_DATE), normalPromotionState);
+            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
+            normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
+            return;
+        }
+        if (stateIdx == 2) {
+            LocalDate settingDay = setSettingDay(LocalDate.parse(strCorporal, DateTimeFormatter.ISO_DATE), normalPromotionState);
+            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
+            normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
+            return;
+        }
+        LocalDate settingDay = setSettingDay(LocalDate.parse(strSergeant, DateTimeFormatter.ISO_DATE), normalPromotionState);
+        hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
+        normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
+    }
+
 
 
     private void setSocial(String socialType, String token, User user) throws BaseException {
@@ -316,35 +380,6 @@ public class UserService {
         user.setAbnormalPromotionState(abnormalPromotionState);
     }
 
-    private void setHobong(Integer stateIdx,
-                           String startDate, String strPrivate, String strCorporal, String strSergeant,
-                           NormalPromotionState normalPromotionState) {
-        LocalDate nowDay = LocalDate.now();
-        Long hobong = Long.valueOf(0);
-
-        if (stateIdx == 0) {
-            LocalDate settingDay = setSettingDay(LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE), normalPromotionState);
-            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
-            normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
-            return;
-        }
-        if (stateIdx == 1) {
-            LocalDate settingDay = setSettingDay(LocalDate.parse(strPrivate, DateTimeFormatter.ISO_DATE), normalPromotionState);
-            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
-            normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
-            return;
-        }
-        if (stateIdx == 2) {
-            LocalDate settingDay = setSettingDay(LocalDate.parse(strCorporal, DateTimeFormatter.ISO_DATE), normalPromotionState);
-            hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
-            normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
-            return;
-        }
-        LocalDate settingDay = setSettingDay(LocalDate.parse(strSergeant, DateTimeFormatter.ISO_DATE), normalPromotionState);
-        hobong = ChronoUnit.MONTHS.between(settingDay, nowDay);
-        normalPromotionState.setHobong(hobong.intValue() + normalPromotionState.getHobong());
-    }
-
     private LocalDate setSettingDay(LocalDate settingDay, NormalPromotionState normalPromotionState) {
         if (settingDay.getDayOfMonth() == 1) {
             return settingDay;
@@ -359,26 +394,5 @@ public class UserService {
             return LocalDate.parse(settingDay.getYear() + "-" + (settingDay.getMonthValue() + 1) + "-01");
         }
         return LocalDate.parse(settingDay.getYear() + "-0" + (settingDay.getMonthValue() + 1) + "-01");
-    }
-
-    private void setStateIdx(String strPrivate, String strCorporal, String strSergeant, NormalPromotionState normalPromotionState) {
-        LocalDate nowDay = LocalDate.now();
-        LocalDate strPrivateDate = LocalDate.parse(strPrivate, DateTimeFormatter.ISO_DATE);
-        LocalDate strCorporalDate = LocalDate.parse(strCorporal, DateTimeFormatter.ISO_DATE);
-        LocalDate strSergeantDate = LocalDate.parse(strSergeant, DateTimeFormatter.ISO_DATE);
-
-        if (nowDay.isBefore(strPrivateDate)) {
-            normalPromotionState.setStateIdx(0);
-            return;
-        }
-        if (nowDay.isAfter(strPrivateDate) && nowDay.isBefore(strCorporalDate)) {
-            normalPromotionState.setStateIdx(1);
-            return;
-        }
-        if (nowDay.isAfter(strCorporalDate) && nowDay.isBefore(strSergeantDate)) {
-            normalPromotionState.setStateIdx(2);
-            return;
-        }
-        normalPromotionState.setStateIdx(3);
     }
 }
