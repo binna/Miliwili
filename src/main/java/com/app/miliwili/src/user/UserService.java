@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -173,6 +174,13 @@ public class UserService {
     public void deleteUser() throws BaseException {
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
         user.setStatus("N");
+
+        if(!Objects.isNull(user.getAbnormalPromotionState())) {
+            user.getAbnormalPromotionState().setStatus("N");
+        }
+        if(Objects.isNull(user.getNormalPromotionState())) {
+            user.getNormalPromotionState().setStatus("N");
+        }
 
         try {
             userRepository.save(user);
