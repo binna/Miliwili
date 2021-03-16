@@ -21,10 +21,7 @@ public class ExerciseWeightRecord {
     @Column(name = "weight", nullable = false)
     private int weight;
 
-    /**
-     * User 회원 가입할 시에 필요할 지?
-     */
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "exercise_id", nullable = false )
     private ExerciseInfo exerciseInfo;
 

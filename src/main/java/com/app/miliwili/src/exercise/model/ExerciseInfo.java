@@ -6,6 +6,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -38,9 +40,16 @@ public class ExerciseInfo extends BaseEntity {
 
 
     /**
-     * ExerciseWeightRecord, ExerciseRoutine, ExerciseRecord 연결 하기
+     * ExerciseWeightRecord, ExerciseRoutine, ExerciseRecord 연결
      */
+    @OneToMany(mappedBy = "exerciseInfo", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseWeightRecord> exerciseWeightRecord = new ArrayList<>();
 
+    @OneToMany(mappedBy = "exerciseInfo", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseRoutine> exerciseRoutine = new ArrayList<>();
+
+//    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+//    private ExerciseRecord exerciseRecord;
 
 
 

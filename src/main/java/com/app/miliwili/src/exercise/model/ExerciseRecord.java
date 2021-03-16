@@ -1,5 +1,6 @@
 package com.app.miliwili.src.exercise.model;
 
+import com.app.miliwili.src.user.models.User;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,14 +13,17 @@ import javax.persistence.*;
 @Entity
 @Table(name = "exerciseRecord")
 public class ExerciseRecord {
-    @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-
-    @Column(name = "routineId", nullable = false, updatable = false)
-    private Long routineId;
+//    @Id
+//    @Column(name = "id", nullable = false, updatable = false)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//
+//    @Column(name = "exerciseStatus")
+//    private String exerciseStatus;
+//
+//    @OneToOne
+//    @JoinColumn(name = "routine_id", nullable = false )
+//    private ExerciseRoutine exerciseRoutine;
 
 
 }

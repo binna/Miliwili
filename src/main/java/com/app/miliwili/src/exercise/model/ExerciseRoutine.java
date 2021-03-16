@@ -5,6 +5,8 @@ import com.app.miliwili.src.user.models.User;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -26,7 +28,10 @@ public class ExerciseRoutine extends BaseEntity {
     @Column(name = "bodyPart",length = 45, nullable = false)
     private String bodyPart;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "exercise_id", nullable = false )
     private ExerciseInfo exerciseInfo;
+
+    @OneToMany(mappedBy = "exerciseRoutine", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseRoutineDetail> exerciseRoutine = new ArrayList<>();
 }
