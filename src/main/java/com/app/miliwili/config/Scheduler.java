@@ -15,12 +15,12 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Component
-public class TaskScheduler {
+public class Scheduler {
     private final UserRepository userRepository;
     private final UserService userService;
 
     @Scheduled(cron  = "0 0 0 * * *")
-    private void setDailyHobongAndStateIdx() {
+    public void setDailyHobongAndStateIdx() {
         List<User> users = userRepository.findAllByStateIdxAndStatus(1, "Y");
 
         for(User user : users) {
@@ -41,6 +41,6 @@ public class TaskScheduler {
             }
         }
     }
-    
+
     // TODO FCM 보내기
 }
