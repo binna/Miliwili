@@ -28,6 +28,8 @@ repositories {
 
 dependencies {
     // Spring Boot Starter
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.awaitility:awaitility:3.1.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // Lombok
