@@ -28,7 +28,6 @@ public class Scheduler {
             String strPrivate = user.getNormalPromotionState().getFirstDate().format(DateTimeFormatter.ISO_DATE);
             String strCorporal = user.getNormalPromotionState().getSecondDate().format(DateTimeFormatter.ISO_DATE);
             String strSergeant = user.getNormalPromotionState().getThirdDate().format(DateTimeFormatter.ISO_DATE);
-
             NormalPromotionState normalPromotionState = user.getNormalPromotionState();
 
             userService.setStateIdx(strPrivate, strCorporal, strSergeant, normalPromotionState);
@@ -43,4 +42,5 @@ public class Scheduler {
     }
 
     // TODO FCM 보내기
+
 }
