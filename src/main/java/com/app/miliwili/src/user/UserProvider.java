@@ -2,6 +2,7 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
+import com.app.miliwili.src.user.models.OrdinaryLeave;
 import com.app.miliwili.src.user.models.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,15 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.app.miliwili.config.BaseResponseStatus.FAILED_TO_GET_USER;
-import static com.app.miliwili.config.BaseResponseStatus.NOT_FOUND_USER;
+import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
 public class UserProvider {
     private final UserSelectRepository userSelectRepository;
     private final UserRepository userRepository;
-
+    private final OrdinaryLeaveRepository ordinaryLeaveRepository;
 
     /**
      * 로그인시 존재하는 구글 아이디(socialId) 검사
@@ -35,7 +35,6 @@ public class UserProvider {
 
         return userList;
     }
-
 
     /**
      * stateIdx --> 일반병사인지 아닌지 확인
@@ -58,7 +57,6 @@ public class UserProvider {
 
         return userStateIdx;
     }
-
 
     /**
      * for 전역일 계산기 (MainProvider)
@@ -84,7 +82,6 @@ public class UserProvider {
 
         return abnormalUserEndDate;
     }
-
 
     /**
      * userId로 유효한 회원만 조회
