@@ -12,18 +12,18 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "exerciseRecord")
-public class ExerciseRecord {
-//    @Id
-//    @Column(name = "id", nullable = false, updatable = false)
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-//
-//    @Column(name = "exerciseStatus")
-//    private String exerciseStatus;
-//
-//    @OneToOne
-//    @JoinColumn(name = "routine_id", nullable = false )
-//    private ExerciseRoutine exerciseRoutine;
+public class ExerciseRecord  {
+    @Id
+    @Column(name = "id", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "exerciseStatus")
+    private String exerciseStatus;
+
+    @OneToOne
+    @JoinColumn(name = "routine_id", nullable = false )
+    private ExerciseRoutine exerciseRoutine;
 
 
 }

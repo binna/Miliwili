@@ -53,6 +53,4 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
     private AbnormalPromotionState abnormalPromotionState;
 
-    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
-    private ExerciseInfo exerciseInfo;
 }

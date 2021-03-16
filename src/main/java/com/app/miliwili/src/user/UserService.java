@@ -113,7 +113,6 @@ public class UserService {
         setSocial(parameters.getSocialType(), token, newUser);
         setUserPromotionState(parameters.getStrPrivate(), parameters.getStrCorporal(), parameters.getStrSergeant(), parameters.getProDate(), newUser);
         setProfileImg(newUser.getSocialType(), token, newUser);
-        setExerciseInfo(newUser);
 
         if (userProvider.isUserBySocialId(newUser.getSocialId())) {
             throw new BaseException(DUPLICATED_USER);
@@ -378,15 +377,15 @@ public class UserService {
     }
 
 
-    /**
-     * UserInfo -> ExerciseInfo initialization
-     * @param newUser
-     */
-    private void setExerciseInfo(User newUser) {
-        ExerciseInfo exerciseInfo = ExerciseInfo.builder()
-                .user(newUser)
-                .build();
-        newUser.setExerciseInfo(exerciseInfo);
-
-    }
+//    /**
+//     * UserInfo -> ExerciseInfo initialization
+//     * @param newUser
+//     */
+//    private void setExerciseInfo(User newUser) {
+//        ExerciseInfo exerciseInfo = ExerciseInfo.builder()
+//                .id(newUser.getId())
+//                .build();
+//
+//
+//    }
 }
