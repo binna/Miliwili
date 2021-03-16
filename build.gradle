@@ -63,6 +63,9 @@ dependencies {
     // okhttp
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
 
+    // swagger
+    compile 'io.springfox:springfox-swagger2:2.9.2'
+    compile 'io.springfox:springfox-swagger-ui:2.9.2'
 }
 
 test {
