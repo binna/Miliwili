@@ -386,5 +386,7 @@ public class UserService {
         ExerciseInfo exerciseInfo = ExerciseInfo.builder()
                 .user(newUser)
                 .build();
+        newUser.setExerciseInfo(exerciseInfo);
+
     }
 }
