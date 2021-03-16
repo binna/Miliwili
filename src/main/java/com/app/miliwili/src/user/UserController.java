@@ -216,7 +216,8 @@ public class UserController {
     @ApiOperation(value = "회원정보 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/users")
-    public BaseResponse<PatchUserRes> updateUser(@RequestBody(required = false) PatchUserReq parameters) {
+    public BaseResponse<PatchUserRes> updateUser(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                 @RequestBody(required = false) PatchUserReq parameters) {
         if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
             return new BaseResponse<>(EMPTY_NAME);
         }
@@ -318,7 +319,8 @@ public class UserController {
     @ApiOperation(value = "정기휴가 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PostMapping("/users/ordinary-leaves")
-    public BaseResponse<PostOrdinaryLeaveRes> postOrdinaryLeave(@RequestBody(required = false) PostOrdinaryLeaveReq parameters) {
+    public BaseResponse<PostOrdinaryLeaveRes> postOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                                @RequestBody(required = false) PostOrdinaryLeaveReq parameters) {
         if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
             return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
         }
@@ -346,7 +348,7 @@ public class UserController {
 
     /**
      * 정기휴가 수정 API
-     * [PATCH] /app/users/ordinary-leaves
+     * [PATCH] /app/users/ordinary-leaves/:ordinaryLeaveId
      *
      * @RequestBody PatchOrdinaryLeaveReq parameters
      * @return BaseResponse<PatchOrdinaryLeaveRes>
@@ -354,11 +356,10 @@ public class UserController {
      */
     @ApiOperation(value = "정기휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PatchMapping("/users/ordinary-leaves")
-    public BaseResponse<PatchOrdinaryLeaveRes> updateOrdinaryLeave(@RequestBody(required = false) PatchOrdinaryLeaveReq parameters) {
-        if(Objects.isNull(parameters.getOrdinaryLeaveId())){
-            return new BaseResponse<>(EMPTY_PRIMARY);
-        }
+    @PatchMapping("/users/ordinary-leaves/{ordinaryLeaveId}")
+    public BaseResponse<PatchOrdinaryLeaveRes> updateOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                                   @RequestBody(required = false) PatchOrdinaryLeaveReq parameters,
+                                                                   @PathVariable Long ordinaryLeaveId) {
         if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
             return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
         }
@@ -377,7 +378,7 @@ public class UserController {
         }
 
         try {
-            PatchOrdinaryLeaveRes ordinaryLeaveRes = userService.updateOrdinaryLeave(parameters);
+            PatchOrdinaryLeaveRes ordinaryLeaveRes = userService.updateOrdinaryLeave(parameters, ordinaryLeaveId);
             return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -393,7 +394,7 @@ public class UserController {
      */
     @ApiOperation(value = "회원탈퇴", notes = "X-ACCESS-TOKEN jwt 필요")
     @DeleteMapping("/users")
-    public BaseResponse<Void> deleteUser() {
+    public BaseResponse<Void> deleteUser(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try {
             userService.deleteUser();
             return new BaseResponse<>(SUCCESS);
@@ -412,7 +413,8 @@ public class UserController {
      */
     @ApiOperation(value = "정기휴가 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
     @DeleteMapping("/users/ordinary-leaves/{ordinaryLeaveId}")
-    public BaseResponse<Void> deleteOrdinaryLeave(@PathVariable Long ordinaryLeaveId) {
+    public BaseResponse<Void> deleteOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                  @PathVariable Long ordinaryLeaveId) {
         try {
             userService.deleteOrdinaryLeave(ordinaryLeaveId);
             return new BaseResponse<>(SUCCESS);

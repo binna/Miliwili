@@ -46,8 +46,8 @@ public class MiliwiliApplication implements CommandLineRunner {
                 .build();
         NormalPromotionState normalPromotionStateKaKao1 = NormalPromotionState.builder()
                 .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-                .secondDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-                .thirdDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
+                .secondDate(LocalDate.parse("2021-12-31" , DateTimeFormatter.ISO_DATE))
+                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
                 .user(userKaKao1)
                 .build();
         userKaKao1.setNormalPromotionState(normalPromotionStateKaKao1);
@@ -59,9 +59,9 @@ public class MiliwiliApplication implements CommandLineRunner {
                 .build();
         NormalPromotionState normalPromotionStateKaKao2 = NormalPromotionState.builder()
                 .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-                .secondDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-                .thirdDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-                .user(userKaKao1)
+                .secondDate(LocalDate.parse("2020-12-31" , DateTimeFormatter.ISO_DATE))
+                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
+                .user(userKaKao2)
                 .build();
         userKaKao2.setNormalPromotionState(normalPromotionStateKaKao2);
 
@@ -72,9 +72,9 @@ public class MiliwiliApplication implements CommandLineRunner {
                 .build();
         NormalPromotionState normalPromotionStateKaKao3 = NormalPromotionState.builder()
                 .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-                .secondDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-                .thirdDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-                .user(userKaKao1)
+                .secondDate(LocalDate.parse("2021-12-31" , DateTimeFormatter.ISO_DATE))
+                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
+                .user(userKaKao3)
                 .build();
         userKaKao3.setNormalPromotionState(normalPromotionStateKaKao3);
 
@@ -85,9 +85,9 @@ public class MiliwiliApplication implements CommandLineRunner {
                 .build();
         NormalPromotionState normalPromotionStateKaKao4 = NormalPromotionState.builder()
                 .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-                .secondDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-                .thirdDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-                .user(userKaKao1)
+                .secondDate(LocalDate.parse("2021-04-20" , DateTimeFormatter.ISO_DATE))
+                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
+                .user(userKaKao4)
                 .build();
         userKaKao4.setNormalPromotionState(normalPromotionStateKaKao4);
         User userKaKao5 = User.builder()
@@ -97,9 +97,9 @@ public class MiliwiliApplication implements CommandLineRunner {
                 .build();
         NormalPromotionState normalPromotionStateKaKao5 = NormalPromotionState.builder()
                 .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-                .secondDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-                .thirdDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-                .user(userKaKao1)
+                .secondDate(LocalDate.parse("2021-01-31" , DateTimeFormatter.ISO_DATE))
+                .thirdDate(LocalDate.parse("2021-03-10" , DateTimeFormatter.ISO_DATE))
+                .user(userKaKao5)
                 .build();
         userKaKao5.setNormalPromotionState(normalPromotionStateKaKao5);
 

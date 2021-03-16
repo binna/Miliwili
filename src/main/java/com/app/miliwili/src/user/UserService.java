@@ -221,16 +221,17 @@ public class UserService {
     /**
      * 정기휴가 수정
      *
-     * @param PatchOrdinaryLeaveReq parameters
+     * @param PatchOrdinaryLeaveReq parameters, Long ordinaryLeaveId
      * @return PatchOrdinaryLeaveRes
      * @throws BaseException
      * @Auther shine
      */
-    public PatchOrdinaryLeaveRes updateOrdinaryLeave(PatchOrdinaryLeaveReq parameters) throws BaseException {
+    public PatchOrdinaryLeaveRes updateOrdinaryLeave(PatchOrdinaryLeaveReq parameters,
+                                                     Long ordinaryLeaveId) throws BaseException {
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         OrdinaryLeave ordinaryLeave = OrdinaryLeave.builder()
-                .id(parameters.getOrdinaryLeaveId())
+                .id(ordinaryLeaveId)
                 .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
                 .user(user)

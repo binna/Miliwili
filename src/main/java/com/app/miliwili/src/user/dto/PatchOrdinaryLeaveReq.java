@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 public class PatchOrdinaryLeaveReq {
-    private Long ordinaryLeaveId;
     private String startDate;
     private String endDate;
 }
