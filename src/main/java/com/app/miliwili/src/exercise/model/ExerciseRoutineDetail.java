@@ -39,6 +39,4 @@ public class ExerciseRoutineDetail extends BaseEntity {
     @JoinColumn(name = "exerciseRoutine_id", nullable = false )
     private ExerciseRoutine exerciseRoutine;
 
-    @OneToMany(mappedBy = "exerciseRoutineDetail", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<ExerciseDetailSet> exerciseDetailSets = new ArrayList<>();
 }

@@ -22,8 +22,8 @@ public class ExerciseRecord  {
     private String exerciseStatus;
 
     @OneToOne
-    @JoinColumn(name = "routine_id", nullable = false )
-    private ExerciseRoutine exerciseRoutine;
+    @JoinColumn(name = "exercise_id", nullable = false )
+    private ExerciseInfo exerciseInfo;
 
 
 }
