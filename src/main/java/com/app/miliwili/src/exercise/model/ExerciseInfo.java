@@ -39,18 +39,6 @@ public class ExerciseInfo extends BaseEntity {
     private User user;
 
 
-    /**
-     * ExerciseWeightRecord, ExerciseRoutine, ExerciseRecord 연결
-     */
-    @OneToMany(mappedBy = "exerciseInfo", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<ExerciseWeightRecord> exerciseWeightRecord = new ArrayList<>();
-
-    @OneToMany(mappedBy = "exerciseInfo", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<ExerciseRoutine> exerciseRoutine = new ArrayList<>();
-
-//    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
-//    private ExerciseRecord exerciseRecord;
-
 
 
 }

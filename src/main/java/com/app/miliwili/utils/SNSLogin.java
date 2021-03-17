@@ -46,6 +46,7 @@ public class SNSLogin {
             } catch (Exception e) {
                 throw new BaseException(INVALID_TOKEN);
             }
+
             System.out.println("??");
 
             int responseCode = conn.getResponseCode();
