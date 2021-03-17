@@ -114,7 +114,6 @@ public class UserService {
         setSocial(parameters.getSocialType(), token, newUser);
         setUserPromotionState(parameters.getStrPrivate(), parameters.getStrCorporal(), parameters.getStrSergeant(), parameters.getProDate(), newUser);
         setProfileImg(newUser.getSocialType(), token, newUser);
-        setExerciseInfo(newUser);
 
         if (userProvider.isUserBySocialId(newUser.getSocialId())) {
             throw new BaseException(DUPLICATED_USER);
@@ -397,11 +396,5 @@ public class UserService {
             return LocalDate.parse(settingDay.getYear() + "-" + (settingDay.getMonthValue() + 1) + "-01");
         }
         return LocalDate.parse(settingDay.getYear() + "-0" + (settingDay.getMonthValue() + 1) + "-01");
-    }
-
-    private void setExerciseInfo(User newUser){
-        ExerciseInfo exerciseInfo = ExerciseInfo.builder()
-                .user(newUser)
-                .build();
     }
 }
