@@ -56,9 +56,10 @@ public class ExerciseService {
     public String createDayilyWeight(PostExerciseWeightReq param, long exerciseId) throws BaseException{
         ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
 
-//        if(){
-//            //userId 같은지 검증
-//        }
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
         ExerciseWeightRecord weightRecord = ExerciseWeightRecord.builder()
                 .weight(param.getDayWeight())
                 .exerciseInfo(exerciseInfo)
@@ -71,6 +72,7 @@ public class ExerciseService {
         }catch (Exception e){
             throw new BaseException(FAILED_POST_DAILY_WEIGHT);
         }
+
         return weightRecord.getWeight()+"kg 입력되었습니다";
     }
 }

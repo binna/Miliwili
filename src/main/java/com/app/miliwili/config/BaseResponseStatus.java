@@ -37,6 +37,7 @@ public enum BaseResponseStatus {
     //vivi: 2500~
 
     INVALID_TOKEN(false, 2500, "유효하지 않은 토큰입니다."),
+    INVALID_USER(false, 2501, "권한이 없는 사용자입니다."),
 
     INVALID_START_DATE(false, 2510, "입대일 형식을 확인해주세요."),
     INVALID_END_DATE(false, 2511, "전역일 형식을 확인해주세요."),
@@ -100,6 +101,7 @@ public enum BaseResponseStatus {
 
     NOT_FOUND_EXERCISEINFO(false, 3530, "존재하지 않는 운동 정보입니다 "),
     FAILED_POST_DAILY_WEIGHT(false, 3531, "일일 체중 기록에 실패하였습니다. "),
+
 
 
     // 4000 : Database 오류
