@@ -2,7 +2,9 @@ package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.exercise.dto.PostExerciseFirstWeightReq;
+import com.app.miliwili.src.exercise.dto.PostExerciseWeightReq;
 import com.app.miliwili.src.exercise.model.ExerciseInfo;
+import com.app.miliwili.src.exercise.model.ExerciseWeightRecord;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.User;
 import com.app.miliwili.utils.JwtService;
@@ -23,6 +25,10 @@ public class ExerciseService {
     private final JwtService jwtService;
 
 
+    /**
+     * 운동탭 처음 입장시 --> 목표 몸무게, 현재 몸무게 입력 ui
+     *
+     */
     public Long createFistWeight(PostExerciseFirstWeightReq param) throws BaseException{
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
@@ -34,7 +40,6 @@ public class ExerciseService {
                 .firstWeight(param.getFirstWeight())
                 .goalWeight(param.getGoalWeight())
                 .build();
-
         try{
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
@@ -43,5 +48,29 @@ public class ExerciseService {
         }
 
         return exerciseInfo.getId();
+    }
+
+    /**
+     * 데일리 몸무게 입력
+     */
+    public String createDayilyWeight(PostExerciseWeightReq param, long exerciseId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+//        if(){
+//            //userId 같은지 검증
+//        }
+        ExerciseWeightRecord weightRecord = ExerciseWeightRecord.builder()
+                .weight(param.getDayWeight())
+                .exerciseInfo(exerciseInfo)
+                .build();
+
+        exerciseInfo.addWeightRecord(weightRecord);
+
+        try {
+            exerciseRepository.save(exerciseInfo);
+        }catch (Exception e){
+            throw new BaseException(FAILED_POST_DAILY_WEIGHT);
+        }
+        return weightRecord.getWeight()+"kg 입력되었습니다";
     }
 }

@@ -1,5 +1,6 @@
 package com.app.miliwili.src.exercise.model;
 
+import com.app.miliwili.config.BaseEntity;
 import com.app.miliwili.src.user.models.User;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "exerciseWeightRecord")
-public class ExerciseWeightRecord {
+public class ExerciseWeightRecord extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

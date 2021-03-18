@@ -1,6 +1,7 @@
 package com.app.miliwili.src.exercise.model;
 
 import com.app.miliwili.config.BaseEntity;
+import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.User;
 import lombok.*;
 
@@ -38,6 +39,16 @@ public class ExerciseInfo extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false )
     private User user;
 
+    /**
+     * 양방향
+     */
+    @OneToMany(mappedBy = "exerciseInfo", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseWeightRecord> weightRecords = new ArrayList<>();
+
+
+    public void addWeightRecord(ExerciseWeightRecord record){
+        this.weightRecords.add(record);
+    }
 
 
 

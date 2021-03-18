@@ -1,5 +1,6 @@
 package com.app.miliwili.src.exercise;
 
+import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import com.app.miliwili.src.exercise.model.QExerciseInfo;
 import com.app.miliwili.src.user.models.User;
 import com.querydsl.core.types.Projections;
@@ -33,4 +34,16 @@ public class ExerciseSelectRepository extends QuerydslRepositorySupport {
                 .fetch();
 
     }
+
+    /**
+     * ExerciseInfo id로 찾기
+     */
+    public List<ExerciseInfo> getExerciseInfoByExerciseId(Long exerciseId){
+        QExerciseInfo exerciseInfo = QExerciseInfo.exerciseInfo;
+        return queryFactory.select((Projections.constructor(ExerciseInfo.class)))
+                .from(exerciseInfo)
+                .where(exerciseInfo.id.eq(exerciseId), exerciseInfo.status.eq("Y"))
+                .fetch();
+    }
+
 }
