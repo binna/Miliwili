@@ -15,7 +15,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/exercise")
+@RequestMapping("/app/exercise")
 public class ExerciseController {
     private final ExerciseProvider exerciseProvider;
     private final ExerciseService exerciseService;
@@ -35,9 +35,9 @@ public class ExerciseController {
         try{
             Long exerciseId = exerciseService.createFistWeight(param);
             return new BaseResponse<>(SUCCESS,exerciseId);
-        }catch (Exception e){
+        }catch (BaseException e){
             e.printStackTrace();
-            return new BaseResponse<>(FAILED_TO_DELETE_ORDINARY_LEAVE);
+            return new BaseResponse<>(e.getStatus());
         }
     }
 }

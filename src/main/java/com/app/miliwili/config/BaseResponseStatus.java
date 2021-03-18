@@ -61,7 +61,6 @@ public enum BaseResponseStatus {
 
 
 
-
     // 3000 : Response 오류
     KAKAO_CONNECTION(false, 3000, "카카오 연결에 실패하였습니다."),
     KAKAO_CONNECTION_1(false, 3001, "카카오 Response 에러 : 플랫폼 서비스의 일시적 내부 장애가 발생했습니다."),
@@ -95,6 +94,10 @@ public enum BaseResponseStatus {
 
     FAILED_TO_GET_USER_STATE_IDX(false, 3510, "회원 복무 형태 조회에 실패하였습니다."),
     FAILED_TO_GET_ABNORMAL_END(false, 3511, "부사관, 준사관, 장교 전역일 조회에 실패하였습니다."),
+
+    FAILED_POST_FIRST_WIEHGT(false, 3520, "첫 몸무게 등록에 실패하였습니다"),
+    FAILED_CHECK_FIRST_WIEHGT(false, 3521, "이미 몸무게가 등록된(운동탭에 방문했던) 사용자입니다 "),
+
 
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");
