@@ -58,6 +58,8 @@ public enum BaseResponseStatus {
     EMPTY_STATEIDX(false, 2707, "복무형태를 입력해주세요.(일반병사, 부사관, 준사관, 장교"),
     EMPTY_SERVE_TYPE(false, 2708, "하위 복무형태를 입력해주세요(육군, 해군 ..등)"),
 
+    EMPTY_WEIGHT(false, 2800, "몸무게를 입력해주세요"),
+
 
 
 
@@ -101,6 +103,7 @@ public enum BaseResponseStatus {
 
     NOT_FOUND_EXERCISEINFO(false, 3530, "존재하지 않는 운동 정보입니다 "),
     FAILED_POST_DAILY_WEIGHT(false, 3531, "일일 체중 기록에 실패하였습니다. "),
+    FAILED_PATCH_GOAL_WEIGHT(false, 3532, "목표체중 수정에 실패하였습니다. "),
 
 
 

@@ -1,6 +1,7 @@
 package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.src.exercise.dto.PatchExerciseGoalWeight;
 import com.app.miliwili.src.exercise.dto.PostExerciseFirstWeightReq;
 import com.app.miliwili.src.exercise.dto.PostExerciseWeightReq;
 import com.app.miliwili.src.exercise.model.ExerciseInfo;
@@ -74,5 +75,26 @@ public class ExerciseService {
         }
 
         return weightRecord.getWeight()+"kg 입력되었습니다";
+    }
+
+    /**
+     * 목표 몸무게 수정
+     */
+    public String modifyGoalWeight(PatchExerciseGoalWeight param, long exerciseId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+        exerciseInfo.setGoalWeight(param.getGoalWeight());
+
+        try {
+            exerciseRepository.save(exerciseInfo);
+        }catch (Exception e){
+            throw new BaseException(FAILED_PATCH_GOAL_WEIGHT);
+        }
+
+        return "목표체중이 "+ exerciseInfo.getGoalWeight() +"kg으로 수정되었습니다.";
+
     }
 }

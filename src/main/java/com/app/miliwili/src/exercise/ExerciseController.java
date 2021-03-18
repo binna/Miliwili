@@ -3,20 +3,24 @@ package com.app.miliwili.src.exercise;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.config.BaseResponseStatus;
+import com.app.miliwili.src.exercise.dto.PatchExerciseGoalWeight;
 import com.app.miliwili.src.exercise.dto.PostExerciseFirstWeightReq;
 import com.app.miliwili.src.exercise.dto.PostExerciseWeightReq;
 import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import com.app.miliwili.src.user.UserController;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.User;
+import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import javax.sound.midi.Patch;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/app/exercise")
+@RequestMapping("/app/exercises")
 public class ExerciseController {
     private final ExerciseProvider exerciseProvider;
     private final ExerciseService exerciseService;
@@ -52,6 +56,10 @@ public class ExerciseController {
     @PostMapping("/{exerciseId}/weights")
     public BaseResponse<String> postDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseWeightReq param,
                                                 @PathVariable Long exerciseId){
+        //TODO: 하루에 한번만 입력되도록 검증
+        if(param.getDayWeight() == null)
+            return new BaseResponse<>(EMPTY_WEIGHT);
+
         try{
             String returnStr = exerciseService.createDayilyWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,returnStr);
@@ -60,4 +68,27 @@ public class ExerciseController {
             return new BaseResponse<>(FAILED_POST_DAILY_WEIGHT);
         }
     }
+
+    /**
+     * 목표체중 수정
+     * @return BaseResponse<String>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @PatchMapping("/{exerciseId}/goal-weights")
+    public BaseResponse<String> patchGoalWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PatchExerciseGoalWeight param,
+                                                @PathVariable Long exerciseId){
+        if(param.getGoalWeight() == null)
+            return new BaseResponse<>(EMPTY_WEIGHT);
+
+        try{
+            String returnStr = exerciseService.modifyGoalWeight(param,exerciseId);
+            return new BaseResponse<>(SUCCESS,returnStr);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(FAILED_PATCH_GOAL_WEIGHT);
+        }
+    }
+
 }
