@@ -1,6 +1,5 @@
 package com.app.miliwili.src.user.models;
 
-import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -15,7 +14,7 @@ import java.time.LocalDate;
 @Data
 @Entity
 @Table(name = "abnormalPromotionState")
-public class AbnormalPromotionState extends BaseEntity {
+public class AbnormalPromotionState {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

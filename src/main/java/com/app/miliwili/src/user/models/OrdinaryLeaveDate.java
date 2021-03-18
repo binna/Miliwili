@@ -5,27 +5,27 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
-import java.util.List;
+import java.time.LocalDate;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"user", "ordinaryLeaveDates"})
+@EqualsAndHashCode(callSuper = false, exclude = {"ordinaryLeave"})
 @Data
 @Entity
-@Table(name = "ordinaryLeave")
-public class OrdinaryLeave {
+@Table(name = "ordinaryLeaveDate")
+public class OrdinaryLeaveDate {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 
-    @OneToMany(mappedBy = "ordinaryLeave", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<OrdinaryLeaveDate> ordinaryLeaveDates;
+    @ManyToOne
+    @JoinColumn(name = "ordinaryLeave_id", nullable = false)
+    private OrdinaryLeave ordinaryLeave;
 
     @Override
     public String toString() {
