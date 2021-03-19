@@ -5,7 +5,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -13,19 +12,22 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false, exclude = {"user", "ordinaryLeaveDates"})
 @Data
 @Entity
-@Table(name = "ordinaryLeave")
-public class OrdinaryLeave {
+@Table(name = "leave")
+public class Leave {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "title", nullable = false, length = 60)
+    private String title;
+
+    @Column(name = "total", nullable = false)
+    private Integer total;
+
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @OneToMany(mappedBy = "ordinaryLeave", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<OrdinaryLeaveDate> ordinaryLeaveDates;
 
     @Override
     public String toString() {

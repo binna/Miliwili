@@ -5,8 +5,11 @@ import com.app.miliwili.src.calendar.dto.PostDDayReq;
 import com.app.miliwili.src.calendar.dto.PostDDayRes;
 import com.app.miliwili.src.calendar.dto.PostScheduleReq;
 import com.app.miliwili.src.calendar.dto.PostScheduleRes;
+import com.app.miliwili.src.user.UserProvider;
+import com.app.miliwili.src.user.models.User;
 import com.app.miliwili.utils.FirebaseCloudMessage;
 import com.app.miliwili.src.calendar.models.*;
+import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +24,10 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class CalendarService {
     private final ScheduleRepository scheduleRepository;
     private final DDayRepository dDayRepository;
-    private final CalendarProvider calendarProvider;
+    private final JwtService jwtService;
     private final FirebaseCloudMessage firebaseCloudMessageService;
+    private final CalendarProvider calendarProvider;
+    private final UserProvider userProvider;
 
     /**
      * 일정 생성
@@ -32,14 +37,15 @@ public class CalendarService {
      * @Auther shine
      */
     public PostScheduleRes createSchedule(PostScheduleReq parameters) throws BaseException {
-        // TODO 회원 완성되면 토근 회원인지 검사
+        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         Schedule newSchedule = Schedule.builder()
                 .color(parameters.getColor())
                 .distinction(parameters.getDistinction())
                 .title(parameters.getTitle())
-                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
-                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
+                //.startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
+                //.endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
+                .user(user)
                 .build();
 
         if(!Objects.isNull(parameters.getRepetition())) {
@@ -73,8 +79,8 @@ public class CalendarService {
                     .color(savedSchedule.getColor())
                     .distinction(savedSchedule.getDistinction())
                     .title(savedSchedule.getTitle())
-                    .startDate(savedSchedule.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                    .endDate(savedSchedule.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    //.startDate(savedSchedule.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    //.endDate(savedSchedule.getEndDate().format(DateTimeFormatter.ISO_DATE))
                     .repetition(savedSchedule.getRepetition())
                     .push(savedSchedule.getPush())
                     .toDoList(calendarProvider.retrieveWorkRes(savedSchedule.getToDoLists()))
@@ -92,7 +98,7 @@ public class CalendarService {
      * @Auther shine
      */
     public PostDDayRes createDDay(PostDDayReq parameters) throws BaseException {
-        // TODO 회원 완성되면 토근 회원인지 검사
+        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         DDay dDay = DDay.builder()
                 .distinction(parameters.getDistinction())
@@ -102,6 +108,7 @@ public class CalendarService {
                 .endDay(LocalDate.parse(parameters.getEndDay(), DateTimeFormatter.ISO_DATE))
                 .placeLat(parameters.getPlaceLat())
                 .placeLon(parameters.getPlaceLon())
+                .user(user)
                 .build();
 
         if (!Objects.isNull(parameters.getLink())) {

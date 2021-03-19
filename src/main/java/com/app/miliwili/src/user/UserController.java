@@ -37,7 +37,7 @@ public class UserController {
      */
     @ApiOperation(value = "jwt 검증", notes = "X-ACCESS-TOKEN jwt 필요")
     @GetMapping("/users/jwt")
-    public BaseResponse<Void> jwt() {
+    public BaseResponse<Void> jwt(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try {
             Long userId = jwtService.getUserId();
             userProvider.retrieveUserByIdAndStatusY(userId);
@@ -210,6 +210,7 @@ public class UserController {
      * [PATCH] /app/users
      *
      * @RequestBody PatchUserReq parameters
+     * @RequestHeader X-ACCESS-TOKEN
      * @return BaseResponse<PatchUserRes>
      * @Auther shine
      */
@@ -220,12 +221,6 @@ public class UserController {
                                                  @RequestBody(required = false) PatchUserReq parameters) {
         if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
             return new BaseResponse<>(EMPTY_NAME);
-        }
-        if (Objects.isNull(parameters.getStateIdx())) {
-            return new BaseResponse<>(EMPTY_STATEIDX);
-        }
-        if (1 > parameters.getStateIdx() || parameters.getStateIdx() > 4) {
-            return new BaseResponse<>(INVALID_STATEIDX);
         }
         if(Objects.isNull(parameters.getServeType()) || parameters.getServeType().length() == 0) {
             return new BaseResponse<>(EMPTY_SERVE_TYPE);
@@ -249,7 +244,9 @@ public class UserController {
             return new BaseResponse<>(FASTER_THAN_START_DATE);
         }
 
-        if (parameters.getStateIdx() == 1) {
+        if(Objects.nonNull(parameters.getStrPrivate())
+                || Objects.nonNull(parameters.getStrCorporal())
+                || Objects.nonNull(parameters.getStrSergeant())) {
             if (Objects.isNull(parameters.getStrPrivate()) || parameters.getStrPrivate().length() == 0) {
                 return new BaseResponse<>(EMPTY_FIRST_DATE);
             }
@@ -285,7 +282,9 @@ public class UserController {
             if (thirdDate.isAfter(endDate)) {
                 return new BaseResponse<>(FASTER_THAN_END_DATE);
             }
-        } else {
+        }
+
+        if(Objects.nonNull(parameters.getProDate())) {
             if (Objects.isNull(parameters.getStrPrivate()) || Objects.isNull(parameters.getStrCorporal()) || Objects.isNull(parameters.getStrSergeant())) {
                 if (Objects.isNull(parameters.getProDate()) || parameters.getProDate().length() == 0) {
                     return new BaseResponse<>(EMPTY_PRO_DATE);
@@ -309,86 +308,10 @@ public class UserController {
     }
 
     /**
-     * 정기휴가 생성 API
-     * [POST] /app/users/ordinary-leaves
-     *
-     * @RequestBody PostOrdinaryLeaveReq parameters
-     * @return BaseResponse<PostOrdinaryLeaveRes>
-     * @Auther shine
-     */
-    @ApiOperation(value = "정기휴가 생성", notes = "X-ACCESS-TOKEN jwt 필요")
-    @ResponseBody
-    @PostMapping("/users/ordinary-leaves")
-    public BaseResponse<PostOrdinaryLeaveRes> postOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                                @RequestBody(required = false) PostOrdinaryLeaveReq parameters) {
-        if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
-        }
-        if(!Validation.isRegexDate(parameters.getStartDate())) {
-            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_START_DATE);
-        }
-        if(Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_ORDINARY_END_DATE);
-        }
-        if(!Validation.isRegexDate(parameters.getEndDate())) {
-            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_END_DATE);
-        }
-        if (LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE)
-                .isAfter(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))) {
-            return new BaseResponse<>(FASTER_THAN_ORDINARY_LEAVE_START_DATE);
-        }
-
-        try {
-            PostOrdinaryLeaveRes ordinaryLeaveRes = userService.createOrdinaryLeave(parameters);
-            return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    /**
-     * 정기휴가 수정 API
-     * [PATCH] /app/users/ordinary-leaves/:ordinaryLeaveId
-     *
-     * @RequestBody PatchOrdinaryLeaveReq parameters
-     * @return BaseResponse<PatchOrdinaryLeaveRes>
-     * @Auther shine
-     */
-    @ApiOperation(value = "정기휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
-    @ResponseBody
-    @PatchMapping("/users/ordinary-leaves/{ordinaryLeaveId}")
-    public BaseResponse<PatchOrdinaryLeaveRes> updateOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                                   @RequestBody(required = false) PatchOrdinaryLeaveReq parameters,
-                                                                   @PathVariable Long ordinaryLeaveId) {
-        if(Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_ORDINARY_START_DATE);
-        }
-        if(!Validation.isRegexDate(parameters.getStartDate())) {
-            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_START_DATE);
-        }
-        if(Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_ORDINARY_END_DATE);
-        }
-        if(!Validation.isRegexDate(parameters.getEndDate())) {
-            return new BaseResponse<>(INVALID_ORDINARY_LEAVE_END_DATE);
-        }
-        if (LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE)
-                .isAfter(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))) {
-            return new BaseResponse<>(FASTER_THAN_ORDINARY_LEAVE_START_DATE);
-        }
-
-        try {
-            PatchOrdinaryLeaveRes ordinaryLeaveRes = userService.updateOrdinaryLeave(parameters, ordinaryLeaveId);
-            return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    /**
      * 회원탈퇴 API
      * [DELETE] /app/users
      *
+     * @RequestHeader X-ACCESS-TOKEN
      * @return BaseResponse<Void>
      * @Auther shine
      */
@@ -403,25 +326,103 @@ public class UserController {
         }
     }
 
+
+    /**
+     * 정기휴가 생성 API
+     * [POST] /app/users/leaves
+     *
+     * @RequestBody PostLeaveReq parameters
+     * @RequestHeader X-ACCESS-TOKEN
+     * @return BaseResponse<PostLeaveRes>
+     * @Auther shine
+     */
+    @ApiOperation(value = "휴가 생성", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ResponseBody
+    @PostMapping("/users/leaves")
+    public BaseResponse<PostLeaveRes> postOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                        @RequestBody(required = false) PostLeaveReq parameters) {
+        if(Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
+            return new BaseResponse<>(EMPTY_TITLE);
+        }
+        if(Objects.isNull(parameters.getTotal())) {
+            return new BaseResponse<>(EMPTY_TOTAL);
+        }
+
+        try {
+            PostLeaveRes leaveRes = userService.createLeave(parameters);
+            return new BaseResponse<>(SUCCESS, leaveRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 정기휴가 수정 API
+     * [PATCH] /app/users/leaves/:leaveId
+     *
+     * @RequestBody PatchLeaveReq parameters
+     * @RequestHeader X-ACCESS-TOKEN
+     * @return BaseResponse<PatchLeaveRes>
+     * @Auther shine
+     */
+    @ApiOperation(value = "정기휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ResponseBody
+    @PatchMapping("/users/leaves/{leaveId}")
+    public BaseResponse<PatchLeaveRes> updateOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                           @RequestBody(required = false) PatchLeaveReq parameters,
+                                                           @PathVariable Long leaveId) {
+        if(Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
+            return new BaseResponse<>(EMPTY_TITLE);
+        }
+        if(Objects.isNull(parameters.getTotal())) {
+            return new BaseResponse<>(EMPTY_TOTAL);
+        }
+
+        try {
+            PatchLeaveRes ordinaryLeaveRes = userService.updateLeave(parameters, leaveId);
+            return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
     /**
      * 정기휴가 삭제 API
-     * [DELETE] /app/users/ordinary-leaves/:ordinaryLeaveId
+     * [DELETE] /app/users/leaves/:leaveId
      *
-     * @PathVariable Long ordinaryLeaveId
+     * @PathVariable Long leaveId
+     * @RequestHeader X-ACCESS-TOKEN
      * @return BaseResponse<Void>
      * @Auther shine
      */
     @ApiOperation(value = "정기휴가 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
-    @DeleteMapping("/users/ordinary-leaves/{ordinaryLeaveId}")
+    @DeleteMapping("/users/leaves/{leaveId}")
     public BaseResponse<Void> deleteOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                  @PathVariable Long ordinaryLeaveId) {
+                                                  @PathVariable Long leaveId) {
         try {
-            userService.deleteOrdinaryLeave(ordinaryLeaveId);
+            userService.deleteLeave(leaveId);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+//    /**
+//     *
+//     * @param token
+//     * @return
+//     */
+//    @GetMapping("/users/ordinary-leaves")
+//    public BaseResponse<GetOrdinaryLeaveRes> getOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token) {
+//        try {
+//            GetOrdinaryLeaveRes ordinaryLeaveRes = userProvider.retrieve();
+//            return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//    }
+
+
 
     /**
      * 테스트용 jwt 생성, 나중에 삭제할거

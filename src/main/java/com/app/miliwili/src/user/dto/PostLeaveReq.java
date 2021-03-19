@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PostOrdinaryLeaveReq {
-    private String startDate;
-    private String endDate;
+public class PostLeaveReq {
+    private String title;
+    private Integer total;
 }

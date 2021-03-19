@@ -1,6 +1,5 @@
 package com.app.miliwili.src.calendar.models;
 
-import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,7 +11,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "toDoList")
-public class ToDoList extends BaseEntity {
+public class ToDoList {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

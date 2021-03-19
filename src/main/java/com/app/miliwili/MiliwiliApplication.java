@@ -1,6 +1,7 @@
 package com.app.miliwili;
 
 import com.app.miliwili.src.user.UserRepository;
+import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.NormalPromotionState;
 import com.app.miliwili.src.user.models.User;
 import lombok.AllArgsConstructor;
@@ -79,17 +80,15 @@ public class MiliwiliApplication implements CommandLineRunner {
         userKaKao3.setNormalPromotionState(normalPromotionStateKaKao3);
 
         User userKaKao4 = User.builder()
-                .name("이사성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
+                .name("이사성").stateIdx(2).serveType("육군").socialType("K").socialId("test1")
                 .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
                 .build();
-        NormalPromotionState normalPromotionStateKaKao4 = NormalPromotionState.builder()
-                .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-                .secondDate(LocalDate.parse("2021-04-20" , DateTimeFormatter.ISO_DATE))
-                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
+        AbnormalPromotionState abnormalPromotionState = AbnormalPromotionState.builder()
+                .proDate(LocalDate.parse("2021-12-31", DateTimeFormatter.ISO_DATE))
                 .user(userKaKao4)
                 .build();
-        userKaKao4.setNormalPromotionState(normalPromotionStateKaKao4);
+        userKaKao4.setAbnormalPromotionState(abnormalPromotionState);
         User userKaKao5 = User.builder()
                 .name("이오성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
                 .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))

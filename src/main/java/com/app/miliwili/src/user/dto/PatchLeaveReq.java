@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PatchOrdinaryLeaveReq {
-    private String startDate;
-    private String endDate;
+public class PatchLeaveReq {
+    private String title;
+    private Integer total;
 }
