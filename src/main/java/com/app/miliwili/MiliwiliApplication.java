@@ -1,7 +1,12 @@
 package com.app.miliwili;
 
+import com.app.miliwili.src.calendar.ScheduleRepository;
+import com.app.miliwili.src.calendar.models.Schedule;
+import com.app.miliwili.src.calendar.models.ScheduleDate;
+import com.app.miliwili.src.user.LeaveRepository;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
+import com.app.miliwili.src.user.models.Leave;
 import com.app.miliwili.src.user.models.NormalPromotionState;
 import com.app.miliwili.src.user.models.User;
 import lombok.AllArgsConstructor;
@@ -25,6 +30,8 @@ import java.util.List;
 @SpringBootApplication
 public class MiliwiliApplication implements CommandLineRunner {
     private final UserRepository userRepository;
+    private final LeaveRepository leaveRepository;
+    private final ScheduleRepository scheduleRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(MiliwiliApplication.class, args);
@@ -38,7 +45,7 @@ public class MiliwiliApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         /**
-         * 더미 데이터
+         * 회원 데이터
          */
         User userKaKao1 = User.builder()
                 .name("이원성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
@@ -105,5 +112,31 @@ public class MiliwiliApplication implements CommandLineRunner {
         final List<User> userList =
                 Arrays.asList(userKaKao1, userKaKao2, userKaKao3, userKaKao4, userKaKao5);
         userRepository.saveAll(userList);
+
+        /**
+         * 휴가 더미데이터
+         */
+        Leave leave1 = Leave.builder().title("1차정기휴가").user(userKaKao1).total(8).build();
+        Leave leave2 = Leave.builder().title("2차정기휴가").user(userKaKao1).total(8).build();
+        Leave leave3 = Leave.builder().title("3차정기휴가").user(userKaKao1).total(8).build();
+
+        final List<Leave> leaveList = Arrays.asList(leave1, leave2, leave3);
+        leaveRepository.saveAll(leaveList);
+
+        /**
+         * 스케줄 더미데이터
+         */
+        Schedule schedule1 = Schedule.builder()
+                .color("빨강").distinction("정기휴가").title("휴가날 뭐할지 딱 정함ㅋ")
+                .leave(leave1).user(userKaKao1)
+                .build();
+        ScheduleDate date = ScheduleDate.builder()
+                .date(LocalDate.parse("2021-12-31", DateTimeFormatter.ISO_DATE))
+                .schedule(schedule1)
+                .build();
+        schedule1.setScheduleDates(Arrays.asList(date));
+
+        final List<Schedule> scheduleList = Arrays.asList(schedule1);
+        scheduleRepository.saveAll(scheduleList);
     }
 }

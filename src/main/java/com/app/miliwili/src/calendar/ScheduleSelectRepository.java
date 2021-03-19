@@ -24,16 +24,16 @@ public class ScheduleSelectRepository extends QuerydslRepositorySupport {
     /**
      * 내 등록된 일정 중 정기휴가의 날짜 부분만 검색
      */
-//    public List<String> findScheduleDateByUserId(Long userId) {
-//        QSchedule schedule = QSchedule.schedule;
-//        QScheduleDate scheduleDate = QScheduleDate.scheduleDate;
-//
-//        return queryFactory.select((Projections.constructor(String.class,
-//                scheduleDate.date)))
-//                .from(schedule)
-//                .where(schedule.distinction.eq("정기휴가"), schedule.user.id.eq(userId))
-//                .innerJoin(scheduleDate.schedule, schedule)
-//                .orderBy(scheduleDate.date.asc())
-//                .fetch();
-//    }
+    public List<String> findScheduleDateByUserId(Long userId) {
+        QSchedule schedule = QSchedule.schedule;
+        QScheduleDate scheduleDate = QScheduleDate.scheduleDate;
+
+        return queryFactory.select((Projections.constructor(String.class,
+                scheduleDate.date)))
+                .from(schedule)
+                .where(schedule.distinction.eq("정기휴가"), schedule.user.id.eq(userId))
+                .innerJoin(scheduleDate.schedule, schedule)
+                .orderBy(scheduleDate.date.asc())
+                .fetch();
+    }
 }

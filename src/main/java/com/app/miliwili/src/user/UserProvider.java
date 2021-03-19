@@ -4,7 +4,7 @@ import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.CalendarProvider;
 import com.app.miliwili.src.calendar.ScheduleSelectRepository;
 import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
-import com.app.miliwili.src.user.dto.GetOrdinaryLeaveRes;
+import com.app.miliwili.src.user.dto.GetLeaveRes;
 import com.app.miliwili.src.user.models.Leave;
 import com.app.miliwili.src.user.models.User;
 import com.app.miliwili.utils.JwtService;
@@ -12,12 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -150,76 +145,28 @@ public class UserProvider {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_LEAVE));
     }
 
-//    /**
-//     * 사용자, 정기휴가 전체 조회
-//     *
-//     * @return List<OrdinaryLeave>
-//     * @throws BaseException
-//     */
-//    private List<OrdinaryLeave> retrieveOrdinaryLeaveByUserIdOrderByStartDateAsc() throws BaseException {
-//        List<OrdinaryLeave> ordinaryLeaves = null;
-//
-//        try {
-//            //ordinaryLeaves = ordinaryLeaveRepository.findByUser_IdOrderByStartDateAsc(jwtService.getUserId());
-//            return ordinaryLeaves;
-//        } catch (Exception exception) {
-//            throw new BaseException(FAILED_TO_GET_LEAVE);
-//        }
-//    }
-//
-//    /**
-//     *
-//     * @return
-//     * @throws BaseException
-//     */
-//    public GetOrdinaryLeaveRes retrieve() throws BaseException {
-//        List<Map<String, String>> ordinaryLeaveMap = new ArrayList<>();
-//
-//        Map<String, List<String>> getOrdinaryLeaveRes = new HashMap<>();
-//
-//        List<OrdinaryLeave> ordinaryLeaves = retrieveOrdinaryLeaveByUserIdOrderByStartDateAsc();
-//        List<String> scheduleDates = scheduleSelectRepository.findScheduleDateByUserId(jwtService.getUserId());
-//
-//        int i = 1;
-//        for (OrdinaryLeave ordinaryLeave : ordinaryLeaves) {        // 정기 휴가 타이틀..
-//
-//            for(OrdinaryLeaveDate ordinaryLeaveDate : ordinaryLeave.getOrdinaryLeaveDates()) {
-//                String title = i + "차 정기 휴가";
-//
-//
-//
-//                //ordinaryLeaveDate.getDate()
-//
-//
-//
-//
-//
-//
-//            }
+    /**
+     * 사용자별 휴가 전체 조회
+     *
+     * @return List<OrdinaryLeave>
+     * @throws BaseException
+     */
+    private List<Leave> retrieveLeaveByUserIdOrderById() throws BaseException {
+        try {
+            List<Leave> ordinaryLeaves = leaveRepository.findByUser_IdOrderById(jwtService.getUserId());
+            return ordinaryLeaves;
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_LEAVE);
+        }
+    }
 
+    /**
+     *
+     * @return
+     * @throws BaseException
+     */
+    public List<GetLeaveRes> retrieve() throws BaseException {
 
-
-//        }
-//        for (OrdinaryLeave ordinaryLeave : ordinaryLeaves) {
-//            Map<String, String> data = new HashMap<>();
-//
-//            LocalDate startDate = ordinaryLeave.getStartDate();
-//            LocalDate endDate = ordinaryLeave.getEndDate();
-//
-//            int days = (int) ChronoUnit.DAYS.between(startDate, endDate);
-//            LocalDate targetDate = startDate;
-//            for(int i = 0; i < days; i++) {
-//                if(startDate.isAfter(targetDate) && endDate.isBefore(targetDate)) {
-//                    data.put(targetDate.format(DateTimeFormatter.ISO_DATE), "T");
-//                    targetDate = targetDate.minusDays(Long.valueOf(1));
-//                    continue;
-//                }
-//                data.put(targetDate.format(DateTimeFormatter.ISO_DATE), "F");
-//                targetDate = targetDate.minusDays(Long.valueOf(1));
-//            }
-//            ordinaryLeaveMap.add(data);
-//        }
-//
-//        return new GetOrdinaryLeaveRes(ordinaryLeaveMap);
-//    }
+        return null;
+    }
 }
