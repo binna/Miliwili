@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class PatchExerciseGoalWeight {
-    private Integer goalWeight;
+    private Double goalWeight;
 }

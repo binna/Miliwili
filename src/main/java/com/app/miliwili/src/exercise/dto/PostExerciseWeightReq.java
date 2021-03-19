@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class PostExerciseWeightReq {
-    private Integer dayWeight;
+    private Double dayWeight;
 }

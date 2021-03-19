@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class PostExerciseFirstWeightReq {
-    private Integer goalWeight;
-    private Integer firstWeight;
+    private Double goalWeight;
+    private Double firstWeight;
 }

@@ -35,15 +35,5 @@ public class ExerciseSelectRepository extends QuerydslRepositorySupport {
 
     }
 
-    /**
-     * ExerciseInfo id로 찾기
-     */
-    public List<ExerciseInfo> getExerciseInfoByExerciseId(Long exerciseId){
-        QExerciseInfo exerciseInfo = QExerciseInfo.exerciseInfo;
-        return queryFactory.select((Projections.constructor(ExerciseInfo.class)))
-                .from(exerciseInfo)
-                .where(exerciseInfo.id.eq(exerciseId), exerciseInfo.status.eq("Y"))
-                .fetch();
-    }
 
 }

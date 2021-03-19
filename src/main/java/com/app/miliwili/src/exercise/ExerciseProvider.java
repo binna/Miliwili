@@ -46,9 +46,7 @@ public class ExerciseProvider {
      */
     public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{
         return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
-            .orElseThrow(() -> new BaseException(NOT_FOUND_ORDINARY_LEAVE));
-
-
+            .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
     }
 }
 
