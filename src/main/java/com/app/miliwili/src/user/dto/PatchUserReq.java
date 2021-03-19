@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class PatchUserReq {
     private String name;
-    private Long stateIdx;
     private String serveType;
     private String startDate;
     private String endDate;

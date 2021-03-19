@@ -26,6 +26,6 @@ public class Supplies extends BaseEntity {
     private String readyState = "F";
 
     @ManyToOne
-    @JoinColumn(name = "dDay_id")
+    @JoinColumn(name = "dDay_id", nullable = false)
     private DDay dDay;
 }

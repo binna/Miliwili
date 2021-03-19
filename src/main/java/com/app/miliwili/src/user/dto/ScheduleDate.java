@@ -7,8 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class PostOrdinaryLeaveRes {
-    private final Long ordinaryLeaveId;
-    private final String startDate;
-    private final String endDate;
+public class ScheduleDate {
+    private final String date;
 }

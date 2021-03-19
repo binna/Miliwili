@@ -1,4 +1,4 @@
-package com.app.miliwili.src.user.models;
+package com.app.miliwili.src.calendar.models;
 
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -10,11 +10,11 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"ordinaryLeave"})
+@EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
-@Table(name = "ordinaryLeaveDate")
-public class OrdinaryLeaveDate {
+@Table(name = "scheduleDate")
+public class ScheduleDate {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +24,8 @@ public class OrdinaryLeaveDate {
     private LocalDate date;
 
     @ManyToOne
-    @JoinColumn(name = "ordinaryLeave_id", nullable = false)
-    private OrdinaryLeave ordinaryLeave;
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private Schedule schedule;
 
     @Override
     public String toString() {

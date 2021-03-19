@@ -3,10 +3,7 @@ package com.app.miliwili.src.user;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import com.app.miliwili.src.user.dto.*;
-import com.app.miliwili.src.user.models.AbnormalPromotionState;
-import com.app.miliwili.src.user.models.NormalPromotionState;
-import com.app.miliwili.src.user.models.OrdinaryLeave;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.*;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -27,7 +24,7 @@ public class UserService {
     private final SNSLogin snsLogin;
     private final JwtService jwtService;
     private final UserRepository userRepository;
-    private final OrdinaryLeaveRepository ordinaryLeaveRepository;
+    private final LeaveRepository leaveRepository;
 
     /**
      * [로그인 - 구글 ]
@@ -75,7 +72,7 @@ public class UserService {
     /**
      * 로그인
      *
-     * @param String socialId
+     * @param socialId
      * @return PostLoginRes
      * @throws BaseException
      * @Auther shine
@@ -97,7 +94,8 @@ public class UserService {
     /**
      * 회원가입
      *
-     * @param PostSignUpReq parameters, String token
+     * @param parameters
+     * @param token
      * @return PostSignUpRes
      * @throws BaseException
      * @Auther shine
@@ -136,16 +134,30 @@ public class UserService {
      * @Auther shine
      */
     public PatchUserRes updateUser(PatchUserReq parameters) throws BaseException {
-        User user = User.builder()
-                .id(jwtService.getUserId())
-                .name(parameters.getName())
-                .serveType(parameters.getServeType())
-                .goal(parameters.getGoal())
-                .profileImg(parameters.getProfileImg())
-                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
-                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
-                .build();
-        setUserPromotionState(parameters.getStrPrivate(), parameters.getStrCorporal(), parameters.getStrSergeant(), parameters.getProDate(), user);
+        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+
+        user.setName(parameters.getName());
+        user.setServeType(parameters.getServeType());
+        user.setGoal(parameters.getGoal());
+        user.setProfileImg(parameters.getProfileImg());
+        user.setStartDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE));
+        user.setEndDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE));
+
+        if(user.getStateIdx() == 1) {
+            user.getNormalPromotionState().setFirstDate(LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE));
+            user.getNormalPromotionState().setSecondDate(LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE));
+            user.getNormalPromotionState().setThirdDate(LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE));
+
+            String startDate = parameters.getStartDate();
+            String strPrivate = parameters.getStrPrivate();
+            String strCorporal = parameters.getStrCorporal();
+            String strSergeant = parameters.getStrSergeant();
+            setStateIdx(strPrivate, strCorporal, strSergeant, user.getNormalPromotionState());
+            setHobong(user.getNormalPromotionState().getStateIdx(), startDate, strPrivate, strCorporal, strSergeant, user.getNormalPromotionState());
+        }
+        if(!(user.getStateIdx() == 1)) {
+            user.getAbnormalPromotionState().setProDate(LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE));
+        }
 
         try {
             User savedUser = userRepository.save(user);
@@ -176,13 +188,6 @@ public class UserService {
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
         user.setStatus("N");
 
-        if(!Objects.isNull(user.getAbnormalPromotionState())) {
-            user.getAbnormalPromotionState().setStatus("N");
-        }
-        if(Objects.isNull(user.getNormalPromotionState())) {
-            user.getNormalPromotionState().setStatus("N");
-        }
-
         try {
             userRepository.save(user);
         } catch (Exception exception) {
@@ -193,90 +198,92 @@ public class UserService {
     /**
      * 정기휴가 생성
      *
-     * @param PostOrdinaryLeaveReq parameters
-     * @return PostOrdinaryLeaveRes
+     * @param parameters
+     * @return PostLeaveRes
      * @throws BaseException
      * @Auther shine
      */
-    public PostOrdinaryLeaveRes createOrdinaryLeave(PostOrdinaryLeaveReq parameters) throws BaseException {
+    public PostLeaveRes createLeave(PostLeaveReq parameters) throws BaseException {
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        OrdinaryLeave newOrdinaryLeave = OrdinaryLeave.builder()
-                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
-                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
+        Leave newLeave = Leave.builder()
+                .title(parameters.getTitle())
+                .total(parameters.getTotal())
                 .user(user)
                 .build();
 
         try {
-            OrdinaryLeave savedOrdinaryLeave = ordinaryLeaveRepository.save(newOrdinaryLeave);
-            return PostOrdinaryLeaveRes.builder()
-                    .ordinaryLeaveId(savedOrdinaryLeave.getId())
-                    .startDate(savedOrdinaryLeave.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                    .endDate(savedOrdinaryLeave.getEndDate().format(DateTimeFormatter.ISO_DATE))
+            Leave savedLeave = leaveRepository.save(newLeave);
+            return PostLeaveRes.builder()
+                    .leaveId(savedLeave.getId())
+                    .title(savedLeave.getTitle())
+                    .total(savedLeave.getTotal())
                     .build();
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_ORDINARY_LEAVE);
+            throw new BaseException(FAILED_TO_POST_LEAVE);
         }
     }
 
     /**
      * 정기휴가 수정
      *
-     * @param PatchOrdinaryLeaveReq parameters, Long ordinaryLeaveId
-     * @return PatchOrdinaryLeaveRes
+     * @param  parameters
+     * @param leaveId
+     * @return PatchLeaveRes
      * @throws BaseException
      * @Auther shine
      */
-    public PatchOrdinaryLeaveRes updateOrdinaryLeave(PatchOrdinaryLeaveReq parameters,
-                                                     Long ordinaryLeaveId) throws BaseException {
-        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+    public PatchLeaveRes updateLeave(PatchLeaveReq parameters, Long leaveId) throws BaseException {
+        Leave leave = userProvider.retrieveLeaveById(leaveId);
 
-        OrdinaryLeave ordinaryLeave = OrdinaryLeave.builder()
-                .id(ordinaryLeaveId)
-                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
-                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
-                .user(user)
-                .build();
+        leave.setTitle(parameters.getTitle());
+        leave.setTotal(parameters.getTotal());
+
+        if(leave.getUser().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
 
         try {
-            OrdinaryLeave savedOrdinaryLeave = ordinaryLeaveRepository.save(ordinaryLeave);
-            return PatchOrdinaryLeaveRes.builder()
-                    .ordinaryLeaveId(savedOrdinaryLeave.getId())
-                    .startDate(savedOrdinaryLeave.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                    .endDate(savedOrdinaryLeave.getEndDate().format(DateTimeFormatter.ISO_DATE))
+            Leave savedLeave = leaveRepository.save(leave);
+            return PatchLeaveRes.builder()
+                    .leaveId(savedLeave.getId())
+                    .title(savedLeave.getTitle())
+                    .total(savedLeave.getTotal())
                     .build();
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_PATCH_ORDINARY_LEAVE);
+            throw new BaseException(FAILED_TO_PATCH_LEAVE);
         }
     }
 
     /**
      * 정기휴가 삭제
      *
-     * @param Long ordinaryLeaveId
+     * @param leaveId
      * @return void
      * @throws BaseException
      * @Auther shine
      */
-    public void deleteOrdinaryLeave(Long ordinaryLeaveId) throws BaseException {
-        OrdinaryLeave ordinaryLeave = ordinaryLeaveRepository.findById(ordinaryLeaveId)
-                .orElseThrow(() -> new BaseException(NOT_FOUND_ORDINARY_LEAVE));
+    public void deleteLeave(Long leaveId) throws BaseException {
+        Leave leave = userProvider.retrieveLeaveById(leaveId);
 
-        if(ordinaryLeave.getUser().getId() == jwtService.getUserId()) {
+        if(leave.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
         try {
-            ordinaryLeaveRepository.delete(ordinaryLeave);
+            leaveRepository.delete(leave);
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_DELETE_ORDINARY_LEAVE);
+            throw new BaseException(FAILED_TO_DELETE_LEAVE);
         }
     }
 
     /**
      * stateIdx 계산
      *
-     * @param String strPrivate, String strCorporal, String strSergeant, NormalPromotionState normalPromotionState
+     * @param strPrivate
+     * @param strCorporal
+     * @param strSergeant
+     * @param normalPromotionState
      * @return void
      * @Auther shine
      */
@@ -304,7 +311,12 @@ public class UserService {
     /**
      * 호봉 계산기
      *
-     * @param Integer stateIdx, String startDate, String strPrivate, String strCorporal, String strSergeant, NormalPromotionState normalPromotionState
+     * @param stateIdx
+     * @param startDate
+     * @param strPrivate
+     * @param strCorporal
+     * @param strSergeant
+     * @param normalPromotionState
      * @return void
      * @Auther shine
      */

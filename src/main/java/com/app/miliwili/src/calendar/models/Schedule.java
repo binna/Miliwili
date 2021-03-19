@@ -1,16 +1,19 @@
 package com.app.miliwili.src.calendar.models;
 
 import com.app.miliwili.config.BaseEntity;
+import com.app.miliwili.src.user.models.Leave;
+import com.app.miliwili.src.user.models.User;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.List;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = {"scheduleDates", "toDoLists"})
 @Data
 @Entity
 @Table(name = "schedule")
@@ -29,12 +32,6 @@ public class Schedule extends BaseEntity {
     @Column(name = "title", nullable = false, length = 60)
     private String title;
 
-    @Column(name = "startDate", nullable = false)
-    private LocalDate startDate;
-
-    @Column(name = "endDate", nullable = false)
-    private LocalDate endDate;
-
     @Builder.Default
     @Column(name = "repetition", nullable = false, columnDefinition = "varchar(1) default 'N'")
     private String repetition = "N";
@@ -46,6 +43,23 @@ public class Schedule extends BaseEntity {
     @Column(name = "pushDeviceToken", columnDefinition = "TEXT")
     private String pushDeviceToken;
 
+    @ManyToOne
+    @JoinColumn(name = "leave_id")
+    private Leave leave;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ScheduleDate> scheduleDates;
+
     @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ToDoList> toDoLists;
+
+    @Override
+    public String toString() {
+        return ToStringBuilder
+                .reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 }

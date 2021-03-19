@@ -1,6 +1,6 @@
 package com.app.miliwili.src.calendar.dto;
 
-import com.app.miliwili.src.user.dto.PostOrdinaryLeaveReq;
+import com.app.miliwili.src.user.dto.PostLeaveReq;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +18,6 @@ public class PostScheduleReq {
     private String repetition;
     private String push;
     private String pushDeviceToken;
-    private List<PostOrdinaryLeaveReq> ordinaryLeave;
+    private List<PostLeaveReq> ordinaryLeave;
     private List<WorkReq> toDoList;
 }
