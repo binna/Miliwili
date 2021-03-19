@@ -10,16 +10,5 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/app/main")
 public class MainController {
 
-    /**
-     * 전역일 계산기
-     * [GET]
-     * @RequestHeader jwt
-     * @return GetEndDayRes
-     * @Auther vivi
-     */
-//    @ResponseBody
-//    @GetMapping("/endDay")
-//    public BaseResponse<GetEndDayRes> getEndDay() (@RequestHeader("X-ACCESS-TOKEN") String token){
-//
-//    }
+
 }

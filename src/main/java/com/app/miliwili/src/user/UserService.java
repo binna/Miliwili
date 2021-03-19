@@ -1,6 +1,7 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.NormalPromotionState;

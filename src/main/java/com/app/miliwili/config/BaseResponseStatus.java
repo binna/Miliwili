@@ -37,6 +37,7 @@ public enum BaseResponseStatus {
     //vivi: 2500~
 
     INVALID_TOKEN(false, 2500, "유효하지 않은 토큰입니다."),
+    INVALID_USER(false, 2501, "권한이 없는 사용자입니다."),
 
     INVALID_START_DATE(false, 2510, "입대일 형식을 확인해주세요."),
     INVALID_END_DATE(false, 2511, "전역일 형식을 확인해주세요."),
@@ -57,6 +58,7 @@ public enum BaseResponseStatus {
     EMPTY_STATEIDX(false, 2707, "복무형태를 입력해주세요.(일반병사, 부사관, 준사관, 장교"),
     EMPTY_SERVE_TYPE(false, 2708, "하위 복무형태를 입력해주세요(육군, 해군 ..등)"),
 
+    EMPTY_WEIGHT(false, 2800, "몸무게를 입력해주세요"),
 
 
 
@@ -95,6 +97,15 @@ public enum BaseResponseStatus {
 
     FAILED_TO_GET_USER_STATE_IDX(false, 3510, "회원 복무 형태 조회에 실패하였습니다."),
     FAILED_TO_GET_ABNORMAL_END(false, 3511, "부사관, 준사관, 장교 전역일 조회에 실패하였습니다."),
+
+    FAILED_POST_FIRST_WIEHGT(false, 3520, "첫 몸무게 등록에 실패하였습니다"),
+    FAILED_CHECK_FIRST_WIEHGT(false, 3521, "이미 몸무게가 등록된(운동탭에 방문했던) 사용자입니다 "),
+
+    NOT_FOUND_EXERCISEINFO(false, 3530, "존재하지 않는 운동 정보입니다 "),
+    FAILED_POST_DAILY_WEIGHT(false, 3531, "일일 체중 기록에 실패하였습니다. "),
+    FAILED_PATCH_GOAL_WEIGHT(false, 3532, "목표체중 수정에 실패하였습니다. "),
+
+
 
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");

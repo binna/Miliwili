@@ -68,4 +68,9 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
     }
 
 
+    /**
+     * user정보 찾기
+     */
+
+
 }

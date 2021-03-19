@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DDayRepository extends CrudRepository<DDay, Long> {
     // TODO
+
+
+
 }
