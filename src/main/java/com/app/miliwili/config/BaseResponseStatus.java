@@ -106,6 +106,7 @@ public enum BaseResponseStatus {
     NOT_FOUND_EXERCISEINFO(false, 3530, "존재하지 않는 운동 정보입니다 "),
     FAILED_POST_DAILY_WEIGHT(false, 3531, "일일 체중 기록에 실패하였습니다. "),
     FAILED_PATCH_GOAL_WEIGHT(false, 3532, "목표체중 수정에 실패하였습니다. "),
+    FAILED_GET_DAILY_WEIGHT(false, 3533, "일일 체중 기록 조회에 실패하였습니다."),
 
 
 

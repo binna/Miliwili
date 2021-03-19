@@ -1,7 +1,6 @@
 package com.app.miliwili.src.exercise;
 
-import com.app.miliwili.src.exercise.model.ExerciseInfo;
-import com.app.miliwili.src.exercise.model.QExerciseInfo;
+import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.models.User;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -35,5 +34,20 @@ public class ExerciseSelectRepository extends QuerydslRepositorySupport {
 
     }
 
+    /**
+     * 일별 체중 조회
+     */
+    public List<ExerciseWeightRecord> getWeightRecordByExerciseId(Long exerciseId){
+        QExerciseWeightRecord exerciseWeightRecord = QExerciseWeightRecord.exerciseWeightRecord;
+        QExerciseInfo exerciseInfo = QExerciseInfo.exerciseInfo;
+
+        return queryFactory.select((Projections.constructor(ExerciseWeightRecord.class)))
+                .from(exerciseWeightRecord)
+                .where(exerciseWeightRecord.status.eq("Y"))
+                .join(exerciseInfo)
+                .on(exerciseInfo.id.eq(exerciseWeightRecord.exerciseInfo.id))
+                .limit(5)
+                .fetchJoin().fetch();
+    }
 
 }

@@ -28,6 +28,9 @@ public class ExerciseRoutine extends BaseEntity {
     @Column(name = "bodyPart",length = 45, nullable = false)
     private String bodyPart;
 
+    @Column(name = "repeatDay", length = 30, nullable = false)
+    private String repeaDay;
+
     @ManyToOne
     @JoinColumn(name = "exercise_id", nullable = false )
     private ExerciseInfo exerciseInfo;
