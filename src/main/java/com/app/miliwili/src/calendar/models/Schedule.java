@@ -1,7 +1,6 @@
 package com.app.miliwili.src.calendar.models;
 
 import com.app.miliwili.config.BaseEntity;
-import com.app.miliwili.src.user.models.Leave;
 import com.app.miliwili.src.user.models.User;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -13,7 +12,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"scheduleDates", "toDoLists"})
+@EqualsAndHashCode(callSuper = false, exclude = {"user", "scheduleDates", "toDoLists"})
 @Data
 @Entity
 @Table(name = "schedule")
@@ -43,10 +42,6 @@ public class Schedule extends BaseEntity {
     @Column(name = "pushDeviceToken", columnDefinition = "TEXT")
     private String pushDeviceToken;
 
-    @ManyToOne
-    @JoinColumn(name = "leave_id")
-    private Leave leave;
-
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -56,6 +51,9 @@ public class Schedule extends BaseEntity {
 
     @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ToDoList> toDoLists;
+
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ScheduleVacation> scheduleLeaves;
 
     @Override
     public String toString() {
