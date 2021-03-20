@@ -8,10 +8,12 @@ import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,6 +79,7 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PostLoginRes loginUser(String socialId) throws BaseException {
         User user = null;
 
@@ -100,6 +103,7 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PostSignUpRes createUser(PostSignUpReq parameters, String token) throws BaseException {
         User newUser = User.builder()
                 .name(parameters.getName())
@@ -119,6 +123,7 @@ public class UserService {
 
         try {
             User savedUser = userRepository.save(newUser);
+            setLeaveDatas(newUser);
             return new PostSignUpRes(savedUser.getId(), jwtService.createJwt(savedUser.getId()));
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_SIGNUP_USER);
@@ -350,6 +355,17 @@ public class UserService {
     }
 
 
+
+    private void setLeaveDatas(User user) {
+        Leave leave1 = Leave.builder().title("1차 정기휴가").user(user).total(8).build();
+        Leave leave2 = Leave.builder().title("2차 정기휴가").user(user).total(8).build();
+        Leave leave3 = Leave.builder().title("3차 정기휴가").user(user).total(8).build();
+        Leave leave4 = Leave.builder().title("포상휴가").user(user).total(15).build();
+
+        final List<Leave> leaveList = Arrays.asList(leave1, leave2, leave3, leave4);
+
+        leaveRepository.saveAll(leaveList);
+    }
 
     private void setSocial(String socialType, String token, User user) throws BaseException {
         if (socialType.equals("K")) {

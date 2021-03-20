@@ -27,7 +27,8 @@ public class CalendarController {
      */
     @ResponseBody
     @PostMapping("/calendars/schedule")
-    public BaseResponse<PostScheduleRes> postSchedule(@RequestBody(required = false) PostScheduleReq parameters) {
+    public BaseResponse<PostScheduleRes> postSchedule(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                      @RequestBody(required = false) PostScheduleReq parameters) {
 
         // TODO 파라미터 검사
 
@@ -49,7 +50,8 @@ public class CalendarController {
      */
     @ResponseBody
     @PostMapping("/calendars/dday")
-    public BaseResponse<PostDDayRes> postDDay(@RequestBody(required = false) PostDDayReq parameters) {
+    public BaseResponse<PostDDayRes> postDDay(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                              @RequestBody(required = false) PostDDayReq parameters) {
 
         // TODO 파라미터 검사
 

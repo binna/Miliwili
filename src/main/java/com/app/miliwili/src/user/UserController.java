@@ -13,6 +13,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -407,20 +408,21 @@ public class UserController {
         }
     }
 
-//    /**
-//     *
-//     * @param token
-//     * @return
-//     */
-//    @GetMapping("/users/ordinary-leaves")
-//    public BaseResponse<GetOrdinaryLeaveRes> getOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token) {
-//        try {
-//            GetOrdinaryLeaveRes ordinaryLeaveRes = userProvider.retrieve();
-//            return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
+    /**
+     *
+     * @param token
+     * @return
+     */
+    @ApiOperation(value = "정기휴가 조회", notes = "X-ACCESS-TOKEN jwt 필요")
+    @GetMapping("/users/ordinary-leaves")
+    public BaseResponse<List<GetLeaveRes>> getOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token) {
+        try {
+            List<GetLeaveRes> LeaveRes = userProvider.retrieve();
+            return new BaseResponse<>(SUCCESS, LeaveRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
 
 
