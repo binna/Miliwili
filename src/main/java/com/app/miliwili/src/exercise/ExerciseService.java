@@ -108,6 +108,7 @@ public class ExerciseService {
     public String createRoutine(PostExerciseRoutineReq param, long exerciseId) throws BaseException {
         ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
 
+        System.out.println("exerciseIduserId:"+exerciseInfo.getUser().getId()+"jwt Id"+jwtService.getUserId());
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(INVALID_USER);
         }
@@ -118,7 +119,8 @@ public class ExerciseService {
                 .repeaDay(param.getRepeatDay())
                 .exerciseInfo(exerciseInfo)
                 .build();
-
+        exerciseInfo.addExerciseRoutine(newRoutine);
+        exerciseRoutineRepository.save(newRoutine);
 
         for (int i = 0; i < param.getDetailName().size(); i++) {
             ExerciseRoutineDetail newRoutineDetail = ExerciseRoutineDetail.builder()
@@ -127,11 +129,15 @@ public class ExerciseService {
                     .routineTypeId(param.getDetailType().get(i))
                     .setCount(param.getDetailSet().get(i))
                     .isSame((param.getDetailSetEqual().get(i)) ? "Y" : "N")
+                    .exerciseRoutine(newRoutine)
                     .build();
+            newRoutine.addRoutineDetail(newRoutineDetail);
 
             //무게 + 개수
             if (newRoutineDetail.getRoutineTypeId() == 1) {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                System.out.println(totalArr[0]);
+                System.out.println(totalArr[1]);
                 for (int j = 0; j < totalArr.length; j++) {
                     String[] weightCount = totalArr[j].split("#");
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
