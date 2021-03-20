@@ -29,12 +29,12 @@ public class NormalPromotionState {
     @Column(name = "thirdDate")
     private LocalDate thirdDate;
 
-    @Column(name = "hobong", nullable = false, columnDefinition = "integer default 1")
     @Builder.Default
+    @Column(name = "hobong", nullable = false, columnDefinition = "integer default 1")
     private Integer hobong = 1;
 
-    @Column(name = "stateIdx", nullable = false, columnDefinition = "integer default 0")
     @Builder.Default
+    @Column(name = "stateIdx", nullable = false, columnDefinition = "integer default 0")
     private Integer stateIdx = 0;
 
     @OneToOne

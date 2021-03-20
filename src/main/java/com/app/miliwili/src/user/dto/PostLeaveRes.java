@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 public class PostLeaveRes {
     private final Long leaveId;
+    private final String distinction;
     private final String title;
-    private final Integer total;
+    private final Integer totalDays;
 }

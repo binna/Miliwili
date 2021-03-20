@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class PatchLeaveReq {
     private String title;
-    private Integer total;
+    private Integer useDays;
+    private Integer totalDays;
 }

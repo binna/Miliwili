@@ -19,6 +19,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -59,22 +60,20 @@ public class CalendarService {
         if(Objects.nonNull(parameters.getToDoList())) {
             newSchedule.setToDoLists(calendarProvider.retrieveToDoList(parameters.getToDoList()));
         }
-        if(newSchedule.getDistinction().equals("정기휴가")) {
-            newSchedule.setLeave(userProvider.retrieveLeaveById(parameters.getLeaveId()));
-        }
 
-        // TODO PUSH 알람 -> 스케줄러로 결정
-        newSchedule.setPush("Y");
+        if(newSchedule.getDistinction().equals("휴가")) {
+            newSchedule.setScheduleLeaves(
+                parameters.getScheduleLeaveData().stream().map(scheduleLeaveDataRes -> {
+                    return ScheduleVacation.builder()
+                            .count(scheduleLeaveDataRes.getCount())
+                            .schedule(newSchedule)
+                            .leaveId(scheduleLeaveDataRes.getLeaveId())
+                            .build();
+                })
+            .collect(Collectors.toList()));
+        }
         if(newSchedule.getPush().equals("Y")) {
-            System.out.println("PUSH 알람");
-            try {
-                firebaseCloudMessageService.sendMessageTo(
-                        parameters.getPushDeviceToken(),
-                        "test " + newSchedule.getTitle(),
-                        "test " + newSchedule.getTitle() + " 일정 하루 전날입니다.\n준비해주세요!");
-            } catch (Exception exception) {
-                // TODO 에러 처리
-            }
+            newSchedule.setPushDeviceToken(parameters.getPushDeviceToken());
         }
 
         try {

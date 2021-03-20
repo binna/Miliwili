@@ -9,6 +9,8 @@ import lombok.Getter;
 @Getter
 public class PatchLeaveRes {
     private final Long leaveId;
+    private final String distinction;
     private final String title;
-    private final Integer total;
+    private final Integer useDays;
+    private final Integer totalDays;
 }

@@ -1,5 +1,6 @@
 package com.app.miliwili.config;
 
+import com.app.miliwili.src.calendar.ScheduleRepository;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.UserService;
 import com.app.miliwili.src.user.models.NormalPromotionState;
@@ -17,6 +18,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Component
 public class Scheduler {
     private final UserRepository userRepository;
+    private final ScheduleRepository scheduleRepository;
     private final UserService userService;
 
     @Scheduled(cron  = "0 0 0 * * *")
@@ -42,5 +44,20 @@ public class Scheduler {
     }
 
     // TODO FCM 보내기
+    public void sendPushMessage() {
+//        // TODO PUSH 알람 -> 스케줄러로 결정
+//        newSchedule.setPush("Y");
+//        if(newSchedule.getPush().equals("Y")) {
+//            System.out.println("PUSH 알람");
+//            try {
+//                firebaseCloudMessageService.sendMessageTo(
+//                        parameters.getPushDeviceToken(),
+//                        "test " + newSchedule.getTitle(),
+//                        "test " + newSchedule.getTitle() + " 일정 하루 전날입니다.\n준비해주세요!");
+//            } catch (Exception exception) {
+//                // TODO 에러 처리
+//            }
+//        }
+    }
 
 }

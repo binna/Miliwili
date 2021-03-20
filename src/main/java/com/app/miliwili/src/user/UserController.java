@@ -342,11 +342,17 @@ public class UserController {
     @PostMapping("/users/leaves")
     public BaseResponse<PostLeaveRes> postOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                         @RequestBody(required = false) PostLeaveReq parameters) {
+        if(Objects.isNull(parameters.getDistinction()) || parameters.getDistinction().length() == 0) {
+            return new BaseResponse<>(EMPTY_DISTINCTION);
+        }
         if(Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
             return new BaseResponse<>(EMPTY_TITLE);
         }
-        if(Objects.isNull(parameters.getTotal())) {
-            return new BaseResponse<>(EMPTY_TOTAL);
+        if(parameters.getDistinction().length() < 20 || parameters.getTitle().length() < 20) {
+            return new BaseResponse<>(EXCEED_MAX20);
+        }
+        if(Objects.isNull(parameters.getTotalDays())) {
+            return new BaseResponse<>(EMPTY_TOTAL_DAYS);
         }
 
         try {
@@ -375,8 +381,16 @@ public class UserController {
         if(Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
             return new BaseResponse<>(EMPTY_TITLE);
         }
-        if(Objects.isNull(parameters.getTotal())) {
-            return new BaseResponse<>(EMPTY_TOTAL);
+        if(parameters.getTitle().length() < 20) {
+            return new BaseResponse<>(EXCEED_MAX20);
+        }
+        if(Objects.isNull(parameters.getTotalDays())) {
+            return new BaseResponse<>(EMPTY_TOTAL_DAYS);
+        }
+        if(Objects.nonNull(parameters.getUseDays())) {
+            if(parameters.getUseDays() > parameters.getTotalDays()) {
+                return new BaseResponse<>(NOT_BE_GREATER_THAN_TOTAL_DAYS);
+            }
         }
 
         try {

@@ -1,7 +1,6 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.*;
 import com.app.miliwili.utils.JwtService;
@@ -15,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -26,7 +25,7 @@ public class UserService {
     private final SNSLogin snsLogin;
     private final JwtService jwtService;
     private final UserRepository userRepository;
-    private final LeaveRepository leaveRepository;
+    private final VacationRepository vacationRepository;
 
     /**
      * [로그인 - 구글 ]
@@ -208,21 +207,24 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PostLeaveRes createLeave(PostLeaveReq parameters) throws BaseException {
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        Leave newLeave = Leave.builder()
+        Vacation newLeave = Vacation.builder()
+                .distinction(parameters.getDistinction())
                 .title(parameters.getTitle())
-                .total(parameters.getTotal())
+                .totalDays(parameters.getTotalDays())
                 .user(user)
                 .build();
 
         try {
-            Leave savedLeave = leaveRepository.save(newLeave);
+            Vacation savedVacation = vacationRepository.save(newLeave);
             return PostLeaveRes.builder()
-                    .leaveId(savedLeave.getId())
-                    .title(savedLeave.getTitle())
-                    .total(savedLeave.getTotal())
+                    .leaveId(savedVacation.getId())
+                    .distinction(savedVacation.getDistinction())
+                    .title(savedVacation.getTitle())
+                    .totalDays(savedVacation.getTotalDays())
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_LEAVE);
@@ -238,22 +240,29 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PatchLeaveRes updateLeave(PatchLeaveReq parameters, Long leaveId) throws BaseException {
-        Leave leave = userProvider.retrieveLeaveById(leaveId);
+        Vacation vacation = userProvider.retrieveLeaveById(leaveId);
 
-        leave.setTitle(parameters.getTitle());
-        leave.setTotal(parameters.getTotal());
+        vacation.setTitle(parameters.getTitle());
+        vacation.setTotalDays(parameters.getTotalDays());
 
-        if(leave.getUser().getId() != jwtService.getUserId()) {
+        if(Objects.nonNull(parameters.getUseDays())) {
+            vacation.setUseDays(parameters.getUseDays());
+        }
+
+        if(vacation.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
         try {
-            Leave savedLeave = leaveRepository.save(leave);
+            Vacation savedLeave = vacationRepository.save(vacation);
             return PatchLeaveRes.builder()
                     .leaveId(savedLeave.getId())
+                    .distinction(savedLeave.getDistinction())
                     .title(savedLeave.getTitle())
-                    .total(savedLeave.getTotal())
+                    .useDays(savedLeave.getUseDays()/* TODO 더해줘야지 스케줄러에서 계산해서 */)
+                    .totalDays(savedLeave.getTotalDays())
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_PATCH_LEAVE);
@@ -268,15 +277,16 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public void deleteLeave(Long leaveId) throws BaseException {
-        Leave leave = userProvider.retrieveLeaveById(leaveId);
+        Vacation vacation = userProvider.retrieveLeaveById(leaveId);
 
-        if(leave.getUser().getId() != jwtService.getUserId()) {
+        if(vacation.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
         try {
-            leaveRepository.delete(leave);
+            vacationRepository.delete(vacation);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_LEAVE);
         }
@@ -357,14 +367,14 @@ public class UserService {
 
 
     private void setLeaveDatas(User user) {
-        Leave leave1 = Leave.builder().title("1차 정기휴가").user(user).total(8).build();
-        Leave leave2 = Leave.builder().title("2차 정기휴가").user(user).total(8).build();
-        Leave leave3 = Leave.builder().title("3차 정기휴가").user(user).total(8).build();
-        Leave leave4 = Leave.builder().title("포상휴가").user(user).total(15).build();
+        Vacation vacation1 = Vacation.builder().distinction("정기").title("1차 정기휴가").user(user).totalDays(8).build();
+        Vacation vacation2 = Vacation.builder().distinction("정기").title("2차 정기휴가").user(user).totalDays(8).build();
+        Vacation vacation3 = Vacation.builder().distinction("정기").title("3차 정기휴가").user(user).totalDays(8).build();
+        Vacation vacation4 = Vacation.builder().distinction("포상").title("포상휴가").user(user).totalDays(15).build();
 
-        final List<Leave> leaveList = Arrays.asList(leave1, leave2, leave3, leave4);
+        final List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3, vacation4);
 
-        leaveRepository.saveAll(leaveList);
+        vacationRepository.saveAll(leaveList);
     }
 
     private void setSocial(String socialType, String token, User user) throws BaseException {

@@ -3,12 +3,14 @@ package com.app.miliwili;
 import com.app.miliwili.src.calendar.ScheduleRepository;
 import com.app.miliwili.src.calendar.models.Schedule;
 import com.app.miliwili.src.calendar.models.ScheduleDate;
-import com.app.miliwili.src.user.LeaveRepository;
+import com.app.miliwili.src.calendar.models.ScheduleVacation;
+import com.app.miliwili.src.user.VacationRepository;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
-import com.app.miliwili.src.user.models.Leave;
 import com.app.miliwili.src.user.models.NormalPromotionState;
 import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.Vacation;
+import com.app.miliwili.utils.Validation;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -30,7 +32,7 @@ import java.util.List;
 @SpringBootApplication
 public class MiliwiliApplication implements CommandLineRunner {
     private final UserRepository userRepository;
-    private final LeaveRepository leaveRepository;
+    private final VacationRepository vacationRepository;
     private final ScheduleRepository scheduleRepository;
 
     public static void main(String[] args) {
@@ -116,25 +118,30 @@ public class MiliwiliApplication implements CommandLineRunner {
         /**
          * 휴가 더미데이터
          */
-        Leave leave1 = Leave.builder().title("1차정기휴가").user(userKaKao1).total(8).build();
-        Leave leave2 = Leave.builder().title("2차정기휴가").user(userKaKao1).total(8).build();
-        Leave leave3 = Leave.builder().title("3차정기휴가").user(userKaKao1).total(8).build();
+        Vacation vacation1 = Vacation.builder().distinction("정기").title("1차정기휴가").user(userKaKao1).totalDays(8).build();
+        Vacation vacation2 = Vacation.builder().distinction("정기").title("2차정기휴가").user(userKaKao1).totalDays(8).build();
+        Vacation vacation3 = Vacation.builder().distinction("정기").title("3차정기휴가").user(userKaKao1).totalDays(8).build();
 
-        final List<Leave> leaveList = Arrays.asList(leave1, leave2, leave3);
-        leaveRepository.saveAll(leaveList);
+        final List<Vacation> validationList = Arrays.asList(vacation1, vacation2, vacation3);
+        vacationRepository.saveAll(validationList);
 
         /**
          * 스케줄 더미데이터
          */
         Schedule schedule1 = Schedule.builder()
-                .color("빨강").distinction("정기휴가").title("휴가날 뭐할지 딱 정함ㅋ")
-                .leave(leave1).user(userKaKao1)
+                .color("빨강").distinction("휴가").title("휴가날 뭐할지 딱 정함ㅋ")
+                .user(userKaKao1)
                 .build();
         ScheduleDate date = ScheduleDate.builder()
                 .date(LocalDate.parse("2021-12-31", DateTimeFormatter.ISO_DATE))
                 .schedule(schedule1)
                 .build();
         schedule1.setScheduleDates(Arrays.asList(date));
+        ScheduleVacation scheduleLeaveData = ScheduleVacation.builder()
+                .count(1)
+                .leaveId(Long.valueOf(1))
+                .build();
+        schedule1.setScheduleLeaves(Arrays.asList(scheduleLeaveData));
 
         final List<Schedule> scheduleList = Arrays.asList(schedule1);
         scheduleRepository.saveAll(scheduleList);
