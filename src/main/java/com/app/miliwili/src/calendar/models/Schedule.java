@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Builder
 @AllArgsConstructor
@@ -46,14 +47,17 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OrderBy("date asc")
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ScheduleDate> scheduleDates;
 
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<ToDoList> toDoLists;
+    @OrderBy("id asc")
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<ToDoList> toDoLists;
 
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<ScheduleVacation> scheduleLeaves;
+    @OrderBy("id asc")
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL,  fetch = FetchType.EAGER)
+    private Set<ScheduleVacation> scheduleVacations;
 
     @Override
     public String toString() {

@@ -4,6 +4,7 @@ import com.app.miliwili.src.calendar.ScheduleRepository;
 import com.app.miliwili.src.calendar.models.Schedule;
 import com.app.miliwili.src.calendar.models.ScheduleDate;
 import com.app.miliwili.src.calendar.models.ScheduleVacation;
+import com.app.miliwili.src.calendar.models.ToDoList;
 import com.app.miliwili.src.user.VacationRepository;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
@@ -14,7 +15,9 @@ import com.app.miliwili.utils.Validation;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.TaskScheduler;
@@ -27,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @AllArgsConstructor
-@EnableJpaAuditing
 @EnableScheduling
 @SpringBootApplication
 public class MiliwiliApplication implements CommandLineRunner {
@@ -129,19 +131,27 @@ public class MiliwiliApplication implements CommandLineRunner {
          * 스케줄 더미데이터
          */
         Schedule schedule1 = Schedule.builder()
-                .color("빨강").distinction("휴가").title("휴가날 뭐할지 딱 정함ㅋ")
+                .color("빨강").distinction("휴가").title("휴가날 뭐할지 딱 정함ㅋ").push("Y").pushDeviceToken("test")
                 .user(userKaKao1)
                 .build();
-        ScheduleDate date = ScheduleDate.builder()
-                .date(LocalDate.parse("2021-12-31", DateTimeFormatter.ISO_DATE))
+        ScheduleDate date1 = ScheduleDate.builder()
+                .date(LocalDate.parse("2021-03-21", DateTimeFormatter.ISO_DATE))
                 .schedule(schedule1)
                 .build();
-        schedule1.setScheduleDates(Arrays.asList(date));
-        ScheduleVacation scheduleLeaveData = ScheduleVacation.builder()
-                .count(1)
-                .leaveId(Long.valueOf(1))
+        ScheduleDate date2 = ScheduleDate.builder()
+                .date(LocalDate.parse("2021-03-22", DateTimeFormatter.ISO_DATE))
+                .schedule(schedule1)
                 .build();
-        schedule1.setScheduleLeaves(Arrays.asList(scheduleLeaveData));
+        schedule1.setScheduleDates(Arrays.asList(date1,date2));
+//        ScheduleVacation scheduleLeaveData = ScheduleVacation.builder()
+//                .count(1)
+//                .vacationId(Long.valueOf(1))
+//                .build();
+//        schedule1.setScheduleVacations(Arrays.asList(scheduleLeaveData));
+//        ToDoList toDoList = ToDoList.builder()
+//                .content("test")
+//                .build();
+//        schedule1.setToDoLists(Arrays.asList(toDoList));
 
         final List<Schedule> scheduleList = Arrays.asList(schedule1);
         scheduleRepository.saveAll(scheduleList);

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.app.miliwili.config.BaseResponseStatus.FAILED_TO_GET_SCHEDULE;
@@ -44,14 +45,14 @@ public class CalendarProvider {
      * @return List<ToDoList>
      * @Auther shine
      */
-    public List<ToDoList> retrieveToDoList(List<WorkReq> parameters) {
+    public Set<ToDoList> retrieveToDoList(List<WorkReq> parameters) {
         if (parameters == null) return null;
 
         return parameters.stream().map(workReq -> {
             return ToDoList.builder()
                     .content(workReq.getContent())
                     .build();
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toSet());
     }
 
     /**
