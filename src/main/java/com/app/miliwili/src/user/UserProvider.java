@@ -142,7 +142,7 @@ public class UserProvider {
     @Transactional
     public Vacation retrieveLeaveById(Long leaveId) throws BaseException {
         return leaveRepository.findById(leaveId)
-                .orElseThrow(() -> new BaseException(NOT_FOUND_LEAVE));
+                .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION));
     }
 
     /**
@@ -156,7 +156,7 @@ public class UserProvider {
             List<Vacation> ordinaryLeaves = leaveRepository.findByUser_IdOrderById(jwtService.getUserId());
             return ordinaryLeaves;
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_GET_LEAVE);
+            throw new BaseException(FAILED_TO_GET_VACATION);
         }
     }
 

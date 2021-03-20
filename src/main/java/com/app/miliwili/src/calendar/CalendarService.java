@@ -29,7 +29,6 @@ public class CalendarService {
     private final ScheduleRepository scheduleRepository;
     private final DDayRepository dDayRepository;
     private final JwtService jwtService;
-    private final FirebaseCloudMessage firebaseCloudMessageService;
     private final CalendarProvider calendarProvider;
     private final UserProvider userProvider;
 
@@ -62,15 +61,14 @@ public class CalendarService {
         }
 
         if(newSchedule.getDistinction().equals("휴가")) {
-            newSchedule.setScheduleLeaves(
+            newSchedule.setScheduleVacations(
                 parameters.getScheduleLeaveData().stream().map(scheduleLeaveDataRes -> {
                     return ScheduleVacation.builder()
                             .count(scheduleLeaveDataRes.getCount())
                             .schedule(newSchedule)
-                            .leaveId(scheduleLeaveDataRes.getLeaveId())
+                            .vacationId(scheduleLeaveDataRes.getLeaveId())
                             .build();
-                })
-            .collect(Collectors.toList()));
+                }).collect(Collectors.toSet()));
         }
         if(newSchedule.getPush().equals("Y")) {
             newSchedule.setPushDeviceToken(parameters.getPushDeviceToken());
@@ -85,7 +83,7 @@ public class CalendarService {
                     .title(savedSchedule.getTitle())
                     .repetition(savedSchedule.getRepetition())
                     .push(savedSchedule.getPush())
-                    .toDoList(calendarProvider.retrieveWorkRes(savedSchedule.getToDoLists()))
+//                    .toDoList(calendarProvider.retrieveWorkRes(savedSchedule.getToDoLists()))
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_SCHEDULE);
@@ -107,7 +105,7 @@ public class CalendarService {
                     .build());
             targetDate = targetDate.plusDays(Long.valueOf(1));
         }
-        schedule.setScheduleDates(scheduleDates);
+//        schedule.setScheduleDates(scheduleDates);
     }
 
     /**

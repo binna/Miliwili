@@ -211,7 +211,7 @@ public class UserService {
     public PostLeaveRes createLeave(PostLeaveReq parameters) throws BaseException {
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        Vacation newLeave = Vacation.builder()
+        Vacation newVacation = Vacation.builder()
                 .distinction(parameters.getDistinction())
                 .title(parameters.getTitle())
                 .totalDays(parameters.getTotalDays())
@@ -219,7 +219,7 @@ public class UserService {
                 .build();
 
         try {
-            Vacation savedVacation = vacationRepository.save(newLeave);
+            Vacation savedVacation = vacationRepository.save(newVacation);
             return PostLeaveRes.builder()
                     .leaveId(savedVacation.getId())
                     .distinction(savedVacation.getDistinction())
@@ -227,7 +227,7 @@ public class UserService {
                     .totalDays(savedVacation.getTotalDays())
                     .build();
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_LEAVE);
+            throw new BaseException(FAILED_TO_POST_VACATION);
         }
     }
 
@@ -265,7 +265,7 @@ public class UserService {
                     .totalDays(savedLeave.getTotalDays())
                     .build();
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_PATCH_LEAVE);
+            throw new BaseException(FAILED_TO_PATCH_VACATION);
         }
     }
 
@@ -288,7 +288,7 @@ public class UserService {
         try {
             vacationRepository.delete(vacation);
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_DELETE_LEAVE);
+            throw new BaseException(FAILED_TO_DELETE_VACATION);
         }
     }
 

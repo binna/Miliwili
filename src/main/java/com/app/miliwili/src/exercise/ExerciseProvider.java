@@ -2,7 +2,6 @@ package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.exercise.model.ExerciseInfo;
-import com.app.miliwili.src.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +45,7 @@ public class ExerciseProvider {
      */
     public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{
         return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
-            .orElseThrow(() -> new BaseException(NOT_FOUND_LEAVE));
+            .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION));
 
 
     }

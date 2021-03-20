@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = {"schedule"})
 @Data
 @Entity
 @Table(name = "scheduleVacation")
@@ -26,6 +26,6 @@ public class ScheduleVacation {
 
 //    @OneToMany(mappedBy = "scheduleLeaveData", orphanRemoval = true, cascade = CascadeType.ALL)
 //    private List<Leave> leaves;
-    @Column(name = "leaveId", nullable = false)
-    private Long leaveId;
+    @Column(name = "vacationId", nullable = false)
+    private Long vacationId;
 }
