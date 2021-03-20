@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -43,19 +46,21 @@ public class CalendarService {
                 .color(parameters.getColor())
                 .distinction(parameters.getDistinction())
                 .title(parameters.getTitle())
-                //.startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
-                //.endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
                 .user(user)
                 .build();
+        setScheduleDate(parameters, newSchedule);
 
-        if(!Objects.isNull(parameters.getRepetition())) {
+        if(Objects.nonNull(parameters.getRepetition())) {
             newSchedule.setRepetition(parameters.getRepetition());
         }
-        if(!Objects.isNull(parameters.getPush())) {
+        if(Objects.nonNull(parameters.getPush())) {
             newSchedule.setPush(parameters.getPush());
         }
-        if(!Objects.isNull(parameters.getToDoList())) {
+        if(Objects.nonNull(parameters.getToDoList())) {
             newSchedule.setToDoLists(calendarProvider.retrieveToDoList(parameters.getToDoList()));
+        }
+        if(newSchedule.getDistinction().equals("정기휴가")) {
+            newSchedule.setLeave(userProvider.retrieveLeaveById(parameters.getLeaveId()));
         }
 
         // TODO PUSH 알람 -> 스케줄러로 결정
@@ -79,8 +84,6 @@ public class CalendarService {
                     .color(savedSchedule.getColor())
                     .distinction(savedSchedule.getDistinction())
                     .title(savedSchedule.getTitle())
-                    //.startDate(savedSchedule.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                    //.endDate(savedSchedule.getEndDate().format(DateTimeFormatter.ISO_DATE))
                     .repetition(savedSchedule.getRepetition())
                     .push(savedSchedule.getPush())
                     .toDoList(calendarProvider.retrieveWorkRes(savedSchedule.getToDoLists()))
@@ -88,6 +91,24 @@ public class CalendarService {
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_SCHEDULE);
         }
+    }
+
+    private void setScheduleDate(PostScheduleReq parameters, Schedule schedule) {
+        List<ScheduleDate> scheduleDates = new ArrayList<>();
+
+        LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
+
+        LocalDate targetDate = startDate;
+        int days = (int) ChronoUnit.DAYS.between(startDate, endDate);
+        for (int i = 0; i <= days; i++) {
+            scheduleDates.add(ScheduleDate.builder()
+                    .date(targetDate)
+                    .schedule(schedule)
+                    .build());
+            targetDate = targetDate.plusDays(Long.valueOf(1));
+        }
+        schedule.setScheduleDates(scheduleDates);
     }
 
     /**

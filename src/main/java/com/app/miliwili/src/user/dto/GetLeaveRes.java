@@ -4,12 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-import java.util.Map;
-
 @AllArgsConstructor
 @Builder
 @Getter
-public class GetOrdinaryLeaveRes {
-    private final List<Map<String, String>> hi;
+public class GetLeaveRes {
+    private final String title;
+    private final Integer use;
+    private final Integer total;
 }
