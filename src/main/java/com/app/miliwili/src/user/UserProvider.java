@@ -5,7 +5,7 @@ import com.app.miliwili.src.calendar.CalendarProvider;
 import com.app.miliwili.src.calendar.ScheduleSelectRepository;
 import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
 import com.app.miliwili.src.user.dto.GetLeaveRes;
-import com.app.miliwili.src.user.models.Leave;
+import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.src.user.models.User;
 import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class UserProvider {
     private final UserSelectRepository userSelectRepository;
     private final UserRepository userRepository;
-    private final LeaveRepository leaveRepository;
+    private final VacationRepository leaveRepository;
     private final ScheduleSelectRepository scheduleSelectRepository;
     private final JwtService jwtService;
     private final CalendarProvider calendarProvider;
@@ -140,7 +140,7 @@ public class UserProvider {
      * @Auther shine
      */
     @Transactional
-    public Leave retrieveLeaveById(Long leaveId) throws BaseException {
+    public Vacation retrieveLeaveById(Long leaveId) throws BaseException {
         return leaveRepository.findById(leaveId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_LEAVE));
     }
@@ -151,9 +151,9 @@ public class UserProvider {
      * @return List<OrdinaryLeave>
      * @throws BaseException
      */
-    private List<Leave> retrieveLeaveByUserIdOrderById() throws BaseException {
+    private List<Vacation> retrieveLeaveByUserIdOrderById() throws BaseException {
         try {
-            List<Leave> ordinaryLeaves = leaveRepository.findByUser_IdOrderById(jwtService.getUserId());
+            List<Vacation> ordinaryLeaves = leaveRepository.findByUser_IdOrderById(jwtService.getUserId());
             return ordinaryLeaves;
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_LEAVE);

@@ -1,13 +1,15 @@
 package com.app.miliwili.src.calendar.models;
 
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = {"schedule"})
 @Data
 @Entity
 @Table(name = "toDoList")
@@ -27,4 +29,10 @@ public class ToDoList {
     @ManyToOne
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
+
+    @Override
+    public String toString() {
+        return ToStringBuilder
+                .reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 }
