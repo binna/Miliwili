@@ -75,8 +75,7 @@ public class ExerciseController {
         try{
             String returnStr = exerciseService.modifyGoalWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,returnStr);
-        }catch (BaseException e){
-            e.printStackTrace();
+        }catch (BaseException e){            e.printStackTrace();
             return new BaseResponse<>(FAILED_PATCH_GOAL_WEIGHT);
         }
     }
@@ -93,6 +92,22 @@ public class ExerciseController {
         try{
             GetExerciseDailyWeightRes exerciseDailyWeightRes= exerciseProvider.retrieveExerciseDailyWeight(exerciseId);
             return new BaseResponse<>(SUCCESS, exerciseDailyWeightRes);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     *
+     */
+    @ResponseBody
+    @PostMapping("/{exerciseId}/routines")
+    public BaseResponse<String> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                             @RequestBody PostExerciseRoutineReq param){
+        try{
+            String result = exerciseService.createRoutine(param,exerciseId);
+            return new BaseResponse<>(SUCCESS,result);
         }catch (BaseException e){
             e.printStackTrace();
             return new BaseResponse<>(e.getStatus());

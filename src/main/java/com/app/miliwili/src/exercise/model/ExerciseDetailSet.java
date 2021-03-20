@@ -19,16 +19,16 @@ public class ExerciseDetailSet extends BaseEntity {
     private Long id;
 
     @Column(name = "setIdx", nullable = false)
-    private Long setIdx;
+    private Integer setIdx;
 
     @Column(name = "setWeight")
-    private Long setWeight;
+    private Double setWeight;
 
     @Column(name = "setCount")
-    private Long setCount;
+    private Integer setCount;
 
     @Column(name = "setTime")
-    private Long setTime;
+    private Integer setTime;
 
     @ManyToOne
     @JoinColumn(name = "exerciseRoutinedetail_id", nullable = false )

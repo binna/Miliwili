@@ -45,9 +45,15 @@ public class ExerciseInfo extends BaseEntity {
     @OneToMany(mappedBy = "exerciseInfo", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ExerciseWeightRecord> weightRecords = new ArrayList<>();
 
+    @OneToMany(mappedBy = "exerciseInfo", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseRoutine> exerciseRoutines = new ArrayList<>();
 
     public void addWeightRecord(ExerciseWeightRecord record){
         this.weightRecords.add(record);
+    }
+
+    public void addExerciseRoutine(ExerciseRoutine routine){
+        this.exerciseRoutines.add(routine);
     }
 
 

@@ -39,4 +39,14 @@ public class ExerciseRoutineDetail extends BaseEntity {
     @JoinColumn(name = "exerciseRoutine_id", nullable = false )
     private ExerciseRoutine exerciseRoutine;
 
+    /**
+     * 양방향
+     */
+    @OneToMany(mappedBy = "exerciseRoutineDetail", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseDetailSet> detailSets = new ArrayList<>();
+
+
+    public void addDetailSet(ExerciseDetailSet detailSet){
+        this.detailSets.add(detailSet);
+    }
 }
