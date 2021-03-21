@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PostLeaveReq {
-    private String distinction;
+public class PostVacationReq {
+    private String vacationType;
     private String title;
     private Integer totalDays;
 }

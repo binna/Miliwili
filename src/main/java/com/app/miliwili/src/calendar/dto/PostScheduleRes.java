@@ -1,6 +1,6 @@
 package com.app.miliwili.src.calendar.dto;
 
-import com.app.miliwili.src.user.dto.PostLeaveRes;
+import com.app.miliwili.src.user.dto.PostVacationRes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +19,6 @@ public class PostScheduleRes {
     private final String endDate;
     private final String repetition;
     private final String push;
-    private final List<PostLeaveRes> ordinaryLeave;
+    private final List<PostVacationRes> ordinaryLeave;
     private final List<WorkRes> toDoList;
 }

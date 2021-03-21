@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PatchLeaveReq {
+public class PatchVacationReq {
     private String title;
     private Integer useDays;
     private Integer totalDays;

@@ -1,7 +1,5 @@
 package com.app.miliwili.src.user.dto;
 
-import com.app.miliwili.src.user.models.AbnormalPromotionState;
-import com.app.miliwili.src.user.models.NormalPromotionState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,13 +10,17 @@ import lombok.Getter;
 public class PatchUserRes {
     private final Long userId;
     private final String name;
-    private final String serveType;
+    private final String profileImg;
+    private final String birthday;
     private final Integer stateIdx;
+    private final String serveType;
     private final String startDate;
     private final String endDate;
-    private final String socialType;
+    private final String strPrivate;
+    private final String strCorporal;
+    private final String strSergeant;
+    private final Integer hobong;
+    private final Integer normalPromotionStateIdx;
+    private final String proDate;
     private final String goal;
-    private final String profileImg;
-    private final NormalPromotionState normalPromotionState;
-    private final AbnormalPromotionState abnormalPromotionState;
 }
