@@ -31,6 +31,6 @@ public class ExerciseDetailSet extends BaseEntity {
     private Integer setTime;
 
     @ManyToOne
-    @JoinColumn(name = "exerciseRoutinedetail_id", nullable = false )
+    @JoinColumn(name = "exercise_routine_detail_id", nullable = false )
     private ExerciseRoutineDetail exerciseRoutineDetail;
 }

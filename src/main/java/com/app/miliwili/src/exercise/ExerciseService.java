@@ -119,8 +119,8 @@ public class ExerciseService {
                 .repeaDay(param.getRepeatDay())
                 .exerciseInfo(exerciseInfo)
                 .build();
-        exerciseInfo.addExerciseRoutine(newRoutine);
-        exerciseRoutineRepository.save(newRoutine);
+//        exerciseInfo.addExerciseRoutine(newRoutine);
+
 
         for (int i = 0; i < param.getDetailName().size(); i++) {
             ExerciseRoutineDetail newRoutineDetail = ExerciseRoutineDetail.builder()
@@ -131,7 +131,7 @@ public class ExerciseService {
                     .isSame((param.getDetailSetEqual().get(i)) ? "Y" : "N")
                     .exerciseRoutine(newRoutine)
                     .build();
-            newRoutine.addRoutineDetail(newRoutineDetail);
+
 
             //무게 + 개수
             if (newRoutineDetail.getRoutineTypeId() == 1) {
@@ -180,6 +180,8 @@ public class ExerciseService {
                 }
             }
             //arr추가
+            //newRoutine.addRoutineDetail(newRoutineDetail);
+
             newRoutine.addRoutineDetail(newRoutineDetail);
 
         }
@@ -192,4 +194,6 @@ public class ExerciseService {
         }
         return "yes!";
     }
+
+
 }

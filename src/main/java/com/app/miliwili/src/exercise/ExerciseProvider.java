@@ -2,17 +2,23 @@ package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.exercise.dto.GetExerciseDailyWeightRes;
+import com.app.miliwili.src.exercise.dto.GetExerciseWeightRecordReq;
+import com.app.miliwili.src.exercise.dto.GetExerciseWeightRecordRes;
 import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import com.app.miliwili.src.exercise.model.ExerciseWeightRecord;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.utils.JwtService;
 import io.jsonwebtoken.Jwt;
+import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.jni.Local;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.Period;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -79,10 +85,200 @@ public class ExerciseProvider {
             return true;
     }
 
-
     /**
-     * ExerciseId로 ExerciseInfo Return
+     * 체중 기록 조회
      */
+    @Transactional
+    public GetExerciseWeightRecordRes retrieveExerciseWeightRecord(Integer viewMonth, Integer viewYear, Long exerciseId) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+        List<ExerciseWeightRecord> allRecordList = exerciseInfo.getWeightRecords();
+        List<ExerciseWeightRecord> exerciseWeightList = new ArrayList<>();
+
+
+        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
+            throw new BaseException(INVALID_USER);
+        }
+
+        //생성 날짜 오름차순 정렬
+        Collections.sort(allRecordList, new Comparator<ExerciseWeightRecord>() {
+            @Override
+            public int compare(ExerciseWeightRecord o1, ExerciseWeightRecord o2) {
+                return o1.getDateCreated().compareTo(o2.getDateCreated());
+            }
+        });
+
+        //지정한 의 모든 몸무게 정보 가져오기
+        for(int i=0;i<allRecordList.size();i++){
+            ExerciseWeightRecord record = allRecordList.get(i);
+            if(record.getDateCreated().getYear() == viewYear && record.getDateCreated().getMonthValue() == viewMonth){
+                exerciseWeightList.add(record);
+            }
+        }
+
+        //최근 5개월 가져와서 평균내기
+        //month에 들어갈애들
+        List<String> monthWeightMonth = new ArrayList<>();
+        List<Double> monthWeight =new ArrayList<>();
+
+        int idx=1;
+        int continueIndx=1;
+        int nowMonth = LocalDate.now().getMonthValue();
+        int nowYear = LocalDate.now().getYear();
+
+        int wantMonth = nowMonth - 1;
+        int wantYear = nowYear;
+
+        int lastIdx=0;
+        while(idx <= 5 && continueIndx <=3) {
+            List<ExerciseWeightRecord> monthWeightList = new ArrayList<>();
+            double sum = 0.0;
+
+            if (wantMonth == 0) {
+                wantYear--;
+                wantMonth = 12;
+            }
+
+            for (int i = 0; i < allRecordList.size(); i++) {
+                ExerciseWeightRecord record = allRecordList.get(i);
+                if (record.getDateCreated().getYear() == wantYear && record.getDateCreated().getMonthValue() == wantMonth) {
+                    monthWeightList.add(record);
+                }
+
+            }
+            if (monthWeightList.size() == 0) {
+                wantMonth--;
+                continueIndx++;
+                continue;
+            }
+
+            monthWeightMonth.add(wantMonth + "월");
+
+            for (int k = 0; k < monthWeightList.size(); k++) {
+                sum += monthWeightList.get(k).getWeight();
+            }
+            double avg = sum / (monthWeightList.size());
+            monthWeight.add(Math.round(avg * 100) / 100.0);
+            System.out.println(idx);
+            idx++;
+            wantMonth--;
+
+        }
+        for(int i=0;i<monthWeight.size();i++){
+            System.out.println(monthWeight.get(i));
+        }
+        for(int i=0;i<monthWeight.size();i++){
+            System.out.println(monthWeightMonth.get(i));
+        }
+
+        GetExerciseWeightRecordRes getExerciseWeightRecordRes = GetExerciseWeightRecordRes.builder()
+                .goalWeight(exerciseInfo.getGoalWeight())
+                .monthWeight(monthWeight)
+                .monthWeightMonth(monthWeightMonth)
+                .dayWeightDay(dayWeightDayList(viewYear,viewMonth))
+                .dayWeight(dayWeightListWeight(dayweightList(viewYear, viewMonth,exerciseWeightList)))
+                .dayDif(dayWeightListDif(exerciseInfo.getGoalWeight(),dayweightList(viewYear, viewMonth,exerciseWeightList)))
+                .build();
+
+        System.out.println("making done");
+        return getExerciseWeightRecordRes;
+    }
+
+    //몇월 몇일인지 출력
+    public List<String> dayWeightDayList( int year, int month){
+        List<String> dayList= new ArrayList<>();
+        System.out.println("dayList");
+        LocalDate standardMonth = LocalDate.of(year,month,1);
+        int moveDay = 1;
+        int monthInt = standardMonth.getMonthValue();
+        LocalDate moveMonth = standardMonth;
+
+        while(moveMonth.getMonthValue() == standardMonth.getMonthValue()){
+            dayList.add(monthInt+"월"+moveMonth.getDayOfMonth()+"일");
+            try {
+                moveMonth = LocalDate.of(year, month, ++moveDay);
+            }catch (Exception e){
+                break;
+            }
+        }
+        return dayList;
+    }
+
+    //몇월 몇일에 몸무게가 얼마였는지 출력  --> int형 --> 이후 차이 계산을 위해  --> 얘는 그대로 쓰이는데 없음
+    public List<Double> dayweightList(int year, int month, List<ExerciseWeightRecord> recordList){
+        System.out.println("dayWeightList");
+
+        List<Double> dayWeightList = new ArrayList<>();
+        int index=0;
+        int moveDay = 1;
+        boolean isEndIndx=false;
+        LocalDate standardMonth = LocalDate.of(year,month,1);
+        LocalDate moveMonth = standardMonth;
+
+        while(moveMonth.getMonthValue() == standardMonth.getMonthValue()){
+            if(isEndIndx == true) {
+                dayWeightList.add(0.0);
+                try {
+                    moveMonth = LocalDate.of(year, month, ++moveDay);
+                }catch (Exception e){
+                    break;
+                }
+                continue;
+            }
+            if(moveMonth.isEqual(recordList.get(index).getDateCreated().toLocalDate())){
+                dayWeightList.add(recordList.get(index).getWeight());
+                if(index == recordList.size()-1) {
+                    isEndIndx = true;
+                }else{
+                    index++;
+                }
+            }else{
+                dayWeightList.add(0.0);
+            }
+
+            try {
+                moveMonth = LocalDate.of(year, month, ++moveDay);
+            }catch (Exception e){
+                break;
+            }
+        }
+
+
+
+        return dayWeightList;
+    }
+    //dayWeight변환
+    public List<String> dayWeightListWeight(List<Double> weightList){
+        System.out.println("ListWeight");
+
+        List<String> changedList = new ArrayList<>();
+        for(int i=0;i<weightList.size();i++){
+            if(weightList.get(i) == 0.0){
+                changedList.add("정보 없음");
+            }else {
+                changedList.add((weightList.get(i)).toString());
+            }
+        }
+        return changedList;
+    }
+    //차이 변환
+    public List<Double> dayWeightListDif(double goalWeight,List<Double> weightList){
+        System.out.println("WeightDif");
+
+        List<Double> changedList = new ArrayList<>();
+        for(int i=0;i<weightList.size();i++){
+            if(weightList.get(i) == 0.0){
+                changedList.add(0.0);
+            }else {
+                changedList.add(Math.round((goalWeight-weightList.get(i)) * 100) / 100.0);
+            }
+        }
+        return changedList;
+    }
+
+
+        /**
+         * ExerciseId로 ExerciseInfo Return
+         */
     public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{
         return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
             .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
