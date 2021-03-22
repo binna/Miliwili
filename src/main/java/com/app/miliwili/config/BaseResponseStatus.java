@@ -131,6 +131,7 @@ public enum BaseResponseStatus {
     FAILED_GET_MONTH_WEIGHT_1(false, 3534, "월별 체중 기록 조회에 실패하였습니다.-1-월별 평균 조회 "),
     FAILED_GET_MONTH_WEIGHT_2(false, 3535, "월별 체중 기록 조회에 실패하였습니다.-2-웗별 일일 조회 "),
     NOT_FOUND_EXERCISE_WEIGHT_RECORD(false, 3536, "해당날짜에 해당 회원의 체중기록이 존재하지 않습니다."),
+    FAILED_PATCH_DAILY_WEIGHT(false, 3537, "일일 체중 기록 수정에 실패하였습니다. "),
 
 
 

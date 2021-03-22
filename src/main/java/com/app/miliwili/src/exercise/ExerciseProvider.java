@@ -1,10 +1,9 @@
 package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.exercise.dto.GetExerciseDailyWeightRes;
-import com.app.miliwili.src.exercise.dto.GetExerciseWeightRecordReq;
-import com.app.miliwili.src.exercise.dto.GetExerciseWeightRecordRes;
+import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.ExerciseInfo;
+import com.app.miliwili.src.exercise.model.ExerciseRoutine;
 import com.app.miliwili.src.exercise.model.ExerciseWeightRecord;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.utils.JwtService;
@@ -277,7 +276,62 @@ public class ExerciseProvider {
     }
 
 
-        /**
+    /**
+     * 사용자의 전체 루틴 조회
+     */
+    public List<MyRoutineInfo> retrieveAllRoutineList(long exerciseId) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
+            throw new BaseException(INVALID_USER);
+        }
+
+        List<ExerciseRoutine> routineList= exerciseInfo.getExerciseRoutines();
+        List<MyRoutineInfo> myAllRoutines = new ArrayList<>();
+        for(int i=0; i< routineList.size(); i++){
+            String[] repeatDay = routineList.get(i).getRepeaDay().split("#");
+            String repeatDayStr = "";
+            for(int j=0;j<repeatDay.length;j++){
+                switch (repeatDay[j]){
+                    case "1":
+                        repeatDayStr+="매일";
+                        break;
+                    case "2":
+                        repeatDayStr+="월,";
+                        break;
+                    case "3":
+                        repeatDayStr+="화,";
+                        break;
+                    case "4":
+                        repeatDayStr+="수,";
+                        break;
+                    case "5":
+                        repeatDayStr+="목,";
+                        break;
+                    case "6":
+                        repeatDayStr+="금,";
+                        break;
+                    case "7":
+                        repeatDayStr+="토,";
+                        break;
+                    case "8":
+                        repeatDayStr+="일,";
+                        break;
+                }
+            }
+            MyRoutineInfo myRoutineInfo = MyRoutineInfo.builder()
+                    .routineName(routineList.get(i).getName())
+                    .routineRepeatDay(repeatDayStr.substring(0,repeatDayStr.length()-1))
+                    .routineId(routineList.get(i).getId())
+                    .build();
+            myAllRoutines.add(myRoutineInfo);
+        }
+
+        return myAllRoutines;
+    }
+
+
+    /**
          * ExerciseId로 ExerciseInfo Return
          */
     public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{

@@ -128,7 +128,7 @@ public class ExerciseService {
      *루틴 만들기
      *
      */
-    public String createRoutine(PostExerciseRoutineReq param, long exerciseId) throws BaseException {
+    public Long createRoutine(PostExerciseRoutineReq param, long exerciseId) throws BaseException {
         ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
 
         System.out.println("exerciseIduserId:"+exerciseInfo.getUser().getId()+"jwt Id"+jwtService.getUserId());
@@ -212,12 +212,15 @@ public class ExerciseService {
         exerciseInfo.addExerciseRoutine(newRoutine);
 
         try {
-            exerciseRepository.save(exerciseInfo);
+            //exerciseRepository.save(exerciseInfo);
+            //이게 문제가 될까????
+            exerciseRoutineRepository.save(newRoutine);
         }catch (Exception e){
-            e.printStackTrace();
-//            throw new BaseException()
+            throw new BaseException(FAILED_PATCH_DAILY_WEIGHT);
         }
-        return "yes!";
+        System.out.println(exerciseInfo.getExerciseRoutines().get(0).getName());
+
+        return newRoutine.getId();
     }
 
 

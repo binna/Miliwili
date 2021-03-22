@@ -1,5 +1,6 @@
 package com.app.miliwili.src.exercise;
 
+import com.app.miliwili.src.exercise.dto.MyRoutineInfo;
 import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.querydsl.core.types.Projections;
@@ -49,6 +50,7 @@ public class ExerciseSelectRepository extends QuerydslRepositorySupport {
                 .limit(5)
                 .fetchJoin().fetch();
     }
+
 
 
 }

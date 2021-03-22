@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -123,24 +124,6 @@ public class ExerciseController {
         }
     }
 
-    /**
-     * 루틴 생성
-     * @return BaseResponse<String>
-     * @RequestHeader X-ACCESS-TOKEN
-     * @Auther vivi
-     */
-    @ResponseBody
-    @PostMapping("/{exerciseId}/routines")
-    public BaseResponse<String> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
-                                             @RequestBody PostExerciseRoutineReq param){
-        try{
-            String result = exerciseService.createRoutine(param,exerciseId);
-            return new BaseResponse<>(SUCCESS,result);
-        }catch (BaseException e){
-            e.printStackTrace();
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
 
     /**
      * 체중 기록 조회
@@ -165,6 +148,44 @@ public class ExerciseController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    /**
+     * 루틴 생성
+     * @return BaseResponse<String>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @PostMapping("/{exerciseId}/routines")
+    public BaseResponse<Long> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                           @RequestBody PostExerciseRoutineReq param){
+        try{
+            Long resultLong = exerciseService.createRoutine(param,exerciseId);
+            System.out.println(resultLong);
+            return new BaseResponse<>(SUCCESS,resultLong);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 전체 루틴 조회
+     * @return BaseResponse<MyRoutineInfo>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/routines")
+    public BaseResponse<List<MyRoutineInfo>> getMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId){
+        try{
+            List<MyRoutineInfo> myAllRoutineList = exerciseProvider.retrieveAllRoutineList(exerciseId);
+            return new BaseResponse<>(SUCCESS, myAllRoutineList);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
 
 
 }
