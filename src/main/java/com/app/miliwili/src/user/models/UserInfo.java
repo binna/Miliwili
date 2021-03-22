@@ -14,8 +14,8 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false, exclude = {"normalPromotionState", "abnormalPromotionState"})
 @Data
 @Entity
-@Table(name = "user")
-public class User extends BaseEntity {
+@Table(name = "userInfo")
+public class UserInfo extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,10 +51,10 @@ public class User extends BaseEntity {
     @Column(name = "endDate", nullable = false)
     private LocalDate endDate;
 
-    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "userInfo", orphanRemoval = true, cascade = CascadeType.ALL)
     private NormalPromotionState normalPromotionState;
 
-    @OneToOne(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "userInfo", orphanRemoval = true, cascade = CascadeType.ALL)
     private AbnormalPromotionState abnormalPromotionState;
 
     @Override

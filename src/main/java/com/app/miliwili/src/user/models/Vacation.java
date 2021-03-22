@@ -34,7 +34,7 @@ public class Vacation {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UserInfo user;
 
     @Override
     public String toString() {

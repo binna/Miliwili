@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"schedule"})
+@EqualsAndHashCode(callSuper = false, exclude = {"plan"})
 @Data
 @Entity
 @Table(name = "diary")
@@ -27,8 +27,8 @@ public class Diary {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_id", nullable = false)
-    private Schedule schedule;
+    @JoinColumn(name = "plan_id", nullable = false)
+    private Plan plan;
 
     @Override
     public String toString() {

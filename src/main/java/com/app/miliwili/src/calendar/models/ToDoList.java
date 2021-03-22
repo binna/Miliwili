@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"schedule"})
+@EqualsAndHashCode(callSuper = false, exclude = {"plan"})
 @Data
 @Entity
 @Table(name = "toDoList")
@@ -27,8 +27,8 @@ public class ToDoList {
     private String processingStatus = "F";
 
     @ManyToOne
-    @JoinColumn(name = "schedule_id", nullable = false)
-    private Schedule schedule;
+    @JoinColumn(name = "plan_id", nullable = false)
+    private Plan plan;
 
     @Override
     public String toString() {

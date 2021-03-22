@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"user"})
+@EqualsAndHashCode(callSuper = false, exclude = {"userInfo"})
 @Data
 @Entity
 @Table(name = "normalPromotionState")
@@ -38,8 +38,8 @@ public class NormalPromotionState {
     private Integer stateIdx = 0;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "userInfo_id", nullable = false)
+    private UserInfo userInfo;
 
     @Override
     public String toString() {

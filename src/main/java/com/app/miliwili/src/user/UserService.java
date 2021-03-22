@@ -4,7 +4,7 @@ import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.NormalPromotionState;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
@@ -83,7 +83,7 @@ public class UserService {
      */
     @Transactional
     public PostLoginRes loginUser(String socialId) throws BaseException {
-        User user = null;
+        UserInfo user = null;
 
         try {
             user = userProvider.retrieveUserBySocialIdAndStatusY(socialId);
@@ -107,7 +107,7 @@ public class UserService {
      */
     @Transactional
     public PostSignUpRes createUser(PostSignUpReq parameters, String token) throws BaseException {
-        User newUser = User.builder()
+        UserInfo newUser = UserInfo.builder()
                 .name(parameters.getName())
                 .serveType(parameters.getServeType())
                 .stateIdx(parameters.getStateIdx())
@@ -124,7 +124,7 @@ public class UserService {
         }
 
         try {
-            User savedUser = userRepository.save(newUser);
+            UserInfo savedUser = userRepository.save(newUser);
             setVacationData(newUser);
             return new PostSignUpRes(savedUser.getId(), jwtService.createJwt(savedUser.getId()));
         } catch (Exception exception) {
@@ -140,8 +140,9 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PatchUserRes updateUser(PatchUserReq parameters) throws BaseException {
-        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+        UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         if (Objects.nonNull(parameters.getName())) {
             user.setName(parameters.getName());
@@ -176,7 +177,7 @@ public class UserService {
         }
 
         try {
-            User savedUser = userRepository.save(user);
+            UserInfo savedUser = userRepository.save(user);
             if (Objects.nonNull(savedUser.getNormalPromotionState())) {
                 return PatchUserRes.builder()
                         .userId(savedUser.getId())
@@ -220,7 +221,7 @@ public class UserService {
      * @Auther shine
      */
     public void deleteUser() throws BaseException {
-        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+        UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
         user.setStatus("N");
 
         try {
@@ -240,7 +241,7 @@ public class UserService {
      */
     @Transactional
     public PostVacationRes createVacation(PostVacationReq parameters) throws BaseException {
-        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+        UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         Vacation newVacation = Vacation.builder()
                 .vacationType(parameters.getVacationType())
@@ -398,7 +399,7 @@ public class UserService {
     }
 
 
-    private void setVacationData(User user) {
+    private void setVacationData(UserInfo user) {
         Vacation vacation1 = Vacation.builder().vacationType("정기").title("1차 정기휴가").user(user).totalDays(8).build();
         Vacation vacation2 = Vacation.builder().vacationType("정기").title("2차 정기휴가").user(user).totalDays(8).build();
         Vacation vacation3 = Vacation.builder().vacationType("정기").title("3차 정기휴가").user(user).totalDays(8).build();
@@ -409,7 +410,7 @@ public class UserService {
         vacationRepository.saveAll(leaveList);
     }
 
-    private void setSocial(String socialType, String token, User user) throws BaseException {
+    private void setSocial(String socialType, String token, UserInfo user) throws BaseException {
         if (socialType.equals("K")) {
             user.setSocialType(socialType);
             user.setSocialId(snsLogin.getUserIdFromKakao(token));
@@ -419,7 +420,7 @@ public class UserService {
         user.setSocialId(snsLogin.userIdFromGoogle(token.replaceAll("\"", "")));
     }
 
-    private void setProfileImg(String socialType, String token, User user) throws BaseException {
+    private void setProfileImg(String socialType, String token, UserInfo user) throws BaseException {
         if (socialType.equals("K")) {
             String img = snsLogin.getProfileImgFromKakao(token);
             if (!img.isEmpty()) {
@@ -432,13 +433,13 @@ public class UserService {
 
     private void setUserPromotionState(String strPrivate, String strCorporal, String strSergeant,
                                        String proDate,
-                                       User user) {
+                                       UserInfo user) {
         if (user.getStateIdx() == 1) {
             NormalPromotionState normalPromotionState = NormalPromotionState.builder()
                     .firstDate(LocalDate.parse(strPrivate, DateTimeFormatter.ISO_DATE))
                     .secondDate(LocalDate.parse(strCorporal, DateTimeFormatter.ISO_DATE))
                     .thirdDate(LocalDate.parse(strSergeant, DateTimeFormatter.ISO_DATE))
-                    .user(user)
+                    .userInfo(user)
                     .build();
             setStateIdx(strPrivate, strCorporal, strSergeant, normalPromotionState);
             setHobong(user.getStateIdx(), user.getStartDate().format(DateTimeFormatter.ISO_DATE), strPrivate, strCorporal, strSergeant, normalPromotionState);
@@ -447,7 +448,7 @@ public class UserService {
         }
         AbnormalPromotionState abnormalPromotionState = AbnormalPromotionState.builder()
                 .proDate(LocalDate.parse(proDate, DateTimeFormatter.ISO_DATE))
-                .user(user)
+                .userInfo(user)
                 .build();
         user.setAbnormalPromotionState(abnormalPromotionState);
     }

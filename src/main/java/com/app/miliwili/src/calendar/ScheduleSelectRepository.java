@@ -1,14 +1,10 @@
 package com.app.miliwili.src.calendar;
 
-import com.app.miliwili.src.calendar.models.QSchedule;
-import com.app.miliwili.src.calendar.models.Schedule;
-import com.querydsl.core.types.Projections;
+import com.app.miliwili.src.calendar.models.Plan;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public class ScheduleSelectRepository extends QuerydslRepositorySupport {
@@ -16,7 +12,7 @@ public class ScheduleSelectRepository extends QuerydslRepositorySupport {
 
     @Autowired
     public ScheduleSelectRepository(JPAQueryFactory queryFactory) {
-        super(Schedule.class);
+        super(Plan.class);
         this.queryFactory = queryFactory;
     }
 

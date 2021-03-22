@@ -1,12 +1,10 @@
 package com.app.miliwili.src.exercise.model;
 
 import com.app.miliwili.config.BaseEntity;
-import com.app.miliwili.src.user.models.AbnormalPromotionState;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.UserInfo;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +35,7 @@ public class ExerciseInfo extends BaseEntity {
      */
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false )
-    private User user;
+    private UserInfo user;
 
     /**
      * 양방향

@@ -4,8 +4,8 @@ import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.src.calendar.dto.PostDDayReq;
 import com.app.miliwili.src.calendar.dto.PostDDayRes;
-import com.app.miliwili.src.calendar.dto.PostScheduleReq;
-import com.app.miliwili.src.calendar.dto.PostScheduleRes;
+import com.app.miliwili.src.calendar.dto.PostPlanReq;
+import com.app.miliwili.src.calendar.dto.PostPlanRes;
 import com.app.miliwili.utils.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class CalendarController {
 
     /**
      * 일정생성 API
-     * [POST] /app/calendars/schedule
+     * [POST] /app/calendars/plan
      * @Token X-ACCESS-TOKEN
      * @RequestBody PostScheduleReq parameters
      * @return BaseResponse<PostScheduleRes>
@@ -33,14 +33,14 @@ public class CalendarController {
      */
     @ApiOperation(value = "일정 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PostMapping("/calendars/schedule")
-    public BaseResponse<PostScheduleRes> postSchedule(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                      @RequestBody(required = false) PostScheduleReq parameters) {
+    @PostMapping("/calendars/plan")
+    public BaseResponse<PostPlanRes> postPlan(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                              @RequestBody(required = false) PostPlanReq parameters) {
         if(Objects.isNull(parameters.getColor()) || parameters.getColor().length() == 0) {
             return new BaseResponse<>(EMPTY_COLOR);
         }
-        if(Objects.isNull(parameters.getScheduleType()) || parameters.getScheduleType().length() == 0) {
-            return new BaseResponse<>(EMPTY_SCHEDULE_TYPE);
+        if(Objects.isNull(parameters.getPlanType()) || parameters.getPlanType().length() == 0) {
+            return new BaseResponse<>(EMPTY_PLAN_TYPE);
         }
         if(Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
             return new BaseResponse<>(EMPTY_TITLE);
@@ -60,22 +60,22 @@ public class CalendarController {
 
         LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
-        if(parameters.getScheduleType().equals("면회") || parameters.getScheduleType().equals("외출")
-                || parameters.getScheduleType().equals("전투휴무") || parameters.getScheduleType().equals("당직")) {
+        if(parameters.getPlanType().equals("면회") || parameters.getPlanType().equals("외출")
+                || parameters.getPlanType().equals("전투휴무") || parameters.getPlanType().equals("당직")) {
             if (startDate.isEqual(endDate)) {
                 return new BaseResponse<>(ONLY_ON_THE_SAME_DAY);
             }
         }
 
-        else if(parameters.getScheduleType().equals("일정") ||
-                parameters.getScheduleType().equals("휴가") || parameters.getScheduleType().equals("외박")) {
+        else if(parameters.getPlanType().equals("일정") ||
+                parameters.getPlanType().equals("휴가") || parameters.getPlanType().equals("외박")) {
             if(startDate.isBefore(endDate)) {
                 return new BaseResponse<>(FASTER_THAN_CALENDAR_START_DATE);
             }
         }
 
         else {
-            return new BaseResponse<>(INVALID_SCHEDULE_TYPE);
+            return new BaseResponse<>(INVALID_PLAN_TYPE);
         }
 
         if(parameters.getPush().equals("Y")) {
@@ -84,14 +84,14 @@ public class CalendarController {
             }
         }
 
-        if(parameters.getScheduleType().equals("휴가")) {
-            if(Objects.isNull(parameters.getScheduleVacation()) || parameters.getScheduleVacation().isEmpty()) {
-                return new BaseResponse<>(EMPTY_SCHEDULE_VACATION);
+        if(parameters.getPlanType().equals("휴가")) {
+            if(Objects.isNull(parameters.getPlanVacation()) || parameters.getPlanVacation().isEmpty()) {
+                return new BaseResponse<>(EMPTY_PLAN_VACATION);
             }
         }
 
         try {
-            PostScheduleRes schedule = calendarService.createSchedule(parameters);
+            PostPlanRes schedule = calendarService.createPlan(parameters);
             return new BaseResponse<>(SUCCESS, schedule);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());

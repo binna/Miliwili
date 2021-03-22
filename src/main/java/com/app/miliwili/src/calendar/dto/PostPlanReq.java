@@ -8,14 +8,14 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PostScheduleReq {
+public class PostPlanReq {
     private String color;
-    private String scheduleType;
+    private String planType;
     private String title;
     private String startDate;
     private String endDate;
     private String push;
     private String pushDeviceToken;
-    private List<ScheduleVacationReq> scheduleVacation;
+    private List<PlanVacationReq> planVacation;
     private List<WorkReq> toDoList;
 }
