@@ -1,6 +1,6 @@
 package com.app.miliwili.config;
 
-import com.app.miliwili.src.calendar.ScheduleRepository;
+import com.app.miliwili.src.calendar.PlanRepository;
 import com.app.miliwili.src.calendar.ScheduleSelectRepository;
 import com.app.miliwili.src.calendar.models.Plan;
 import com.app.miliwili.src.exercise.ExerciseProvider;
@@ -28,11 +28,13 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Component
 public class Scheduler {
     private final UserRepository userRepository;
-    private final ScheduleRepository scheduleRepository;
-    private final ExerciseProvider exerciseProvider;
-    private final ExerciseService exerciseService;
+    private final PlanRepository scheduleRepository;
+    private final ScheduleSelectRepository scheduleSelectRepository;
     private final UserService userService;
     private final FirebaseCloudMessage firebaseCloudMessageService;
+    private final ExerciseProvider exerciseProvider;
+    private final ExerciseService exerciseService;
+
 
     @Scheduled(cron = "0 0 0 * * *")
     public void setDailyHobongAndStateIdx() {
