@@ -1,13 +1,12 @@
 package com.app.miliwili.src.calendar;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.calendar.dto.PostDDayReq;
-import com.app.miliwili.src.calendar.dto.PostDDayRes;
-import com.app.miliwili.src.calendar.dto.PostPlanReq;
-import com.app.miliwili.src.calendar.dto.PostPlanRes;
+import com.app.miliwili.src.calendar.dto.*;
+import com.app.miliwili.src.calendar.models.DDay;
+import com.app.miliwili.src.calendar.models.Diary;
+import com.app.miliwili.src.calendar.models.Plan;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.UserInfo;
-import com.app.miliwili.src.calendar.models.*;
 import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,8 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @Service
 public class CalendarService {
-    private final ScheduleRepository scheduleRepository;
+    private final PlanRepository planRepository;
+    private final DiaryRepository diaryRepository;
     private final DDayRepository dDayRepository;
     private final JwtService jwtService;
     private final CalendarProvider calendarProvider;
@@ -30,6 +30,7 @@ public class CalendarService {
 
     /**
      * 일정 생성
+     *
      * @param parameters
      * @return PostPlanRes
      * @throws BaseException
@@ -48,21 +49,21 @@ public class CalendarService {
                 .userInfo(user)
                 .build();
 
-        if(parameters.getPush().equals("Y")) {
+        if (Objects.nonNull(parameters.getPush()) && parameters.getPush().equals("Y")) {
             newSchedule.setPush(parameters.getPush());
             newSchedule.setPushDeviceToken(parameters.getPushDeviceToken());
         }
 
-        if(newSchedule.getPlanType().equals("휴가")) {
+        if (newSchedule.getPlanType().equals("휴가")) {
             newSchedule.setPlanVacations(calendarProvider.changeListPlanVacationReqToSetPlanVacation(parameters.getPlanVacation(), newSchedule));
         }
 
-        if(Objects.nonNull(parameters.getToDoList())) {
+        if (Objects.nonNull(parameters.getToDoList())) {
             newSchedule.setToDoLists(calendarProvider.changeListWorkReqToListToDoList(parameters.getToDoList(), newSchedule));
         }
 
         try {
-            Plan savedSchedule = scheduleRepository.save(newSchedule);
+            Plan savedSchedule = planRepository.save(newSchedule);
             return PostPlanRes.builder()
                     .planId(savedSchedule.getId())
                     .color(savedSchedule.getColor())
@@ -76,9 +77,60 @@ public class CalendarService {
                     .build();
         } catch (Exception exception) {
             exception.printStackTrace();
-            throw new BaseException(FAILED_TO_POST_SCHEDULE);
+            throw new BaseException(FAILED_TO_POST_PLAN);
         }
     }
+
+
+    /**
+     * 일정 다이어리 생성
+     *
+     * @param parameters
+     * @param planId
+     * @return PostDiaryRes
+     * @throws BaseException
+     */
+    public PostDiaryRes createDiary(PostDiaryReq parameters, Long planId) throws BaseException {
+        Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
+
+        Diary newDiary = Diary.builder()
+                .date(LocalDate.parse(parameters.getDate(), DateTimeFormatter.ISO_DATE))
+                .content(parameters.getContent())
+                .plan(plan)
+                .build();
+
+        if (plan.getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
+        checkDate(plan, parameters.getDate());
+
+        try {
+            Diary savedDiary = diaryRepository.save(newDiary);
+            return PostDiaryRes.builder()
+                    .diaryId(savedDiary.getId())
+                    .date(savedDiary.getDate().format(DateTimeFormatter.ISO_DATE))
+                    .title(savedDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
+                    .content(savedDiary.getContent())
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_POST_DIARY);
+        }
+    }
+
+    private void checkDate(Plan plan, String diaryDate) throws BaseException {
+        LocalDate date = LocalDate.parse(diaryDate, DateTimeFormatter.ISO_DATE);
+
+        if (date.isBefore(plan.getStartDate()) || date.isAfter(plan.getEndDate())) {
+            throw new BaseException(OUT_OF_BOUNDS_DATE_DIARY);
+        }
+        for (Diary diary : plan.getDiaries()) {
+            if (diary.getDate().isEqual(date)) {
+                throw new BaseException(ALREADY_EXIST_DIARY);
+            }
+        }
+    }
+
 
 //    private void setScheduleDate(String startDate, String endDate, Schedule schedule) {
 //        List<Diary> scheduleDates = new ArrayList<>();
@@ -100,6 +152,7 @@ public class CalendarService {
 
     /**
      * D-Day 생성
+     *
      * @param
      * @return
      * @throws BaseException
@@ -145,7 +198,6 @@ public class CalendarService {
             throw new BaseException(FAILED_TO_POST_D_DAY);
         }
     }
-
 
 
 }
