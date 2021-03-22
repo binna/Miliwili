@@ -1,10 +1,7 @@
 package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.exercise.dto.PatchExerciseGoalWeight;
-import com.app.miliwili.src.exercise.dto.PostExerciseFirstWeightReq;
-import com.app.miliwili.src.exercise.dto.PostExerciseRoutineReq;
-import com.app.miliwili.src.exercise.dto.PostExerciseWeightReq;
+import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.UserInfo;
@@ -14,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -83,6 +83,27 @@ public class ExerciseService {
     }
 
     /**
+     * 데일리 몸무게 수정
+     */
+    public String modifyDailyWeight(PatchExerciseDailyWeightReq param, long exerciseId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        LocalDateTime targetDate = LocalDateTime.parse(param.getDayDate()+"T00:00:00");
+        LocalDateTime targetNextDate = LocalDateTime.parse((param.getDayDate()+"T23:59:59"));
+
+        ExerciseWeightRecord targetWeightRecord = exerciseProvider.getExerciseWiehgtRecord(exerciseId, targetDate,targetNextDate);
+        targetWeightRecord.setWeight(param.getDayWeight());
+
+        exerciseRepository.save(exerciseInfo);
+
+        return param.getDayWeight()+"kg으로 수정되었습니다.";
+    }
+
+    /**
      * 목표 몸무게 수정
      */
     public String modifyGoalWeight(PatchExerciseGoalWeight param, long exerciseId) throws BaseException{
@@ -104,7 +125,7 @@ public class ExerciseService {
     }
 
     /**
-     *
+     *루틴 만들기
      *
      */
     public String createRoutine(PostExerciseRoutineReq param, long exerciseId) throws BaseException {

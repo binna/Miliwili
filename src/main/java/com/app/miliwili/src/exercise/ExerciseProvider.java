@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -282,6 +283,15 @@ public class ExerciseProvider {
     public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{
         return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
             .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
+    }
+
+    /**
+     * 생성 날짜로 exerciseWeightRecord찾기
+     */
+    public ExerciseWeightRecord getExerciseWiehgtRecord(long exerciseId, LocalDateTime targetDate, LocalDateTime targetNextDate) throws BaseException{
+       return exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween
+               (exerciseId, "Y", targetDate, targetNextDate)
+                    .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISE_WEIGHT_RECORD));
     }
 
     /**

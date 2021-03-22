@@ -51,19 +51,4 @@ public class ExerciseSelectRepository extends QuerydslRepositorySupport {
     }
 
 
-
-    public List<ExerciseWeightRecord> getWeightRecordListByExerciseId(long exerciseId, int year, int month){
-        QExerciseWeightRecord exerciseWeightRecord = QExerciseWeightRecord.exerciseWeightRecord;
-//        return queryFactory.select((Projections.constructor(ExerciseWeightRecord.class)))
-//                .from(exerciseWeightRecord)
-//                .where(exerciseWeightRecord.exerciseInfo.id.eq(exerciseId), exerciseWeightRecord.status.eq("Y"))
-//                .fetch();
-        QExerciseInfo exerciseInfo = QExerciseInfo.exerciseInfo;
-        return queryFactory.select((Projections.constructor(ExerciseWeightRecord.class,
-                exerciseInfo.weightRecords)))
-                .from(exerciseInfo)
-                .where(exerciseInfo.id.eq(exerciseId), exerciseInfo.status.eq("Y"))
-                .fetch();
-
-    }
 }

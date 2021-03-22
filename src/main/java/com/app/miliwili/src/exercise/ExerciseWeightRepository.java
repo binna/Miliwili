@@ -20,7 +20,8 @@ public interface ExerciseWeightRepository extends CrudRepository<ExerciseWeightR
    //
     // List<ExerciseWeightRecord> findAllByExerciseInfo_IdAndStatusAndDateCreated_YearAndDateCreated_MonthValue(Long exerciseId, String status, Integer year, Integer month);
 
-
+//    @Query("select * from ExerciseWeightRecord  where dateCreated )
+    Optional<ExerciseWeightRecord> findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween(Long exerciseId, String status, LocalDateTime dateCreated, LocalDateTime dateCreatedNext);
 
 }
 

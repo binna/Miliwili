@@ -3,6 +3,7 @@ package com.app.miliwili.src.exercise;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.src.exercise.dto.*;
+import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,6 +59,28 @@ public class ExerciseController {
         }catch (BaseException e){
             e.printStackTrace();
             return new BaseResponse<>(FAILED_POST_DAILY_WEIGHT);
+        }
+    }
+
+    /**
+     * daily 체중 수정
+     * @return BaseResponse<String>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @PatchMapping("/{exerciseId}/weights")
+    public BaseResponse<String> patchDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PatchExerciseDailyWeightReq param,
+                                                 @PathVariable Long exerciseId){
+        if(!Validation.isRegexDate(param.getDayDate())){
+            return new BaseResponse<>(INVALID_MODIFY_DATE);
+        }
+
+        try{
+            String resultStr = exerciseService.modifyDailyWeight(param,exerciseId);
+            return new BaseResponse<>(SUCCESS,resultStr);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
         }
     }
 
