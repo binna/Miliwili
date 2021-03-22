@@ -28,8 +28,24 @@ public class ExerciseRoutine extends BaseEntity {
     @Column(name = "bodyPart",length = 45, nullable = false)
     private String bodyPart;
 
-    @ManyToOne
+    @Column(name = "repeatDay", length = 30, nullable = false)
+    private String repeaDay;
+
+    @Builder.Default
+    @Column(name = "done", nullable = false, length = 1)
+    private String done = "N";
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "exercise_id", nullable = false )
     private ExerciseInfo exerciseInfo;
+
+    @OneToMany(mappedBy = "exerciseRoutine", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseRoutineDetail> routineDetails = new ArrayList<>();
+
+
+    public void addRoutineDetail(ExerciseRoutineDetail detail){
+        this.routineDetails.add(detail);
+    }
+
 
 }

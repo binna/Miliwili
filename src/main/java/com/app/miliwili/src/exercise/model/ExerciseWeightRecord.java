@@ -20,7 +20,7 @@ public class ExerciseWeightRecord extends BaseEntity {
     private Long id;
 
     @Column(name = "weight", nullable = false)
-    private int weight;
+    private Double weight;
 
     @ManyToOne
     @JoinColumn(name = "exercise_id", nullable = false )
