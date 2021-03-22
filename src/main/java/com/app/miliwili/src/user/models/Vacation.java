@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"user"})
+@EqualsAndHashCode(callSuper = false, exclude = {"userInfo"})
 @Data
 @Entity
 @Table(name = "vacation")
@@ -33,8 +33,8 @@ public class Vacation {
     private Integer totalDays;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserInfo user;
+    @JoinColumn(name = "userInfo_id", nullable = false)
+    private UserInfo userInfo;
 
     @Override
     public String toString() {

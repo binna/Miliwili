@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface VacationRepository extends CrudRepository<Vacation, Long> {
-    List<Vacation> findByUser_IdOrderById(Long userId);
+    //List<Vacation> findByUserInfo_IdOrderById(Long userId);
 }
