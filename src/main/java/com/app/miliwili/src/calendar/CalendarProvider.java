@@ -10,6 +10,7 @@ import com.app.miliwili.src.calendar.models.PlanVacation;
 import com.app.miliwili.src.calendar.models.ToDoList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -20,7 +21,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @Service
 public class CalendarProvider {
-    private final ScheduleRepository scheduleRepository;
+    private final PlanRepository planRepository;
 
     /**
      * 정기휴가 스케줄 검색
@@ -40,6 +41,20 @@ public class CalendarProvider {
 //            throw new BaseException(FAILED_TO_GET_SCHEDULE);
 //        }
 //    }
+
+    /**
+     * planId로 유효한 일정 조회
+     *
+     * @param planId
+     * @return Plan
+     * @throws BaseException
+     */
+    @Transactional
+    public Plan retrievePlanByIdAndStatusY(Long planId) throws BaseException {
+        return planRepository.findByIdAndStatus(planId, "Y")
+                .orElseThrow(() -> new BaseException(NOT_FOUND_PLAN));
+    }
+
 
     /**
      * List<PlanVacationReq> -> Set<PlanVacation> 변경

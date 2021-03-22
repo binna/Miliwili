@@ -90,7 +90,7 @@ public class UserProvider {
     }
 
     /**
-     * userId로 유효한 회원만 조회
+     * userId로 유효한 회원조회
      *
      * @param userId
      * @return User
@@ -131,7 +131,7 @@ public class UserProvider {
     }
 
     /**
-     * vacationId로 정기휴가 조회
+     * vacationId로 휴가조회
      *
      * @param vacationId
      * @return Vacation

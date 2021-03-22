@@ -1,6 +1,6 @@
 package com.app.miliwili;
 
-import com.app.miliwili.src.calendar.ScheduleRepository;
+import com.app.miliwili.src.calendar.PlanRepository;
 import com.app.miliwili.src.user.VacationRepository;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
@@ -28,7 +28,7 @@ import java.util.List;
 public class MiliwiliApplication implements CommandLineRunner {
     private final UserRepository userRepository;
     private final VacationRepository vacationRepository;
-    private final ScheduleRepository scheduleRepository;
+    private final PlanRepository scheduleRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(MiliwiliApplication.class, args);
