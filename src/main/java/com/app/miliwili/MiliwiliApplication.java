@@ -49,101 +49,101 @@ public class MiliwiliApplication implements CommandLineRunner {
         /**
          * 회원 데이터
          */
-//        User userKaKao1 = User.builder()
-//                .name("이원성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
-//                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
-//                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-//                .build();
-//        NormalPromotionState normalPromotionStateKaKao1 = NormalPromotionState.builder()
-//                .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-//                .secondDate(LocalDate.parse("2021-12-31" , DateTimeFormatter.ISO_DATE))
-//                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
-//                .user(userKaKao1)
-//                .build();
-//        userKaKao1.setNormalPromotionState(normalPromotionStateKaKao1);
-//
-//        User userKaKao2 = User.builder()
-//                .name("이두성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
-//                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
-//                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-//                .build();
-//        NormalPromotionState normalPromotionStateKaKao2 = NormalPromotionState.builder()
-//                .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-//                .secondDate(LocalDate.parse("2020-12-31" , DateTimeFormatter.ISO_DATE))
-//                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
-//                .user(userKaKao2)
-//                .build();
-//        userKaKao2.setNormalPromotionState(normalPromotionStateKaKao2);
-//
-//        User userKaKao3 = User.builder()
-//                .name("이삼성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
-//                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
-//                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-//                .build();
-//        NormalPromotionState normalPromotionStateKaKao3 = NormalPromotionState.builder()
-//                .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-//                .secondDate(LocalDate.parse("2021-12-31" , DateTimeFormatter.ISO_DATE))
-//                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
-//                .user(userKaKao3)
-//                .build();
-//        userKaKao3.setNormalPromotionState(normalPromotionStateKaKao3);
-//
-//        User userKaKao4 = User.builder()
-//                .name("이사성").stateIdx(2).serveType("육군").socialType("K").socialId("test1")
-//                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
-//                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-//                .build();
-//        AbnormalPromotionState abnormalPromotionState = AbnormalPromotionState.builder()
-//                .proDate(LocalDate.parse("2021-12-31", DateTimeFormatter.ISO_DATE))
-//                .user(userKaKao4)
-//                .build();
-//        userKaKao4.setAbnormalPromotionState(abnormalPromotionState);
-//        User userKaKao5 = User.builder()
-//                .name("이오성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
-//                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
-//                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
-//                .build();
-//        NormalPromotionState normalPromotionStateKaKao5 = NormalPromotionState.builder()
-//                .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
-//                .secondDate(LocalDate.parse("2021-01-31" , DateTimeFormatter.ISO_DATE))
-//                .thirdDate(LocalDate.parse("2021-03-10" , DateTimeFormatter.ISO_DATE))
-//                .user(userKaKao5)
-//                .build();
-//        userKaKao5.setNormalPromotionState(normalPromotionStateKaKao5);
-//
-//        final List<User> userList =
-//                Arrays.asList(userKaKao1, userKaKao2, userKaKao3, userKaKao4, userKaKao5);
-//        userRepository.saveAll(userList);
-//
-//        /**
-//         * 휴가 더미데이터
-//         */
-//        Vacation vacation1 = Vacation.builder().distinction("정기").title("1차정기휴가").user(userKaKao1).totalDays(8).build();
-//        Vacation vacation2 = Vacation.builder().distinction("정기").title("2차정기휴가").user(userKaKao1).totalDays(8).build();
-//        Vacation vacation3 = Vacation.builder().distinction("정기").title("3차정기휴가").user(userKaKao1).totalDays(8).build();
-//
-//        final List<Vacation> validationList = Arrays.asList(vacation1, vacation2, vacation3);
-//        vacationRepository.saveAll(validationList);
-//
-//        /**
-//         * 스케줄 더미데이터
-//         */
-//        Schedule schedule1 = Schedule.builder()
-//                .color("빨강").distinction("휴가").title("휴가날 뭐할지 딱 정함ㅋ")
-//                .user(userKaKao1)
-//                .build();
-//        ScheduleDate date = ScheduleDate.builder()
-//                .date(LocalDate.parse("2021-12-31", DateTimeFormatter.ISO_DATE))
-//                .schedule(schedule1)
-//                .build();
-//        schedule1.setScheduleDates(Arrays.asList(date));
-//        ScheduleVacation scheduleLeaveData = ScheduleVacation.builder()
-//                .count(1)
-//                .leaveId(Long.valueOf(1))
-//                .build();
-//        schedule1.setScheduleLeaves(Arrays.asList(scheduleLeaveData));
-//
-//        final List<Schedule> scheduleList = Arrays.asList(schedule1);
-//        scheduleRepository.saveAll(scheduleList);
+        User userKaKao1 = User.builder()
+                .name("이원성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
+                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
+                .build();
+        NormalPromotionState normalPromotionStateKaKao1 = NormalPromotionState.builder()
+                .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
+                .secondDate(LocalDate.parse("2021-12-31" , DateTimeFormatter.ISO_DATE))
+                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
+                .user(userKaKao1)
+                .build();
+        userKaKao1.setNormalPromotionState(normalPromotionStateKaKao1);
+
+        User userKaKao2 = User.builder()
+                .name("이두성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
+                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
+                .build();
+        NormalPromotionState normalPromotionStateKaKao2 = NormalPromotionState.builder()
+                .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
+                .secondDate(LocalDate.parse("2020-12-31" , DateTimeFormatter.ISO_DATE))
+                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
+                .user(userKaKao2)
+                .build();
+        userKaKao2.setNormalPromotionState(normalPromotionStateKaKao2);
+
+        User userKaKao3 = User.builder()
+                .name("이삼성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
+                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
+                .build();
+        NormalPromotionState normalPromotionStateKaKao3 = NormalPromotionState.builder()
+                .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
+                .secondDate(LocalDate.parse("2021-12-31" , DateTimeFormatter.ISO_DATE))
+                .thirdDate(LocalDate.parse("2022-10-31" , DateTimeFormatter.ISO_DATE))
+                .user(userKaKao3)
+                .build();
+        userKaKao3.setNormalPromotionState(normalPromotionStateKaKao3);
+
+        User userKaKao4 = User.builder()
+                .name("이사성").stateIdx(2).serveType("육군").socialType("K").socialId("test1")
+                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
+                .build();
+        AbnormalPromotionState abnormalPromotionState = AbnormalPromotionState.builder()
+                .proDate(LocalDate.parse("2021-12-31", DateTimeFormatter.ISO_DATE))
+                .user(userKaKao4)
+                .build();
+        userKaKao4.setAbnormalPromotionState(abnormalPromotionState);
+        User userKaKao5 = User.builder()
+                .name("이오성").stateIdx(1).serveType("육군").socialType("K").socialId("test1")
+                .startDate(LocalDate.parse("2020-01-01" , DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse("2022-12-31" , DateTimeFormatter.ISO_DATE))
+                .build();
+        NormalPromotionState normalPromotionStateKaKao5 = NormalPromotionState.builder()
+                .firstDate(LocalDate.parse("2020-10-31" , DateTimeFormatter.ISO_DATE))
+                .secondDate(LocalDate.parse("2021-01-31" , DateTimeFormatter.ISO_DATE))
+                .thirdDate(LocalDate.parse("2021-03-10" , DateTimeFormatter.ISO_DATE))
+                .user(userKaKao5)
+                .build();
+        userKaKao5.setNormalPromotionState(normalPromotionStateKaKao5);
+
+        final List<User> userList =
+                Arrays.asList(userKaKao1, userKaKao2, userKaKao3, userKaKao4, userKaKao5);
+        userRepository.saveAll(userList);
+
+        /**
+         * 휴가 더미데이터
+         */
+        Vacation vacation1 = Vacation.builder().distinction("정기").title("1차정기휴가").user(userKaKao1).totalDays(8).build();
+        Vacation vacation2 = Vacation.builder().distinction("정기").title("2차정기휴가").user(userKaKao1).totalDays(8).build();
+        Vacation vacation3 = Vacation.builder().distinction("정기").title("3차정기휴가").user(userKaKao1).totalDays(8).build();
+
+        final List<Vacation> validationList = Arrays.asList(vacation1, vacation2, vacation3);
+        vacationRepository.saveAll(validationList);
+
+        /**
+         * 스케줄 더미데이터
+         */
+        Schedule schedule1 = Schedule.builder()
+                .color("빨강").distinction("휴가").title("휴가날 뭐할지 딱 정함ㅋ")
+                .user(userKaKao1)
+                .build();
+        ScheduleDate date = ScheduleDate.builder()
+                .date(LocalDate.parse("2021-12-31", DateTimeFormatter.ISO_DATE))
+                .schedule(schedule1)
+                .build();
+        schedule1.setScheduleDates(Arrays.asList(date));
+        ScheduleVacation scheduleLeaveData = ScheduleVacation.builder()
+                .count(1)
+                .leaveId(Long.valueOf(1))
+                .build();
+        schedule1.setScheduleLeaves(Arrays.asList(scheduleLeaveData));
+
+        final List<Schedule> scheduleList = Arrays.asList(schedule1);
+        scheduleRepository.saveAll(scheduleList);
     }
 }

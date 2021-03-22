@@ -31,13 +31,14 @@ public class ExerciseRoutine extends BaseEntity {
     @Column(name = "repeatDay", length = 30, nullable = false)
     private String repeaDay;
 
-    @ManyToOne
+    @Builder.Default
+    @Column(name = "done", nullable = false, length = 1)
+    private String done = "N";
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "exercise_id", nullable = false )
     private ExerciseInfo exerciseInfo;
 
-    /**
-     * 양방향
-     */
     @OneToMany(mappedBy = "exerciseRoutine", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ExerciseRoutineDetail> routineDetails = new ArrayList<>();
 

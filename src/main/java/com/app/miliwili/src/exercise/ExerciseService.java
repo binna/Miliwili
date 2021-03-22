@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.util.ArrayList;
+
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @Service
@@ -118,9 +120,11 @@ public class ExerciseService {
                 .bodyPart(param.getBodyPart())
                 .repeaDay(param.getRepeatDay())
                 .exerciseInfo(exerciseInfo)
+                .routineDetails(new ArrayList<>())
                 .build();
-//        exerciseInfo.addExerciseRoutine(newRoutine);
 
+
+      //  System.out.println(exerciseInfo.getExerciseRoutines().get(0).getRoutineDetails());
 
         for (int i = 0; i < param.getDetailName().size(); i++) {
             ExerciseRoutineDetail newRoutineDetail = ExerciseRoutineDetail.builder()
@@ -130,8 +134,10 @@ public class ExerciseService {
                     .setCount(param.getDetailSet().get(i))
                     .isSame((param.getDetailSetEqual().get(i)) ? "Y" : "N")
                     .exerciseRoutine(newRoutine)
+                    .detailSets(new ArrayList<>())
                     .build();
-
+            System.out.println(newRoutineDetail.getName());
+//            exerciseRoutineDetailRepository.save(newRoutineDetail);
 
             //무게 + 개수
             if (newRoutineDetail.getRoutineTypeId() == 1) {
@@ -180,12 +186,10 @@ public class ExerciseService {
                 }
             }
             //arr추가
-            //newRoutine.addRoutineDetail(newRoutineDetail);
-
             newRoutine.addRoutineDetail(newRoutineDetail);
-
         }
         exerciseInfo.addExerciseRoutine(newRoutine);
+
         try {
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
