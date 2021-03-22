@@ -1,13 +1,11 @@
 package com.app.miliwili.src.exercise.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class RoutineInfo {
     private String routineName;
     private String routineRepeatDay;

@@ -132,7 +132,10 @@ public enum BaseResponseStatus {
     FAILED_GET_MONTH_WEIGHT_2(false, 3535, "월별 체중 기록 조회에 실패하였습니다.-2-웗별 일일 조회 "),
     NOT_FOUND_EXERCISE_WEIGHT_RECORD(false, 3536, "해당날짜에 해당 회원의 체중기록이 존재하지 않습니다."),
     FAILED_PATCH_DAILY_WEIGHT(false, 3537, "일일 체중 기록 수정에 실패하였습니다. "),
+
     FAILED_FIND_DELETE_ROUTINE(false, 3538, "삭제하고자 하는 루틴의 ID와 일치하는 루틴이 존재하지 않습니다. "),
+    FAILED_FIND_GET_ROUTINE(false, 3539, "오늘 운동 완료된 루틴이 없습니다. "),
+    FAILED_RESET_ROTUINE_DONE(false, 3540, "운동 상태 리셋에 실패하였습니다. "),
 
 
 

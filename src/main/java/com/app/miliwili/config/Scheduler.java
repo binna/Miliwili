@@ -3,6 +3,11 @@ package com.app.miliwili.config;
 import com.app.miliwili.src.calendar.ScheduleRepository;
 import com.app.miliwili.src.calendar.ScheduleSelectRepository;
 import com.app.miliwili.src.calendar.models.Plan;
+import com.app.miliwili.src.exercise.ExerciseProvider;
+import com.app.miliwili.src.exercise.ExerciseRepository;
+import com.app.miliwili.src.exercise.ExerciseService;
+import com.app.miliwili.src.exercise.model.ExerciseInfo;
+import com.app.miliwili.src.exercise.model.ExerciseRoutine;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.UserService;
 import com.app.miliwili.src.user.models.NormalPromotionState;
@@ -14,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -23,7 +29,8 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class Scheduler {
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
-    private final ScheduleSelectRepository scheduleSelectRepository;
+    private final ExerciseProvider exerciseProvider;
+    private final ExerciseService exerciseService;
     private final UserService userService;
     private final FirebaseCloudMessage firebaseCloudMessageService;
 
@@ -65,4 +72,25 @@ public class Scheduler {
             }
         }
     }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void resetExerciseRoutineState(){
+        List<ExerciseRoutine> exerciseRoutines = new ArrayList<>();
+        try {
+            exerciseRoutines = exerciseProvider.getCompleteRoutine();
+        }catch (Exception e){
+            e.printStackTrace();
+            new BaseResponse<>(FAILED_FIND_GET_ROUTINE);
+        }
+        for(ExerciseRoutine routine: exerciseRoutines){
+            try{
+                exerciseService.resetRoutineDone(routine);
+            }catch (Exception e){
+                e.printStackTrace();
+                new BaseResponse<>(FAILED_RESET_ROTUINE_DONE);
+            }
+        }
+    }
+
+
 }

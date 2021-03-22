@@ -242,12 +242,23 @@ public class ExerciseService {
         if(i == routineList.size()-1 || routine == null)
             throw new BaseException(FAILED_FIND_DELETE_ROUTINE);
 
-        exerciseInfo.getExerciseRoutines().remove(routine);
         routine.setExerciseInfo(null);
+
+        exerciseInfo.getExerciseRoutines().remove(routine);
         exerciseRoutineRepository.delete(routine);
 
 
         return "\""+routine.getName()+"\""+"루틴이 삭제되었습니다";
     }
+
+
+    /**
+     * 운동 안한상태로 초기화
+     */
+    public void resetRoutineDone(ExerciseRoutine routine){
+        routine.setDone("N");
+        exerciseRoutineRepository.save(routine);
+    }
+
 
 }

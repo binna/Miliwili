@@ -176,7 +176,7 @@ public class ExerciseController {
      * @Auther vivi
      */
     @ResponseBody
-    @GetMapping("/{exerciseId}/routines")
+    @GetMapping("/{exerciseId}/all-routines")
     public BaseResponse<List<MyRoutineInfo>> getMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId){
         try{
             List<MyRoutineInfo> myAllRoutineList = exerciseProvider.retrieveAllRoutineList(exerciseId);
@@ -195,11 +195,33 @@ public class ExerciseController {
      */
     @ResponseBody
     @DeleteMapping("/{exerciseId}/routines/{routineId}")
-    public BaseResponse<String> getMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+    public BaseResponse<String> deleteMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
                                                               @PathVariable Long routineId){
         try{
             String resultStr = exerciseService.deleteRoutine(exerciseId,routineId);
             return new BaseResponse<>(SUCCESS, resultStr);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+
+    /**
+     * 특정 날짜의 루틴 조회
+     * @return BaseResponse<MyRoutineInfo>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/routines")
+    public BaseResponse<List<RoutineInfo>> getMyDateRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                                       @RequestParam String targetDate){
+        if(!Validation.isRegexDate(targetDate)){
+            return new BaseResponse<>(INVALID_MODIFY_DATE);
+        }
+        try{
+            List<RoutineInfo> resultList = exerciseProvider.retrieveDateRoutine(exerciseId, targetDate);
+            return new BaseResponse<>(SUCCESS, resultList);
         }catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
         }
