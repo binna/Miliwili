@@ -294,7 +294,7 @@ public class ExerciseProvider {
             for(int j=0;j<repeatDay.length;j++){
                 switch (repeatDay[j]){
                     case "1":
-                        repeatDayStr+="매일";
+                        repeatDayStr+="매일,";
                         break;
                     case "2":
                         repeatDayStr+="월,";

@@ -15,7 +15,7 @@ spring:
 #      ddl-auto: create-drop
     database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-    generate-ddl: false
+    generate-ddl: true
     show-sql: true
 #  quartz:
 #    scheduler-name: QuartzScheduler
