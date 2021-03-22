@@ -13,28 +13,38 @@ public enum BaseResponseStatus {
     // 2000 : Request 오류
     EMPTY_JWT(false, 2000, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2001, "유효하지 않은 JWT입니다."),
-    EMPTY_TITLE(false, 2009, "제목을 입력해주세요."),
-    EMPTY_TOTAL_DAYS(false, 2010, "총 휴가개수를 입력해주세요."),
-    EMPTY_SOCIAL_TYPE(false, 2010, "가입 요청하는 소셜타입을 입력해주세요."),
-    EMPTY_PRIMARY(false, 2000, "PK를 입력해주세요."),
-    EMPTY_VACATION_TYPE(false, 2000, "휴가구분을 입력해주세요."),
-    EMPTY_BIRTHDAY(false, 2000, "생일을 입력해주세요."),
-    EMPTY_GOAL(false, 2000, "목표를 입력해주세요."),
-    EMPTY_ALL(false, 2000, "입력된 값이 없습니다. 값을 입력해주세요."),
-    INVALID_ORDINARY_LEAVE_START_DATE(false, 2011, "휴가시작일 형식을 확인해주세요."),
-    INVALID_ORDINARY_LEAVE_END_DATE(false, 2012, "휴가종료일 형식을 확인해주세요."),
-    INVALID_BIRTHDAY(false, 2000, "생일 형식을 확인해주세요."),
-    EXCEED_MAX20(false, 2000, "입력할 수 있는 최대 20글자의 수를 초과하였습니다."),
-    NOT_BE_GREATER_THAN_TOTAL_DAYS(false, 2000, "사용일은 총 휴가일수를 초과할 수 없다."),
-    CHOOSE_BETWEEN_ABNORMAL_OR_NORMAL(false, 2002, "진급일이나 일병과 상병과 병장진급일 중 하나는 꼭 입력해주셔야 합니다."),
-    FASTER_THAN_START_DATE(false, 2003, "전역일은 입대일보다 빠를 수 없습니다."),
-    FASTER_THAN_FIRST_DATE(false, 2004, "입대일은 상병진급일보다 빠를 수 없습니다."),
-    FASTER_THAN_SECOND_DATE(false, 2005, "상병진급일은 병장진급일보다  빠를 수 없습니다."),
-    FASTER_THAN_THIRD_DATE(false, 2006, "병장진급일은 상병진급일보다 빠를 수 없습니다."),
-    FASTER_THAN_END_DATE(false, 2007, "상병진급일은 전역일보다 빠를 수 없습니다."),
-    FASTER_THAN_PRO_DATE(false, 2008, "진급심사일은 입대일보다 빠를 수 없습니다."),
-    FASTER_THAN_ORDINARY_LEAVE_START_DATE(false, 2003, "휴가종료일은 휴가시작일보다 빠를 수 없습니다."),
-
+    EMPTY_TITLE(false, 2002, "제목을 입력해주세요."),
+    EMPTY_TOTAL_DAYS(false, 2003, "총 휴가개수를 입력해주세요."),
+    EMPTY_SOCIAL_TYPE(false, 2004, "가입 요청하는 소셜타입을 입력해주세요."),
+    EMPTY_PRIMARY(false, 2005, "PK를 입력해주세요."),
+    EMPTY_VACATION_TYPE(false, 2006, "휴가구분을 입력해주세요."),
+    EMPTY_BIRTHDAY(false, 2007, "생일을 입력해주세요."),
+    EMPTY_GOAL(false, 2008, "목표를 입력해주세요."),
+    EMPTY_ALL(false, 2009, "입력된 값이 없습니다. 값을 입력해주세요."),
+    EMPTY_COLOR(false, 2010, "색상을 입력해주세요."),
+    EMPTY_SCHEDULE_TYPE(false, 2011, "일정 타입을 입력해주세요."),
+    EMPTY_CALENDAR_START_DATE(false, 2012, "시작날짜을 입력해주세요."),
+    EMPTY_CALENDAR_END_DATE(false, 2013, "종료날짜을 입력해주세요."),
+    EMPTY_PUSH_DEVICE_TOKEN(false, 2014, "PUSH 디바이스 토큰을 입력해주세요."),
+    INVALID_ORDINARY_LEAVE_START_DATE(false, 2015, "휴가시작일 형식을 확인해주세요."),
+    INVALID_ORDINARY_LEAVE_END_DATE(false, 2016, "휴가종료일 형식을 확인해주세요."),
+    INVALID_BIRTHDAY(false, 2017, "생일 형식을 확인해주세요."),
+    INVALID_CALENDAR_START_DATE(false, 2018, "시작날짜 형식을 확인해주세요."),
+    INVALID_CALENDAR_END_DATE(false, 2019, "종료날짜 형식을 확인해주세요."),
+    EXCEED_MAX20(false, 2020, "입력할 수 있는 최대 20글자의 수를 초과하였습니다."),
+    NOT_BE_GREATER_THAN_TOTAL_DAYS(false, 2021, "사용일은 총 휴가일수를 초과할 수 없다."),
+    CHOOSE_BETWEEN_ABNORMAL_OR_NORMAL(false, 2022, "진급일이나 일병과 상병과 병장진급일 중 하나는 꼭 입력해주셔야 합니다."),
+    FASTER_THAN_START_DATE(false, 2023, "전역일은 입대일보다 빠를 수 없습니다."),
+    FASTER_THAN_FIRST_DATE(false, 2024, "입대일은 상병진급일보다 빠를 수 없습니다."),
+    FASTER_THAN_SECOND_DATE(false, 2025, "상병진급일은 병장진급일보다  빠를 수 없습니다."),
+    FASTER_THAN_THIRD_DATE(false, 2026, "병장진급일은 상병진급일보다 빠를 수 없습니다."),
+    FASTER_THAN_END_DATE(false, 2027, "상병진급일은 전역일보다 빠를 수 없습니다."),
+    FASTER_THAN_PRO_DATE(false, 2028, "진급심사일은 입대일보다 빠를 수 없습니다."),
+    FASTER_THAN_ORDINARY_LEAVE_START_DATE(false, 2029, "휴가종료일은 휴가시작일보다 빠를 수 없습니다."),
+    ONLY_ON_THE_SAME_DAY(false, 2030, "날짜 범위 등록 불가, 당일만 등록 가능합니다."),
+    FASTER_THAN_CALENDAR_START_DATE(false, 2031, "종료일은 시작일보다 빠를 수 없습니다."),
+    INVALID_SCHEDULE_TYPE(false, 2032, "유효하지 않은 일정 타입입니다."),
+    EMPTY_SCHEDULE_VACATION(false, 2014, "휴가 정보를 입력해주세요."),
 
 
 
@@ -120,8 +130,6 @@ public enum BaseResponseStatus {
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");
 
-    // 5000 : 필요시 만들어서 쓰세요
-    // 6000 : 필요시 만들어서 쓰세요
 
     private final boolean isSuccess;
     private final int code;
