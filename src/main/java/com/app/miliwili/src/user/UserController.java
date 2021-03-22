@@ -341,7 +341,7 @@ public class UserController {
 
 
     /**
-     * 정기휴가 생성 API
+     * 휴가생성 API
      * [POST] /app/users/vacation
      *
      * @return BaseResponse<PostVacationRes>
@@ -376,7 +376,7 @@ public class UserController {
     }
 
     /**
-     * 정기휴가 수정 API
+     * 휴가수정 API
      * [PATCH] /app/users/vacation/:vacationId
      *
      * @return BaseResponse<PatchVacationRes>
@@ -414,7 +414,7 @@ public class UserController {
     }
 
     /**
-     * 정기휴가 삭제 API
+     * 휴가삭제 API
      * [DELETE] /app/users/vacation/:vacationId
      *
      * @return BaseResponse<Void>
