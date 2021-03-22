@@ -22,7 +22,7 @@ public enum BaseResponseStatus {
     EMPTY_GOAL(false, 2008, "목표를 입력해주세요."),
     EMPTY_ALL(false, 2009, "입력된 값이 없습니다. 값을 입력해주세요."),
     EMPTY_COLOR(false, 2010, "색상을 입력해주세요."),
-    EMPTY_SCHEDULE_TYPE(false, 2011, "일정 타입을 입력해주세요."),
+    EMPTY_PLAN_TYPE(false, 2011, "일정 타입을 입력해주세요."),
     EMPTY_CALENDAR_START_DATE(false, 2012, "시작날짜을 입력해주세요."),
     EMPTY_CALENDAR_END_DATE(false, 2013, "종료날짜을 입력해주세요."),
     EMPTY_PUSH_DEVICE_TOKEN(false, 2014, "PUSH 디바이스 토큰을 입력해주세요."),
@@ -43,8 +43,8 @@ public enum BaseResponseStatus {
     FASTER_THAN_ORDINARY_LEAVE_START_DATE(false, 2029, "휴가종료일은 휴가시작일보다 빠를 수 없습니다."),
     ONLY_ON_THE_SAME_DAY(false, 2030, "날짜 범위 등록 불가, 당일만 등록 가능합니다."),
     FASTER_THAN_CALENDAR_START_DATE(false, 2031, "종료일은 시작일보다 빠를 수 없습니다."),
-    INVALID_SCHEDULE_TYPE(false, 2032, "유효하지 않은 일정 타입입니다."),
-    EMPTY_SCHEDULE_VACATION(false, 2014, "휴가 정보를 입력해주세요."),
+    INVALID_PLAN_TYPE(false, 2032, "유효하지 않은 일정 타입입니다."),
+    EMPTY_PLAN_VACATION(false, 2014, "휴가 정보를 입력해주세요."),
 
 
 

@@ -1,6 +1,5 @@
 package com.app.miliwili.src.exercise.model;
 
-import com.app.miliwili.src.user.models.User;
 import lombok.*;
 
 import javax.persistence.*;

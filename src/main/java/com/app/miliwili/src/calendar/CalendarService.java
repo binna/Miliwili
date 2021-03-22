@@ -3,19 +3,19 @@ package com.app.miliwili.src.calendar;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.dto.PostDDayReq;
 import com.app.miliwili.src.calendar.dto.PostDDayRes;
-import com.app.miliwili.src.calendar.dto.PostScheduleReq;
-import com.app.miliwili.src.calendar.dto.PostScheduleRes;
+import com.app.miliwili.src.calendar.dto.PostPlanReq;
+import com.app.miliwili.src.calendar.dto.PostPlanRes;
 import com.app.miliwili.src.user.UserProvider;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.src.calendar.models.*;
 import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -30,21 +30,22 @@ public class CalendarService {
 
     /**
      * 일정 생성
-     * @param PostScheduleReq parameters
-     * @return PostScheduleRes
+     * @param parameters
+     * @return PostPlanRes
      * @throws BaseException
      * @Auther shine
      */
-    public PostScheduleRes createSchedule(PostScheduleReq parameters) throws BaseException {
-        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+    @Transactional
+    public PostPlanRes createPlan(PostPlanReq parameters) throws BaseException {
+        UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        Schedule newSchedule = Schedule.builder()
+        Plan newSchedule = Plan.builder()
                 .color(parameters.getColor())
-                .scheduleType(parameters.getScheduleType())
+                .planType(parameters.getPlanType())
                 .title(parameters.getTitle())
                 .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
                 .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
-                .user(user)
+                .userInfo(user)
                 .build();
 
         if(parameters.getPush().equals("Y")) {
@@ -52,8 +53,8 @@ public class CalendarService {
             newSchedule.setPushDeviceToken(parameters.getPushDeviceToken());
         }
 
-        if(newSchedule.getScheduleType().equals("휴가")) {
-            newSchedule.setScheduleVacations(calendarProvider.changeListScheduleVacationReqToSetScheduleVacation(parameters.getScheduleVacation(), newSchedule));
+        if(newSchedule.getPlanType().equals("휴가")) {
+            newSchedule.setPlanVacations(calendarProvider.changeListPlanVacationReqToSetPlanVacation(parameters.getPlanVacation(), newSchedule));
         }
 
         if(Objects.nonNull(parameters.getToDoList())) {
@@ -61,16 +62,16 @@ public class CalendarService {
         }
 
         try {
-            Schedule savedSchedule = scheduleRepository.save(newSchedule);
-            return PostScheduleRes.builder()
-                    .scheduleId(savedSchedule.getId())
+            Plan savedSchedule = scheduleRepository.save(newSchedule);
+            return PostPlanRes.builder()
+                    .planId(savedSchedule.getId())
                     .color(savedSchedule.getColor())
-                    .scheduleType(savedSchedule.getScheduleType())
+                    .planType(savedSchedule.getPlanType())
                     .title(savedSchedule.getTitle())
                     .startDate(savedSchedule.getStartDate().format(DateTimeFormatter.ISO_DATE))
                     .endDate(savedSchedule.getEndDate().format(DateTimeFormatter.ISO_DATE))
                     .push(savedSchedule.getPush())
-                    .scheduleVacation(calendarProvider.changeSetScheduleVacationToListScheduleVacationRes(savedSchedule.getScheduleVacations()))
+                    .planVacation(calendarProvider.changeSetPlanVacationToListPlanVacationRes(savedSchedule.getPlanVacations()))
                     .toDoList(calendarProvider.changeListToDoListToListWorkRes(savedSchedule.getToDoLists()))
                     .build();
         } catch (Exception exception) {
@@ -105,7 +106,7 @@ public class CalendarService {
      * @Auther shine
      */
     public PostDDayRes createDDay(PostDDayReq parameters) throws BaseException {
-        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+        UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         DDay dDay = DDay.builder()
                 .distinction(parameters.getDistinction())
@@ -115,7 +116,7 @@ public class CalendarService {
                 .endDay(LocalDate.parse(parameters.getEndDay(), DateTimeFormatter.ISO_DATE))
                 .placeLat(parameters.getPlaceLat())
                 .placeLon(parameters.getPlaceLon())
-                .user(user)
+                .userInfo(user)
                 .build();
 
         if (!Objects.isNull(parameters.getLink())) {

@@ -2,8 +2,8 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
 import com.app.miliwili.src.user.models.QAbnormalPromotionState;
-import com.app.miliwili.src.user.models.QUser;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.QUserInfo;
+import com.app.miliwili.src.user.models.UserInfo;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
 
     @Autowired
     public UserSelectRepository(JPAQueryFactory queryFactory){
-        super(User.class);
+        super(UserInfo.class);
         this.queryFactory=queryFactory;
     }
 
@@ -27,7 +27,7 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
      * return: id
      */
     public List<Long> findUsersIdByGoogleId(String gsocialId) {
-        QUser user = QUser.user;
+        QUserInfo user = QUserInfo.userInfo;
         return queryFactory.select((Projections.constructor(Long.class,
                 user.id)))
                 .from(user)
@@ -40,7 +40,7 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
      * stateIdx 조회
      */
     public List<Integer> findUserStateIdxByUserId(long userId){
-        QUser user = QUser.user;
+        QUserInfo user = QUserInfo.userInfo;
         return queryFactory.select((Projections.constructor(Integer.class,
                 user.stateIdx)))
                 .from(user)
@@ -53,7 +53,7 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
      * --> mainProvider
      */
     public List<GetAbnormalUserEndDate> findEndDateInfoByUserId(long userId){
-        QUser user = QUser.user;
+        QUserInfo user = QUserInfo.userInfo;
         QAbnormalPromotionState abnormal = QAbnormalPromotionState.abnormalPromotionState;
 
         return queryFactory.select((Projections.constructor(GetAbnormalUserEndDate.class,
@@ -62,7 +62,7 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                 .from(user)
                 .where(user.status.eq("Y"), user.id.eq(userId))
                 .join(abnormal)
-                .on(abnormal.user.id.eq(user.id))   //???왜래키라면???
+                .on(abnormal.userInfo.id.eq(user.id))   //???왜래키라면???
                 .fetch();
 
     }

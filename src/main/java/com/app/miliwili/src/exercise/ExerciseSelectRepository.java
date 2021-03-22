@@ -1,7 +1,7 @@
 package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.src.exercise.model.*;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.UserInfo;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class ExerciseSelectRepository extends QuerydslRepositorySupport {
 
     @Autowired
     public ExerciseSelectRepository(JPAQueryFactory queryFactory){
-        super(User.class);
+        super(UserInfo.class);
         this.queryFactory=queryFactory;
     }
 

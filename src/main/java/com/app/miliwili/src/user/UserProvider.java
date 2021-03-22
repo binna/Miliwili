@@ -5,7 +5,7 @@ import com.app.miliwili.src.calendar.CalendarProvider;
 import com.app.miliwili.src.calendar.ScheduleSelectRepository;
 import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
 import com.app.miliwili.src.user.models.Vacation;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -98,7 +98,7 @@ public class UserProvider {
      * @Auther shine
      */
     @Transactional
-    public User retrieveUserByIdAndStatusY(Long userId) throws BaseException {
+    public UserInfo retrieveUserByIdAndStatusY(Long userId) throws BaseException {
         return userRepository.findByIdAndStatus(userId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
     }
@@ -125,7 +125,7 @@ public class UserProvider {
      * @Auther shine
      */
     @Transactional
-    public User retrieveUserBySocialIdAndStatusY(String socialId) throws BaseException {
+    public UserInfo retrieveUserBySocialIdAndStatusY(String socialId) throws BaseException {
         return userRepository.findBySocialIdAndStatus(socialId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
     }

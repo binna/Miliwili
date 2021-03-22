@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class ScheduleVacationReq {
+public class PlanVacationReq {
     private Long vacationId;
     private Integer count;
 }

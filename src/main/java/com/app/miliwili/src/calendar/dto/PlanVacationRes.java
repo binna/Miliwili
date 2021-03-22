@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class ScheduleVacationRes {
-    private final Long scheduleVacationId;
+public class PlanVacationRes {
+    private final Long planVacationId;
     private final Integer count;
     private final Long vacationId;
 }

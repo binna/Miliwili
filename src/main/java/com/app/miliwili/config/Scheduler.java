@@ -2,11 +2,11 @@ package com.app.miliwili.config;
 
 import com.app.miliwili.src.calendar.ScheduleRepository;
 import com.app.miliwili.src.calendar.ScheduleSelectRepository;
-import com.app.miliwili.src.calendar.models.Schedule;
+import com.app.miliwili.src.calendar.models.Plan;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.UserService;
 import com.app.miliwili.src.user.models.NormalPromotionState;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.FirebaseCloudMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,9 +29,9 @@ public class Scheduler {
 
     @Scheduled(cron = "0 0 0 * * *")
     public void setDailyHobongAndStateIdx() {
-        List<User> users = userRepository.findAllByStateIdxAndStatus(1, "Y");
+        List<UserInfo> users = userRepository.findAllByStateIdxAndStatus(1, "Y");
 
-        for (User user : users) {
+        for (UserInfo user : users) {
             String startDate = user.getStartDate().format(DateTimeFormatter.ISO_DATE);
             String strPrivate = user.getNormalPromotionState().getFirstDate().format(DateTimeFormatter.ISO_DATE);
             String strCorporal = user.getNormalPromotionState().getSecondDate().format(DateTimeFormatter.ISO_DATE);
@@ -51,9 +51,9 @@ public class Scheduler {
 
     @Scheduled(cron = "0 0 19 * * *")
     public void sendPushMessage() {
-        List<Schedule> schedules = scheduleRepository.findByPushAndStatusAndStartDate("Y", "Y", LocalDate.now().plusDays(1));
+        List<Plan> schedules = scheduleRepository.findByPushAndStatusAndStartDate("Y", "Y", LocalDate.now().plusDays(1));
 
-        for (Schedule schedule : schedules) {
+        for (Plan schedule : schedules) {
             System.out.println(schedule.getStartDate() + ", " + schedule.getTitle());
             try {
                     firebaseCloudMessageService.sendMessageTo(

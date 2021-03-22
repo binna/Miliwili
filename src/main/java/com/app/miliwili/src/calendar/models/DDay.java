@@ -1,7 +1,7 @@
 package com.app.miliwili.src.calendar.models;
 
 import com.app.miliwili.config.BaseEntity;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.UserInfo;
 import lombok.*;
 
 import javax.persistence.*;
@@ -52,8 +52,8 @@ public class DDay extends BaseEntity {
     private BigDecimal placeLon;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "userInfo_id", nullable = false)
+    private UserInfo userInfo;
 
     @OneToMany(mappedBy = "dDay", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Supplies> supplies;

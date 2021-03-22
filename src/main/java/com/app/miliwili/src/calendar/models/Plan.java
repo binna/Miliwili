@@ -1,7 +1,7 @@
 package com.app.miliwili.src.calendar.models;
 
 import com.app.miliwili.config.BaseEntity;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.UserInfo;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -14,11 +14,11 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"user", "toDoLists", "scheduleVacations", "diaries"})
+@EqualsAndHashCode(callSuper = false, exclude = {"userInfo", "toDoLists", "planVacations", "diaries"})
 @Data
 @Entity
-@Table(name = "schedule")
-public class Schedule extends BaseEntity {
+@Table(name = "plan")
+public class Plan extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +27,8 @@ public class Schedule extends BaseEntity {
     @Column(name = "color", nullable = false, length = 30)
     private String color;
 
-    @Column(name = "scheduleType", nullable = false, length = 10)
-    private String scheduleType;
+    @Column(name = "planType", nullable = false, length = 10)
+    private String planType;
 
     @Column(name = "title", nullable = false, length = 60)
     private String title;
@@ -47,19 +47,19 @@ public class Schedule extends BaseEntity {
     private String pushDeviceToken;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "userInfo_id", nullable = false)
+    private UserInfo userInfo;
 
     @OrderBy("id asc")
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "plan", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ToDoList> toDoLists;
 
     @OrderBy("id asc")
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<ScheduleVacation> scheduleVacations;
+    @OneToMany(mappedBy = "plan", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<PlanVacation> planVacations;
 
     @OrderBy("date asc")
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "plan", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Diary> diaries;
 
     @Override

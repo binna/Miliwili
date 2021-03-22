@@ -9,11 +9,11 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"schedule"})
+@EqualsAndHashCode(callSuper = false, exclude = {"plan"})
 @Data
 @Entity
-@Table(name = "scheduleVacation")
-public class ScheduleVacation {
+@Table(name = "planVacation")
+public class PlanVacation {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +26,8 @@ public class ScheduleVacation {
     private Long vacationId;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_id")
-    private Schedule schedule;
+    @JoinColumn(name = "plan_id")
+    private Plan plan;
 
     @Override
     public String toString() {

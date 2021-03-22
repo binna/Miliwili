@@ -7,7 +7,7 @@ import com.app.miliwili.src.exercise.dto.PostExerciseRoutineReq;
 import com.app.miliwili.src.exercise.dto.PostExerciseWeightReq;
 import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.UserProvider;
-import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class ExerciseService {
      *
      */
     public Long createFistWeight(PostExerciseFirstWeightReq param) throws BaseException{
-        User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+        UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         if(exerciseProvider.isExerciseInfoUser(user.getId()) == true)
             throw new BaseException(FAILED_CHECK_FIRST_WIEHGT);
