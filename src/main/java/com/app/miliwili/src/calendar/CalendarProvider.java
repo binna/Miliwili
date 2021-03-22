@@ -1,9 +1,12 @@
 package com.app.miliwili.src.calendar;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.src.calendar.dto.ScheduleVacationReq;
+import com.app.miliwili.src.calendar.dto.ScheduleVacationRes;
 import com.app.miliwili.src.calendar.dto.WorkReq;
 import com.app.miliwili.src.calendar.dto.WorkRes;
 import com.app.miliwili.src.calendar.models.Schedule;
+import com.app.miliwili.src.calendar.models.ScheduleVacation;
 import com.app.miliwili.src.calendar.models.ToDoList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,34 +42,79 @@ public class CalendarProvider {
     }
 
     /**
-     * List<ToDoList> -> List<WorkRes> 변경
+     * List<ScheduleVacationReq> -> Set<ScheduleVacation> 변경
      *
-     * @param List<WorkReq> parameters
-     * @return List<ToDoList>
+     * @param parameters
+     * @param schedule
+     * @return Set<ScheduleVacation>
      * @Auther shine
      */
-    public Set<ToDoList> retrieveToDoList(List<WorkReq> parameters) {
+    public Set<ScheduleVacation> changeListScheduleVacationReqToSetScheduleVacation(List<ScheduleVacationReq> parameters, Schedule schedule) {
         if (parameters == null) return null;
 
-        return parameters.stream().map(workReq -> {
-            return ToDoList.builder()
-                    .content(workReq.getContent())
+        return parameters.stream().map(scheduleVacationReq -> {
+            return ScheduleVacation.builder()
+                    .count(scheduleVacationReq.getCount())
+                    .vacationId(scheduleVacationReq.getVacationId())
+                    .schedule(schedule)
                     .build();
         }).collect(Collectors.toSet());
     }
 
     /**
+     * Set<ScheduleVacation> -> List<ScheduleVacationRes> 변경
+     *
+     * @param parameters
+     * @return Set<ScheduleVacation>
+     * @Auther shine
+     */
+    public List<ScheduleVacationRes> changeSetScheduleVacationToListScheduleVacationRes(Set<ScheduleVacation> parameters) {
+        if (parameters == null) return null;
+
+        return parameters.stream().map(scheduleVacation -> {
+            return ScheduleVacationRes.builder()
+                    .scheduleVacationId(scheduleVacation.getVacationId())
+                    .count(scheduleVacation.getCount())
+                    .vacationId(scheduleVacation.getVacationId())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * List<WorkReq> -> List<ToDoList> 변경
+     *
+     * @param parameters
+     * @param schedule
+     * @return List<ToDoList>
+     * @Auther shine
+     */
+    public List<ToDoList> changeListWorkReqToListToDoList(List<WorkReq> parameters, Schedule schedule) {
+        if (parameters == null) return null;
+
+        return parameters.stream().map(workReq -> {
+            return ToDoList.builder()
+                    .content(workReq.getContent())
+                    .schedule(schedule)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    /**
      * List<ToDoList> -> List<WorkRes> 변경
      *
-     * @param List<ToDoList> parameters
+     * @param parameters
      * @return List<WorkRes>
      * @Auther shine
      */
-    public List<WorkRes> retrieveWorkRes(List<ToDoList> parameters) {
+    public List<WorkRes> changeListToDoListToListWorkRes(List<ToDoList> parameters) {
         if (parameters == null) return null;
 
         return parameters.stream().map(toDoList -> {
-            return new WorkRes(toDoList.getContent(), toDoList.getProcessingStatus());
+            return WorkRes.builder()
+                    .id(toDoList.getId())
+                    .content(toDoList.getContent())
+                    .processingStatus(toDoList.getProcessingStatus())
+                    .build();
         }).collect(Collectors.toList());
     }
 }

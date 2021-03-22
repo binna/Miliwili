@@ -14,9 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -55,20 +52,12 @@ public class CalendarService {
             newSchedule.setPushDeviceToken(parameters.getPushDeviceToken());
         }
 
-        if(Objects.nonNull(parameters.getScheduleVacation())) {
-            newSchedule.setScheduleVacations(parameters.getScheduleVacation().stream().map(scheduleVacationReq -> {
-                return ScheduleVacation.builder()
-                        .count(scheduleVacationReq.getCount())
-                        .vacationId(scheduleVacationReq.getVacationId())
-                        .schedule(newSchedule)
-                        .build();
-            }).collect(Collectors.toSet()));
+        if(newSchedule.getScheduleType().equals("휴가")) {
+            newSchedule.setScheduleVacations(calendarProvider.changeListScheduleVacationReqToSetScheduleVacation(parameters.getScheduleVacation(), newSchedule));
         }
 
         if(Objects.nonNull(parameters.getToDoList())) {
-            newSchedule.setToDoLists(parameters.getToDoList().stream().map(workReq -> {
-                return ToDoList.builder().content(workReq.getContent()).schedule(newSchedule).build();
-            }).collect(Collectors.toList()));
+            newSchedule.setToDoLists(calendarProvider.changeListWorkReqToListToDoList(parameters.getToDoList(), newSchedule));
         }
 
         try {
@@ -78,8 +67,11 @@ public class CalendarService {
                     .color(savedSchedule.getColor())
                     .scheduleType(savedSchedule.getScheduleType())
                     .title(savedSchedule.getTitle())
+                    .startDate(savedSchedule.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(savedSchedule.getEndDate().format(DateTimeFormatter.ISO_DATE))
                     .push(savedSchedule.getPush())
-//                    .toDoList(calendarProvider.retrieveWorkRes(savedSchedule.getToDoLists()))
+                    .scheduleVacation(calendarProvider.changeSetScheduleVacationToListScheduleVacationRes(savedSchedule.getScheduleVacations()))
+                    .toDoList(calendarProvider.changeListToDoListToListWorkRes(savedSchedule.getToDoLists()))
                     .build();
         } catch (Exception exception) {
             exception.printStackTrace();

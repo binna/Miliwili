@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -52,19 +51,17 @@ public class Scheduler {
 
     @Scheduled(cron = "0 0 19 * * *")
     public void sendPushMessage() {
-        List<Schedule> schedules = scheduleRepository.findByPushAndStatus("Y", "Y");
-        LocalDate standardDay = LocalDate.now().plusDays(1);
+        List<Schedule> schedules = scheduleRepository.findByPushAndStatusAndStartDate("Y", "Y", LocalDate.now().plusDays(1));
 
         for (Schedule schedule : schedules) {
-            if(schedule.getStartDate().isEqual(standardDay)) {
-                try {
-                        firebaseCloudMessageService.sendMessageTo(
-                                schedule.getPushDeviceToken(),
-                                schedule.getTitle(),
-                                schedule.getTitle() + " 일정 하루 전날입니다. 준비해주세요!");
-                } catch (Exception exception) {
-                    new BaseResponse<>(FAILED_TO_PUSH_MESSAGE);
-                }
+            System.out.println(schedule.getStartDate() + ", " + schedule.getTitle());
+            try {
+                    firebaseCloudMessageService.sendMessageTo(
+                            schedule.getPushDeviceToken(),
+                            schedule.getTitle(),
+                            schedule.getTitle() + " 일정 하루 전날입니다. 준비해주세요!");
+            } catch (Exception exception) {
+                new BaseResponse<>(FAILED_TO_PUSH_MESSAGE);
             }
         }
     }
