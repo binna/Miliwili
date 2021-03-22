@@ -1,13 +1,15 @@
 package com.app.miliwili.src.calendar.models;
 
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = {"schedule"})
 @Data
 @Entity
 @Table(name = "scheduleVacation")
@@ -20,12 +22,16 @@ public class ScheduleVacation {
     @Column(name = "count", nullable = false)
     private Integer count;
 
+    @Column(name = "vacationId", nullable = false)
+    private Long vacationId;
+
     @ManyToOne
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 
-//    @OneToMany(mappedBy = "scheduleLeaveData", orphanRemoval = true, cascade = CascadeType.ALL)
-//    private List<Leave> leaves;
-    @Column(name = "leaveId", nullable = false)
-    private Long leaveId;
+    @Override
+    public String toString() {
+        return ToStringBuilder
+                .reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 }

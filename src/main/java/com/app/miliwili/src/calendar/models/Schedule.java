@@ -7,12 +7,14 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"user", "scheduleDates", "toDoLists"})
+@EqualsAndHashCode(callSuper = false, exclude = {"user", "toDoLists", "scheduleVacations", "diaries"})
 @Data
 @Entity
 @Table(name = "schedule")
@@ -25,15 +27,17 @@ public class Schedule extends BaseEntity {
     @Column(name = "color", nullable = false, length = 30)
     private String color;
 
-    @Column(name = "distinction", nullable = false, length = 10)
-    private String distinction;
+    @Column(name = "scheduleType", nullable = false, length = 10)
+    private String scheduleType;
 
     @Column(name = "title", nullable = false, length = 60)
     private String title;
 
-    @Builder.Default
-    @Column(name = "repetition", nullable = false, columnDefinition = "varchar(1) default 'N'")
-    private String repetition = "N";
+    @Column(name = "startDate", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "endDate", nullable = false)
+    private LocalDate endDate;
 
     @Builder.Default
     @Column(name = "push", nullable = false, columnDefinition = "varchar(1) default 'F'")
@@ -46,14 +50,17 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<ScheduleDate> scheduleDates;
-
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OrderBy("id asc")
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ToDoList> toDoLists;
 
-    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<ScheduleVacation> scheduleLeaves;
+    @OrderBy("id asc")
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<ScheduleVacation> scheduleVacations;
+
+    @OrderBy("date asc")
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Diary> diaries;
 
     @Override
     public String toString() {

@@ -13,7 +13,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -121,7 +120,7 @@ public class UserController {
         if (1 > parameters.getStateIdx() || parameters.getStateIdx() > 4) {
             return new BaseResponse<>(INVALID_STATEIDX);
         }
-        if(Objects.isNull(parameters.getServeType()) || parameters.getServeType().length() == 0) {
+        if (Objects.isNull(parameters.getServeType()) || parameters.getServeType().length() == 0) {
             return new BaseResponse<>(EMPTY_SERVE_TYPE);
         }
         if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
@@ -194,7 +193,7 @@ public class UserController {
             }
         }
 
-        if(Objects.isNull(parameters.getSocialType()) || parameters.getSocialType().length() == 0) {
+        if (Objects.isNull(parameters.getSocialType()) || parameters.getSocialType().length() == 0) {
             return new BaseResponse<>(EMPTY_SOCIAL_TYPE);
         }
 
@@ -210,9 +209,9 @@ public class UserController {
      * 회원정보 수정 API
      * [PATCH] /app/users
      *
+     * @return BaseResponse<PatchUserRes>
      * @RequestBody PatchUserReq parameters
      * @RequestHeader X-ACCESS-TOKEN
-     * @return BaseResponse<PatchUserRes>
      * @Auther shine
      */
     @ApiOperation(value = "회원정보 수정", notes = "X-ACCESS-TOKEN jwt 필요")
@@ -220,84 +219,97 @@ public class UserController {
     @PatchMapping("/users")
     public BaseResponse<PatchUserRes> updateUser(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                  @RequestBody(required = false) PatchUserReq parameters) {
-        if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
-            return new BaseResponse<>(EMPTY_NAME);
-        }
-        if(Objects.isNull(parameters.getServeType()) || parameters.getServeType().length() == 0) {
-            return new BaseResponse<>(EMPTY_SERVE_TYPE);
-        }
-        if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_START_DATE);
-        }
-        if (!Validation.isRegexDate((parameters.getStartDate()))) {
-            return new BaseResponse<>(INVALID_START_DATE);
-        }
-        if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_END_DATE);
-        }
-        if (!Validation.isRegexDate((parameters.getEndDate()))) {
-            return new BaseResponse<>(INVALID_END_DATE);
-        }
-
-        LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
-        LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
-        if (startDate.isAfter(endDate)) {
-            return new BaseResponse<>(FASTER_THAN_START_DATE);
-        }
-
-        if(Objects.nonNull(parameters.getStrPrivate())
-                || Objects.nonNull(parameters.getStrCorporal())
-                || Objects.nonNull(parameters.getStrSergeant())) {
-            if (Objects.isNull(parameters.getStrPrivate()) || parameters.getStrPrivate().length() == 0) {
-                return new BaseResponse<>(EMPTY_FIRST_DATE);
+        if(Objects.nonNull(parameters.getName()) || Objects.nonNull(parameters.getBirthday())) {
+            if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
+                return new BaseResponse<>(EMPTY_NAME);
             }
-            if (!Validation.isRegexDate((parameters.getStrPrivate()))) {
-                return new BaseResponse<>(INVALID_FIRST_DATE);
+            if (Objects.isNull(parameters.getBirthday()) || parameters.getBirthday().length() == 0) {
+                return new BaseResponse<>(EMPTY_BIRTHDAY);
             }
-            LocalDate firstDate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
-            if (startDate.isAfter(firstDate)) {
-                return new BaseResponse<>(FASTER_THAN_FIRST_DATE);
-            }
-
-            if (Objects.isNull(parameters.getStrCorporal()) || parameters.getStrCorporal().length() == 0) {
-                return new BaseResponse<>(EMPTY_SECOND_DATE);
-            }
-            if (!Validation.isRegexDate((parameters.getStrCorporal()))) {
-                return new BaseResponse<>(INVALID_SECOND_DATE);
-            }
-            LocalDate secondDate = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
-            if (firstDate.isAfter(secondDate)) {
-                return new BaseResponse<>(FASTER_THAN_SECOND_DATE);
-            }
-
-            if (Objects.isNull(parameters.getStrSergeant()) || parameters.getStrSergeant().length() == 0) {
-                return new BaseResponse<>(EMPTY_THIRD_DATE);
-            }
-            LocalDate thirdDate = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
-            if (!Validation.isRegexDate((parameters.getStrSergeant()))) {
-                return new BaseResponse<>(INVALID_THIRD_DATE);
-            }
-            if (secondDate.isAfter(thirdDate)) {
-                return new BaseResponse<>(FASTER_THAN_THIRD_DATE);
-            }
-            if (thirdDate.isAfter(endDate)) {
-                return new BaseResponse<>(FASTER_THAN_END_DATE);
+            if (!Validation.isRegexDate(parameters.getBirthday())) {
+                return new BaseResponse<>(INVALID_BIRTHDAY);
             }
         }
 
-        if(Objects.nonNull(parameters.getProDate())) {
-            if (Objects.isNull(parameters.getStrPrivate()) || Objects.isNull(parameters.getStrCorporal()) || Objects.isNull(parameters.getStrSergeant())) {
-                if (Objects.isNull(parameters.getProDate()) || parameters.getProDate().length() == 0) {
-                    return new BaseResponse<>(EMPTY_PRO_DATE);
+        else if(Objects.nonNull(parameters.getStrPrivate()) || Objects.nonNull(parameters.getStrCorporal()) || Objects.nonNull(parameters.getStrSergeant())
+                || Objects.nonNull(parameters.getProDate())) {
+            if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
+                return new BaseResponse<>(EMPTY_START_DATE);
+            }
+            if (!Validation.isRegexDate((parameters.getStartDate()))) {
+                return new BaseResponse<>(INVALID_START_DATE);
+            }
+            if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
+                return new BaseResponse<>(EMPTY_END_DATE);
+            }
+            if (!Validation.isRegexDate((parameters.getEndDate()))) {
+                return new BaseResponse<>(INVALID_END_DATE);
+            }
+
+            LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
+            LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
+            if (startDate.isAfter(endDate)) {
+                return new BaseResponse<>(FASTER_THAN_START_DATE);
+            }
+
+            if (Objects.isNull(parameters.getProDate())) {
+                if (Objects.isNull(parameters.getStrPrivate()) || parameters.getStrPrivate().length() == 0) {
+                    return new BaseResponse<>(EMPTY_FIRST_DATE);
                 }
-                if (!Validation.isRegexDate((parameters.getProDate()))) {
-                    return new BaseResponse<>(INVALID_PRO_DATE);
+                if (!Validation.isRegexDate((parameters.getStrPrivate()))) {
+                    return new BaseResponse<>(INVALID_FIRST_DATE);
                 }
-                LocalDate proDate = LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE);
-                if (startDate.isAfter(proDate)) {
-                    return new BaseResponse<>(FASTER_THAN_PRO_DATE);
+                LocalDate firstDate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
+                if (startDate.isAfter(firstDate)) {
+                    return new BaseResponse<>(FASTER_THAN_FIRST_DATE);
+                }
+
+                if (Objects.isNull(parameters.getStrCorporal()) || parameters.getStrCorporal().length() == 0) {
+                    return new BaseResponse<>(EMPTY_SECOND_DATE);
+                }
+                if (!Validation.isRegexDate((parameters.getStrCorporal()))) {
+                    return new BaseResponse<>(INVALID_SECOND_DATE);
+                }
+                LocalDate secondDate = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
+                if (firstDate.isAfter(secondDate)) {
+                    return new BaseResponse<>(FASTER_THAN_SECOND_DATE);
+                }
+
+                if (Objects.isNull(parameters.getStrSergeant()) || parameters.getStrSergeant().length() == 0) {
+                    return new BaseResponse<>(EMPTY_THIRD_DATE);
+                }
+                LocalDate thirdDate = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
+                if (!Validation.isRegexDate((parameters.getStrSergeant()))) {
+                    return new BaseResponse<>(INVALID_THIRD_DATE);
+                }
+                if (secondDate.isAfter(thirdDate)) {
+                    return new BaseResponse<>(FASTER_THAN_THIRD_DATE);
+                }
+                if (thirdDate.isAfter(endDate)) {
+                    return new BaseResponse<>(FASTER_THAN_END_DATE);
+                }
+            } else {
+                if (Objects.isNull(parameters.getStrPrivate()) || Objects.isNull(parameters.getStrCorporal()) || Objects.isNull(parameters.getStrSergeant())) {
+                    if (Objects.isNull(parameters.getProDate()) || parameters.getProDate().length() == 0) {
+                        return new BaseResponse<>(EMPTY_PRO_DATE);
+                    }
+                    if (!Validation.isRegexDate((parameters.getProDate()))) {
+                        return new BaseResponse<>(INVALID_PRO_DATE);
+                    }
+                    LocalDate proDate = LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE);
+                    if (startDate.isAfter(proDate)) {
+                        return new BaseResponse<>(FASTER_THAN_PRO_DATE);
+                    }
                 }
             }
+        }
+
+        else if(Objects.nonNull(parameters.getGoal())) {
+            return new BaseResponse<>(EMPTY_GOAL);
+        }
+
+        else {
+            return new BaseResponse<>(EMPTY_ALL);
         }
 
         try {
@@ -312,8 +324,8 @@ public class UserController {
      * 회원탈퇴 API
      * [DELETE] /app/users
      *
-     * @RequestHeader X-ACCESS-TOKEN
      * @return BaseResponse<Void>
+     * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
      */
     @ApiOperation(value = "회원탈퇴", notes = "X-ACCESS-TOKEN jwt 필요")
@@ -330,34 +342,34 @@ public class UserController {
 
     /**
      * 정기휴가 생성 API
-     * [POST] /app/users/leaves
+     * [POST] /app/users/vacation
      *
-     * @RequestBody PostLeaveReq parameters
+     * @return BaseResponse<PostVacationRes>
+     * @RequestBody PostVacationReq parameters
      * @RequestHeader X-ACCESS-TOKEN
-     * @return BaseResponse<PostLeaveRes>
      * @Auther shine
      */
     @ApiOperation(value = "휴가 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PostMapping("/users/leaves")
-    public BaseResponse<PostLeaveRes> postOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                        @RequestBody(required = false) PostLeaveReq parameters) {
-        if(Objects.isNull(parameters.getDistinction()) || parameters.getDistinction().length() == 0) {
-            return new BaseResponse<>(EMPTY_DISTINCTION);
+    @PostMapping("/users/vacation")
+    public BaseResponse<PostVacationRes> postVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                      @RequestBody(required = false) PostVacationReq parameters) {
+        if (Objects.isNull(parameters.getVacationType()) || parameters.getVacationType().length() == 0) {
+            return new BaseResponse<>(EMPTY_VACATION_TYPE);
         }
-        if(Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
+        if (Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
             return new BaseResponse<>(EMPTY_TITLE);
         }
-        if(parameters.getDistinction().length() < 20 || parameters.getTitle().length() < 20) {
+        if (parameters.getVacationType().length() < 20 || parameters.getTitle().length() < 20) {
             return new BaseResponse<>(EXCEED_MAX20);
         }
-        if(Objects.isNull(parameters.getTotalDays())) {
+        if (Objects.isNull(parameters.getTotalDays())) {
             return new BaseResponse<>(EMPTY_TOTAL_DAYS);
         }
 
         try {
-            PostLeaveRes leaveRes = userService.createLeave(parameters);
-            return new BaseResponse<>(SUCCESS, leaveRes);
+            PostVacationRes vacation = userService.createVacation(parameters);
+            return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
@@ -365,37 +377,37 @@ public class UserController {
 
     /**
      * 정기휴가 수정 API
-     * [PATCH] /app/users/leaves/:leaveId
+     * [PATCH] /app/users/vacation/:vacationId
      *
-     * @RequestBody PatchLeaveReq parameters
+     * @return BaseResponse<PatchVacationRes>
+     * @RequestBody PatchVacationReq parameters
      * @RequestHeader X-ACCESS-TOKEN
-     * @return BaseResponse<PatchLeaveRes>
      * @Auther shine
      */
     @ApiOperation(value = "정기휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PatchMapping("/users/leaves/{leaveId}")
-    public BaseResponse<PatchLeaveRes> updateOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                           @RequestBody(required = false) PatchLeaveReq parameters,
-                                                           @PathVariable Long leaveId) {
-        if(Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
+    @PatchMapping("/users/vacation/{vacationId}")
+    public BaseResponse<PatchVacationRes> updateVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                         @RequestBody(required = false) PatchVacationReq parameters,
+                                                         @PathVariable Long vacationId) {
+        if (Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
             return new BaseResponse<>(EMPTY_TITLE);
         }
-        if(parameters.getTitle().length() < 20) {
+        if (parameters.getTitle().length() < 20) {
             return new BaseResponse<>(EXCEED_MAX20);
         }
-        if(Objects.isNull(parameters.getTotalDays())) {
+        if (Objects.isNull(parameters.getTotalDays())) {
             return new BaseResponse<>(EMPTY_TOTAL_DAYS);
         }
-        if(Objects.nonNull(parameters.getUseDays())) {
-            if(parameters.getUseDays() > parameters.getTotalDays()) {
+        if (Objects.nonNull(parameters.getUseDays())) {
+            if (parameters.getUseDays() > parameters.getTotalDays()) {
                 return new BaseResponse<>(NOT_BE_GREATER_THAN_TOTAL_DAYS);
             }
         }
 
         try {
-            PatchLeaveRes ordinaryLeaveRes = userService.updateLeave(parameters, leaveId);
-            return new BaseResponse<>(SUCCESS, ordinaryLeaveRes);
+            PatchVacationRes vacation = userService.updateVacation(parameters, vacationId);
+            return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
@@ -403,41 +415,39 @@ public class UserController {
 
     /**
      * 정기휴가 삭제 API
-     * [DELETE] /app/users/leaves/:leaveId
+     * [DELETE] /app/users/vacation/:vacationId
      *
-     * @PathVariable Long leaveId
-     * @RequestHeader X-ACCESS-TOKEN
      * @return BaseResponse<Void>
+     * @PathVariable Long vacationId
+     * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
      */
     @ApiOperation(value = "정기휴가 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
-    @DeleteMapping("/users/leaves/{leaveId}")
-    public BaseResponse<Void> deleteOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                  @PathVariable Long leaveId) {
+    @DeleteMapping("/users/vacation/{vacationId}")
+    public BaseResponse<Void> deleteVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                             @PathVariable Long vacationId) {
         try {
-            userService.deleteLeave(leaveId);
+            userService.deleteVacation(vacationId);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
-    /**
-     *
-     * @param token
-     * @return
-     */
-    @ApiOperation(value = "정기휴가 조회", notes = "X-ACCESS-TOKEN jwt 필요")
-    @GetMapping("/users/ordinary-leaves")
-    public BaseResponse<List<GetLeaveRes>> getOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token) {
-        try {
-            List<GetLeaveRes> LeaveRes = userProvider.retrieve();
-            return new BaseResponse<>(SUCCESS, LeaveRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
+//    /**
+//     * @param token
+//     * @return
+//     */
+//    @ApiOperation(value = "정기휴가 조회", notes = "X-ACCESS-TOKEN jwt 필요")
+//    @GetMapping("/users/ordinary-leaves")
+//    public BaseResponse<List<GetLeaveRes>> getOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token) {
+//        try {
+//            List<GetLeaveRes> LeaveRes = userProvider.retrieve();
+//            return new BaseResponse<>(SUCCESS, LeaveRes);
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//    }
 
 
     /**

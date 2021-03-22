@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class PatchUserReq {
     private String name;
+    private String birthday;
+    private String profileImg;
     private String serveType;
     private String startDate;
     private String endDate;
@@ -16,5 +18,4 @@ public class PatchUserReq {
     private String strSergeant;
     private String proDate;
     private String goal;
-    private String profileImg;
 }

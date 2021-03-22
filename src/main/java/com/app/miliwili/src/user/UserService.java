@@ -2,7 +2,10 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.user.dto.*;
-import com.app.miliwili.src.user.models.*;
+import com.app.miliwili.src.user.models.AbnormalPromotionState;
+import com.app.miliwili.src.user.models.NormalPromotionState;
+import com.app.miliwili.src.user.models.User;
+import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
 import lombok.RequiredArgsConstructor;
@@ -85,7 +88,7 @@ public class UserService {
         try {
             user = userProvider.retrieveUserBySocialIdAndStatusY(socialId);
         } catch (BaseException exception) {
-            if (exception.getStatus() != NOT_FOUND_USER) {
+            if (exception.getStatus() == NOT_FOUND_USER) {
                 return new PostLoginRes(false, null);
             }
         }
@@ -122,7 +125,7 @@ public class UserService {
 
         try {
             User savedUser = userRepository.save(newUser);
-            setLeaveDatas(newUser);
+            setVacationData(newUser);
             return new PostSignUpRes(savedUser.getId(), jwtService.createJwt(savedUser.getId()));
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_SIGNUP_USER);
@@ -140,41 +143,69 @@ public class UserService {
     public PatchUserRes updateUser(PatchUserReq parameters) throws BaseException {
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        user.setName(parameters.getName());
-        user.setServeType(parameters.getServeType());
-        user.setGoal(parameters.getGoal());
-        user.setProfileImg(parameters.getProfileImg());
-        user.setStartDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE));
-        user.setEndDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE));
-
-        if(user.getStateIdx() == 1) {
-            user.getNormalPromotionState().setFirstDate(LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE));
-            user.getNormalPromotionState().setSecondDate(LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE));
-            user.getNormalPromotionState().setThirdDate(LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE));
-
-            String startDate = parameters.getStartDate();
-            String strPrivate = parameters.getStrPrivate();
-            String strCorporal = parameters.getStrCorporal();
-            String strSergeant = parameters.getStrSergeant();
-            setStateIdx(strPrivate, strCorporal, strSergeant, user.getNormalPromotionState());
-            setHobong(user.getNormalPromotionState().getStateIdx(), startDate, strPrivate, strCorporal, strSergeant, user.getNormalPromotionState());
+        if (Objects.nonNull(parameters.getName())) {
+            user.setName(parameters.getName());
+            user.setBirthday(LocalDate.parse(parameters.getBirthday(), DateTimeFormatter.ISO_DATE));
+            user.setProfileImg(parameters.getProfileImg());
         }
-        if(!(user.getStateIdx() == 1)) {
-            user.getAbnormalPromotionState().setProDate(LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE));
+
+        if (Objects.nonNull(parameters.getServeType())) {
+            user.setServeType(parameters.getServeType());
+            user.setStartDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE));
+            user.setEndDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE));
+
+            if (user.getStateIdx() == 1) {
+                user.getNormalPromotionState().setFirstDate(LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE));
+                user.getNormalPromotionState().setSecondDate(LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE));
+                user.getNormalPromotionState().setThirdDate(LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE));
+
+                String startDate = parameters.getStartDate();
+                String strPrivate = parameters.getStrPrivate();
+                String strCorporal = parameters.getStrCorporal();
+                String strSergeant = parameters.getStrSergeant();
+                setStateIdx(strPrivate, strCorporal, strSergeant, user.getNormalPromotionState());
+                setHobong(user.getNormalPromotionState().getStateIdx(), startDate, strPrivate, strCorporal, strSergeant, user.getNormalPromotionState());
+            }
+            if (!(user.getStateIdx() == 1)) {
+                user.getAbnormalPromotionState().setProDate(LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE));
+            }
+        }
+
+        if (Objects.nonNull(parameters.getGoal())) {
+            user.setGoal(parameters.getGoal());
         }
 
         try {
             User savedUser = userRepository.save(user);
-            // TODO 리턴은 좀더 고민하기
+            if (Objects.nonNull(savedUser.getNormalPromotionState())) {
+                return PatchUserRes.builder()
+                        .userId(savedUser.getId())
+                        .name(savedUser.getName())
+                        .birthday(savedUser.getBirthday().format(DateTimeFormatter.ISO_DATE))
+                        .profileImg(savedUser.getProfileImg())
+                        .stateIdx(savedUser.getStateIdx())
+                        .serveType(savedUser.getServeType())
+                        .startDate(savedUser.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                        .endDate(savedUser.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                        .strPrivate(savedUser.getNormalPromotionState().getFirstDate().format(DateTimeFormatter.ISO_DATE))
+                        .strCorporal(savedUser.getNormalPromotionState().getSecondDate().format(DateTimeFormatter.ISO_DATE))
+                        .strSergeant(savedUser.getNormalPromotionState().getThirdDate().format(DateTimeFormatter.ISO_DATE))
+                        .hobong(savedUser.getNormalPromotionState().getHobong())
+                        .normalPromotionStateIdx(savedUser.getNormalPromotionState().getStateIdx())
+                        .goal(savedUser.getGoal())
+                        .build();
+            }
             return PatchUserRes.builder()
                     .userId(savedUser.getId())
                     .name(savedUser.getName())
-                    .serveType(savedUser.getServeType())
+                    .birthday(savedUser.getBirthday().format(DateTimeFormatter.ISO_DATE))
+                    .profileImg(savedUser.getProfileImg())
                     .stateIdx(savedUser.getStateIdx())
+                    .serveType(savedUser.getServeType())
                     .startDate(savedUser.getStartDate().format(DateTimeFormatter.ISO_DATE))
                     .endDate(savedUser.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .proDate(savedUser.getAbnormalPromotionState().getProDate().format(DateTimeFormatter.ISO_DATE))
                     .goal(savedUser.getGoal())
-                    .profileImg(savedUser.getProfileImg())
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_PATCH_USER);
@@ -203,94 +234,96 @@ public class UserService {
      * 정기휴가 생성
      *
      * @param parameters
-     * @return PostLeaveRes
+     * @return PostVacationRes
      * @throws BaseException
      * @Auther shine
      */
     @Transactional
-    public PostLeaveRes createLeave(PostLeaveReq parameters) throws BaseException {
+    public PostVacationRes createVacation(PostVacationReq parameters) throws BaseException {
         User user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        Vacation newLeave = Vacation.builder()
-                .distinction(parameters.getDistinction())
+        Vacation newVacation = Vacation.builder()
+                .vacationType(parameters.getVacationType())
                 .title(parameters.getTitle())
                 .totalDays(parameters.getTotalDays())
                 .user(user)
                 .build();
 
         try {
-            Vacation savedVacation = vacationRepository.save(newLeave);
-            return PostLeaveRes.builder()
-                    .leaveId(savedVacation.getId())
-                    .distinction(savedVacation.getDistinction())
+            Vacation savedVacation = vacationRepository.save(newVacation);
+            return PostVacationRes.builder()
+                    .vacationId(savedVacation.getId())
+                    .vacationType(savedVacation.getVacationType())
                     .title(savedVacation.getTitle())
+                    .useDays(savedVacation.getUseDays())
                     .totalDays(savedVacation.getTotalDays())
                     .build();
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_LEAVE);
+            throw new BaseException(FAILED_TO_POST_VACATION);
         }
     }
 
     /**
      * 정기휴가 수정
      *
-     * @param  parameters
-     * @param leaveId
-     * @return PatchLeaveRes
+     * @param parameters
+     * @param vacationId
+     * @return PatchVacationRes
      * @throws BaseException
      * @Auther shine
      */
     @Transactional
-    public PatchLeaveRes updateLeave(PatchLeaveReq parameters, Long leaveId) throws BaseException {
-        Vacation vacation = userProvider.retrieveLeaveById(leaveId);
+    public PatchVacationRes updateVacation(PatchVacationReq parameters, Long vacationId) throws BaseException {
+        Vacation vacation = userProvider.retrieveVacationById(vacationId);
 
         vacation.setTitle(parameters.getTitle());
         vacation.setTotalDays(parameters.getTotalDays());
 
-        if(Objects.nonNull(parameters.getUseDays())) {
+        if (Objects.nonNull(parameters.getUseDays())) {
             vacation.setUseDays(parameters.getUseDays());
         }
 
-        if(vacation.getUser().getId() != jwtService.getUserId()) {
+        if (vacation.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
         try {
-            Vacation savedLeave = vacationRepository.save(vacation);
-            return PatchLeaveRes.builder()
-                    .leaveId(savedLeave.getId())
-                    .distinction(savedLeave.getDistinction())
-                    .title(savedLeave.getTitle())
-                    .useDays(savedLeave.getUseDays()/* TODO 더해줘야지 스케줄러에서 계산해서 */)
-                    .totalDays(savedLeave.getTotalDays())
+            Vacation savedVacation = vacationRepository.save(vacation);
+            return PatchVacationRes.builder()
+                    .vacationId(savedVacation.getId())
+                    .vacationType(savedVacation.getVacationType())
+                    .title(savedVacation.getTitle())
+                    .useDays(savedVacation.getUseDays()/* TODO 더해줘야지 스케줄러에서 계산해서 */)
+                    .totalDays(savedVacation.getTotalDays())
                     .build();
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_PATCH_LEAVE);
+            throw new BaseException(FAILED_TO_PATCH_VACATION);
         }
     }
 
     /**
      * 정기휴가 삭제
      *
-     * @param leaveId
+     * @param vacationId
      * @return void
      * @throws BaseException
      * @Auther shine
      */
     @Transactional
-    public void deleteLeave(Long leaveId) throws BaseException {
-        Vacation vacation = userProvider.retrieveLeaveById(leaveId);
+    public void deleteVacation(Long vacationId) throws BaseException {
+        Vacation vacation = userProvider.retrieveVacationById(vacationId);
 
-        if(vacation.getUser().getId() != jwtService.getUserId()) {
+        if (vacation.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
         try {
             vacationRepository.delete(vacation);
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_DELETE_LEAVE);
+            throw new BaseException(FAILED_TO_DELETE_VACATION);
         }
     }
+
 
     /**
      * stateIdx 계산
@@ -365,12 +398,11 @@ public class UserService {
     }
 
 
-
-    private void setLeaveDatas(User user) {
-        Vacation vacation1 = Vacation.builder().distinction("정기").title("1차 정기휴가").user(user).totalDays(8).build();
-        Vacation vacation2 = Vacation.builder().distinction("정기").title("2차 정기휴가").user(user).totalDays(8).build();
-        Vacation vacation3 = Vacation.builder().distinction("정기").title("3차 정기휴가").user(user).totalDays(8).build();
-        Vacation vacation4 = Vacation.builder().distinction("포상").title("포상휴가").user(user).totalDays(15).build();
+    private void setVacationData(User user) {
+        Vacation vacation1 = Vacation.builder().vacationType("정기").title("1차 정기휴가").user(user).totalDays(8).build();
+        Vacation vacation2 = Vacation.builder().vacationType("정기").title("2차 정기휴가").user(user).totalDays(8).build();
+        Vacation vacation3 = Vacation.builder().vacationType("정기").title("3차 정기휴가").user(user).totalDays(8).build();
+        Vacation vacation4 = Vacation.builder().vacationType("포상").title("포상휴가").user(user).totalDays(15).build();
 
         final List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3, vacation4);
 

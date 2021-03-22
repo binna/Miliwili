@@ -10,11 +10,11 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = {"schedule"})
 @Data
 @Entity
-@Table(name = "scheduleDate")
-public class ScheduleDate {
+@Table(name = "diary")
+public class Diary {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +22,9 @@ public class ScheduleDate {
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
+
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    private String content;
 
     @ManyToOne
     @JoinColumn(name = "schedule_id", nullable = false)

@@ -7,7 +7,6 @@ import com.app.miliwili.src.calendar.dto.PostScheduleReq;
 import com.app.miliwili.src.calendar.dto.PostScheduleRes;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.User;
-import com.app.miliwili.utils.FirebaseCloudMessage;
 import com.app.miliwili.src.calendar.models.*;
 import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ public class CalendarService {
     private final ScheduleRepository scheduleRepository;
     private final DDayRepository dDayRepository;
     private final JwtService jwtService;
-    private final FirebaseCloudMessage firebaseCloudMessageService;
     private final CalendarProvider calendarProvider;
     private final UserProvider userProvider;
 
@@ -45,35 +43,32 @@ public class CalendarService {
 
         Schedule newSchedule = Schedule.builder()
                 .color(parameters.getColor())
-                .distinction(parameters.getDistinction())
+                .scheduleType(parameters.getScheduleType())
                 .title(parameters.getTitle())
+                .startDate(LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE))
+                .endDate(LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE))
                 .user(user)
                 .build();
-        setScheduleDate(parameters, newSchedule);
 
-        if(Objects.nonNull(parameters.getRepetition())) {
-            newSchedule.setRepetition(parameters.getRepetition());
-        }
-        if(Objects.nonNull(parameters.getPush())) {
+        if(parameters.getPush().equals("Y")) {
             newSchedule.setPush(parameters.getPush());
-        }
-        if(Objects.nonNull(parameters.getToDoList())) {
-            newSchedule.setToDoLists(calendarProvider.retrieveToDoList(parameters.getToDoList()));
+            newSchedule.setPushDeviceToken(parameters.getPushDeviceToken());
         }
 
-        if(newSchedule.getDistinction().equals("휴가")) {
-            newSchedule.setScheduleLeaves(
-                parameters.getScheduleLeaveData().stream().map(scheduleLeaveDataRes -> {
-                    return ScheduleVacation.builder()
-                            .count(scheduleLeaveDataRes.getCount())
-                            .schedule(newSchedule)
-                            .leaveId(scheduleLeaveDataRes.getLeaveId())
-                            .build();
-                })
-            .collect(Collectors.toList()));
+        if(Objects.nonNull(parameters.getScheduleVacation())) {
+            newSchedule.setScheduleVacations(parameters.getScheduleVacation().stream().map(scheduleVacationReq -> {
+                return ScheduleVacation.builder()
+                        .count(scheduleVacationReq.getCount())
+                        .vacationId(scheduleVacationReq.getVacationId())
+                        .schedule(newSchedule)
+                        .build();
+            }).collect(Collectors.toSet()));
         }
-        if(newSchedule.getPush().equals("Y")) {
-            newSchedule.setPushDeviceToken(parameters.getPushDeviceToken());
+
+        if(Objects.nonNull(parameters.getToDoList())) {
+            newSchedule.setToDoLists(parameters.getToDoList().stream().map(workReq -> {
+                return ToDoList.builder().content(workReq.getContent()).schedule(newSchedule).build();
+            }).collect(Collectors.toList()));
         }
 
         try {
@@ -81,34 +76,34 @@ public class CalendarService {
             return PostScheduleRes.builder()
                     .scheduleId(savedSchedule.getId())
                     .color(savedSchedule.getColor())
-                    .distinction(savedSchedule.getDistinction())
+                    .scheduleType(savedSchedule.getScheduleType())
                     .title(savedSchedule.getTitle())
-                    .repetition(savedSchedule.getRepetition())
                     .push(savedSchedule.getPush())
-                    .toDoList(calendarProvider.retrieveWorkRes(savedSchedule.getToDoLists()))
+//                    .toDoList(calendarProvider.retrieveWorkRes(savedSchedule.getToDoLists()))
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_SCHEDULE);
         }
     }
 
-    private void setScheduleDate(PostScheduleReq parameters, Schedule schedule) {
-        List<ScheduleDate> scheduleDates = new ArrayList<>();
-
-        LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
-        LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
-
-        LocalDate targetDate = startDate;
-        int days = (int) ChronoUnit.DAYS.between(startDate, endDate);
-        for (int i = 0; i <= days; i++) {
-            scheduleDates.add(ScheduleDate.builder()
-                    .date(targetDate)
-                    .schedule(schedule)
-                    .build());
-            targetDate = targetDate.plusDays(Long.valueOf(1));
-        }
-        schedule.setScheduleDates(scheduleDates);
-    }
+//    private void setScheduleDate(String startDate, String endDate, Schedule schedule) {
+//        List<Diary> scheduleDates = new ArrayList<>();
+//
+//        LocalDate startDay = LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE);
+//        LocalDate endDay = LocalDate.parse(endDate, DateTimeFormatter.ISO_DATE);
+//
+//        LocalDate targetDate = startDay;
+//        int days = (int) ChronoUnit.DAYS.between(startDay, endDay);
+//        for (int i = 0; i <= days; i++) {
+//            scheduleDates.add(Diary.builder()
+//                    .date(targetDate)
+//                    .schedule(schedule)
+//                    .build());
+//            targetDate = targetDate.plusDays(Long.valueOf(1));
+//        }
+//        schedule.setScheduleDates(scheduleDates);
+//    }
 
     /**
      * D-Day 생성

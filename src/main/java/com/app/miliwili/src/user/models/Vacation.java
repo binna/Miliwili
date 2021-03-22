@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = {"user"})
 @Data
 @Entity
 @Table(name = "vacation")
@@ -19,8 +19,8 @@ public class Vacation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "distinction", nullable = false, length = 60, updatable = false)
-    private String distinction;
+    @Column(name = "vacationType", nullable = false, length = 60, updatable = false)
+    private String vacationType;
 
     @Column(name = "title", nullable = false, length = 60)
     private String title;

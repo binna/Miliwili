@@ -4,7 +4,6 @@ import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.CalendarProvider;
 import com.app.miliwili.src.calendar.ScheduleSelectRepository;
 import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
-import com.app.miliwili.src.user.dto.GetLeaveRes;
 import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.src.user.models.User;
 import com.app.miliwili.utils.JwtService;
@@ -21,7 +20,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class UserProvider {
     private final UserSelectRepository userSelectRepository;
     private final UserRepository userRepository;
-    private final VacationRepository leaveRepository;
+    private final VacationRepository vacationRepository;
     private final ScheduleSelectRepository scheduleSelectRepository;
     private final JwtService jwtService;
     private final CalendarProvider calendarProvider;
@@ -132,41 +131,41 @@ public class UserProvider {
     }
 
     /**
-     * ordinaryLeaveId로 정기휴가 조회
+     * vacationId로 정기휴가 조회
      *
-     * @param leaveId
-     * @return Leave
+     * @param vacationId
+     * @return Vacation
      * @throws BaseException
      * @Auther shine
      */
     @Transactional
-    public Vacation retrieveLeaveById(Long leaveId) throws BaseException {
-        return leaveRepository.findById(leaveId)
-                .orElseThrow(() -> new BaseException(NOT_FOUND_LEAVE));
+    public Vacation retrieveVacationById(Long vacationId) throws BaseException {
+        return vacationRepository.findById(vacationId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION));
     }
 
-    /**
-     * 사용자별 휴가 전체 조회
-     *
-     * @return List<OrdinaryLeave>
-     * @throws BaseException
-     */
-    private List<Vacation> retrieveLeaveByUserIdOrderById() throws BaseException {
-        try {
-            List<Vacation> ordinaryLeaves = leaveRepository.findByUser_IdOrderById(jwtService.getUserId());
-            return ordinaryLeaves;
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_GET_LEAVE);
-        }
-    }
-
-    /**
-     *
-     * @return
-     * @throws BaseException
-     */
-    public List<GetLeaveRes> retrieve() throws BaseException {
-
-        return null;
-    }
+//    /**
+//     * 사용자별 휴가 전체 조회
+//     *
+//     * @return List<OrdinaryLeave>
+//     * @throws BaseException
+//     */
+//    private List<Vacation> retrieveLeaveByUserIdOrderById() throws BaseException {
+//        try {
+//            List<Vacation> ordinaryLeaves = vacationRepository.findByUser_IdOrderById(jwtService.getUserId());
+//            return ordinaryLeaves;
+//        } catch (Exception exception) {
+//            throw new BaseException(FAILED_TO_GET_VACATION);
+//        }
+//    }
+//
+//    /**
+//     *
+//     * @return
+//     * @throws BaseException
+//     */
+//    public List<GetLeaveRes> retrieve() throws BaseException {
+//
+//        return null;
+//    }
 }

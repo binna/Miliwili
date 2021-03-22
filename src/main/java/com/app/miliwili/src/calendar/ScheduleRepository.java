@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ScheduleRepository extends CrudRepository<Schedule, Long> {
-    //List<Schedule> findByUser_IdAndDistinctionAndStatusOrderByStartDate(Long userId, String distinction, String status);
+    List<Schedule> findByPushAndStatus(String push, String status);
 }
