@@ -35,8 +35,14 @@ public class ExerciseRoutineDetail extends BaseEntity {
     @Column(name = "isSame", nullable = false)
     private String isSame;
 
-    @ManyToOne
-    @JoinColumn(name = "exerciseRoutine_id", nullable = false )
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "exercise_routine_id", nullable = false )
     private ExerciseRoutine exerciseRoutine;
 
+    @OneToMany(mappedBy = "exerciseRoutineDetail", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseDetailSet> detailSets = new ArrayList<>();
+
+    public void addDetailSet(ExerciseDetailSet detailSet){
+        this.detailSets.add(detailSet);
+    }
 }

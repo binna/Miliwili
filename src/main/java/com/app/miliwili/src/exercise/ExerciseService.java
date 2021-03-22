@@ -3,9 +3,9 @@ package com.app.miliwili.src.exercise;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.exercise.dto.PatchExerciseGoalWeight;
 import com.app.miliwili.src.exercise.dto.PostExerciseFirstWeightReq;
+import com.app.miliwili.src.exercise.dto.PostExerciseRoutineReq;
 import com.app.miliwili.src.exercise.dto.PostExerciseWeightReq;
-import com.app.miliwili.src.exercise.model.ExerciseInfo;
-import com.app.miliwili.src.exercise.model.ExerciseWeightRecord;
+import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.User;
 import com.app.miliwili.utils.JwtService;
@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.util.ArrayList;
+
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @Service
@@ -21,6 +23,9 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Transactional
 public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
+    private final ExerciseRoutineRepository exerciseRoutineRepository;
+    private final ExerciseRoutineDetailRepository exerciseRoutineDetailRepository;
+    private final ExerciseDetailSetRepository exerciseDetailSetRepository;
     private final ExerciseProvider exerciseProvider;
     private final UserProvider userProvider;
     private final JwtService jwtService;
@@ -97,4 +102,102 @@ public class ExerciseService {
         return "목표체중이 "+ exerciseInfo.getGoalWeight() +"kg으로 수정되었습니다.";
 
     }
+
+    /**
+     *
+     *
+     */
+    public String createRoutine(PostExerciseRoutineReq param, long exerciseId) throws BaseException {
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        System.out.println("exerciseIduserId:"+exerciseInfo.getUser().getId()+"jwt Id"+jwtService.getUserId());
+        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
+            throw new BaseException(INVALID_USER);
+        }
+
+        ExerciseRoutine newRoutine = ExerciseRoutine.builder()
+                .name(param.getRoutineName())
+                .bodyPart(param.getBodyPart())
+                .repeaDay(param.getRepeatDay())
+                .exerciseInfo(exerciseInfo)
+                .routineDetails(new ArrayList<>())
+                .build();
+
+
+      //  System.out.println(exerciseInfo.getExerciseRoutines().get(0).getRoutineDetails());
+
+        for (int i = 0; i < param.getDetailName().size(); i++) {
+            ExerciseRoutineDetail newRoutineDetail = ExerciseRoutineDetail.builder()
+                    .sequence(i + 1)
+                    .name(param.getDetailName().get(i))
+                    .routineTypeId(param.getDetailType().get(i))
+                    .setCount(param.getDetailSet().get(i))
+                    .isSame((param.getDetailSetEqual().get(i)) ? "Y" : "N")
+                    .exerciseRoutine(newRoutine)
+                    .detailSets(new ArrayList<>())
+                    .build();
+            System.out.println(newRoutineDetail.getName());
+//            exerciseRoutineDetailRepository.save(newRoutineDetail);
+
+            //무게 + 개수
+            if (newRoutineDetail.getRoutineTypeId() == 1) {
+                String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                System.out.println(totalArr[0]);
+                System.out.println(totalArr[1]);
+                for (int j = 0; j < totalArr.length; j++) {
+                    String[] weightCount = totalArr[j].split("#");
+                    ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
+                            .setIdx(j + 1)
+                            .setWeight(Double.parseDouble(weightCount[0]))
+                            .setCount(Integer.parseInt(weightCount[1]))
+                            .exerciseRoutineDetail(newRoutineDetail)
+                            .build();
+                    //arr추가
+                    newRoutineDetail.addDetailSet(newDetailSet);
+                }
+
+            }
+            // 개수간
+            else if (newRoutineDetail.getRoutineTypeId() == 2) {
+                String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                for (int j = 0; j < totalArr.length; j++) {
+                    ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
+                            .setIdx(j + 1)
+                            .setCount(Integer.parseInt(totalArr[j]))
+                            .exerciseRoutineDetail(newRoutineDetail)
+                            .build();
+                    //arr추가
+                    newRoutineDetail.addDetailSet(newDetailSet);
+
+                }
+            }
+            //시간
+            else {
+                String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                for (int j = 0; j < totalArr.length; j++) {
+                    ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
+                            .setIdx(j + 1)
+                            .setTime(Integer.parseInt(totalArr[j]))
+                            .exerciseRoutineDetail(newRoutineDetail)
+                            .build();
+                    //arr추가
+                    newRoutineDetail.addDetailSet(newDetailSet);
+
+                }
+            }
+            //arr추가
+            newRoutine.addRoutineDetail(newRoutineDetail);
+        }
+        exerciseInfo.addExerciseRoutine(newRoutine);
+
+        try {
+            exerciseRepository.save(exerciseInfo);
+        }catch (Exception e){
+            e.printStackTrace();
+//            throw new BaseException()
+        }
+        return "yes!";
+    }
+
+
 }

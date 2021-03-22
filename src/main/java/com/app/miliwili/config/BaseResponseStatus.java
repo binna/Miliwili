@@ -63,6 +63,7 @@ public enum BaseResponseStatus {
     INVALID_THIRD_DATE(false, 2514, "병장 진급 형식을 확인해주세요."),
     INVALID_PRO_DATE(false, 2515, "진급 심사일 형식을 확인해주세요."),
     INVALID_STATEIDX(false, 2516, "복무형태는 1~4로 나타내야합니다."),
+    INVALID_VIEW_DATE(false, 2517, "조회하고자 하는 날짜는 이번달 이전만 가능합니다"),
 
 
     EMPTY_START_DATE(false, 2700, "입대일을 입력해주세요."),
@@ -124,6 +125,9 @@ public enum BaseResponseStatus {
     NOT_FOUND_EXERCISEINFO(false, 3530, "존재하지 않는 운동 정보입니다 "),
     FAILED_POST_DAILY_WEIGHT(false, 3531, "일일 체중 기록에 실패하였습니다. "),
     FAILED_PATCH_GOAL_WEIGHT(false, 3532, "목표체중 수정에 실패하였습니다. "),
+    FAILED_GET_DAILY_WEIGHT(false, 3533, "일일 체중 기록 조회에 실패하였습니다."),
+    FAILED_GET_MONTH_WEIGHT_1(false, 3534, "월별 체중 기록 조회에 실패하였습니다.-1-월별 평균 조회 "),
+    FAILED_GET_MONTH_WEIGHT_2(false, 3535, "월별 체중 기록 조회에 실패하였습니다.-2-웗별 일일 조회 "),
 
 
 

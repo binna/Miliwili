@@ -2,19 +2,11 @@ package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
-import com.app.miliwili.config.BaseResponseStatus;
-import com.app.miliwili.src.exercise.dto.PatchExerciseGoalWeight;
-import com.app.miliwili.src.exercise.dto.PostExerciseFirstWeightReq;
-import com.app.miliwili.src.exercise.dto.PostExerciseWeightReq;
-import com.app.miliwili.src.exercise.model.ExerciseInfo;
-import com.app.miliwili.src.user.UserController;
-import com.app.miliwili.src.user.UserProvider;
-import com.app.miliwili.src.user.models.User;
-import com.sun.xml.bind.v2.TODO;
+import com.app.miliwili.src.exercise.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sound.midi.Patch;
+import java.time.LocalDate;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -85,10 +77,71 @@ public class ExerciseController {
         try{
             String returnStr = exerciseService.modifyGoalWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,returnStr);
-        }catch (BaseException e){
-            e.printStackTrace();
+        }catch (BaseException e){            e.printStackTrace();
             return new BaseResponse<>(FAILED_PATCH_GOAL_WEIGHT);
         }
     }
+
+    /**
+     * 일별 체중 기록 조회
+     * @return BaseResponse<GetExerciseDailyWeight>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/daily-weights")
+    public BaseResponse<GetExerciseDailyWeightRes> getDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId){
+        try{
+            GetExerciseDailyWeightRes exerciseDailyWeightRes= exerciseProvider.retrieveExerciseDailyWeight(exerciseId);
+            return new BaseResponse<>(SUCCESS, exerciseDailyWeightRes);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 루틴 생성
+     * @return BaseResponse<String>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @PostMapping("/{exerciseId}/routines")
+    public BaseResponse<String> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                             @RequestBody PostExerciseRoutineReq param){
+        try{
+            String result = exerciseService.createRoutine(param,exerciseId);
+            return new BaseResponse<>(SUCCESS,result);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 체중 기록 조회
+     * @return BaseResponse<String>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/weight-records")
+    public BaseResponse<GetExerciseWeightRecordRes> getWeightRecords(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                             @RequestParam Integer viewMonth, @RequestParam Integer viewYear){
+
+        LocalDate now = LocalDate.now();
+        if(viewYear > now.getYear() || (viewYear==now.getYear() && viewMonth>now.getMonthValue()))
+            return new BaseResponse<>(INVALID_VIEW_DATE);
+        try{
+            GetExerciseWeightRecordRes result = exerciseProvider.retrieveExerciseWeightRecord(viewMonth, viewYear,exerciseId);
+            System.out.println("outout again");
+            return new BaseResponse<>(SUCCESS,result);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
 
 }

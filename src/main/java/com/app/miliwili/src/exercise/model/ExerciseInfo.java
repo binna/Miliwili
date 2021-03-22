@@ -26,11 +26,11 @@ public class ExerciseInfo extends BaseEntity {
 
     @Column(name = "goalWeight")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer goalWeight;
+    private Double goalWeight;
 
     @Column(name = "firstWeight")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer firstWeight;
+    private Double firstWeight;
 
     /**
      * User 회원 가입할 시에 필요할 지?
@@ -45,9 +45,15 @@ public class ExerciseInfo extends BaseEntity {
     @OneToMany(mappedBy = "exerciseInfo", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ExerciseWeightRecord> weightRecords = new ArrayList<>();
 
+    @OneToMany(mappedBy = "exerciseInfo", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseRoutine> exerciseRoutines = new ArrayList<>();
 
     public void addWeightRecord(ExerciseWeightRecord record){
         this.weightRecords.add(record);
+    }
+
+    public void addExerciseRoutine(ExerciseRoutine routine){
+        this.exerciseRoutines.add(routine);
     }
 
 
