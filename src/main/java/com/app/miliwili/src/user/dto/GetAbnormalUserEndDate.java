@@ -17,5 +17,4 @@ public class GetAbnormalUserEndDate {
     private final LocalDate startDate;
     private final LocalDate proDate;
     private final String goal;
-
 }

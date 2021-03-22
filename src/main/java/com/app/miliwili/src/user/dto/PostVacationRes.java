@@ -7,8 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class GetLeaveRes {
+public class PostVacationRes {
+    private final Long vacationId;
+    private final String vacationType;
     private final String title;
-    private final Integer use;
-    private final Integer total;
+    private final Integer useDays;
+    private final Integer totalDays;
 }
