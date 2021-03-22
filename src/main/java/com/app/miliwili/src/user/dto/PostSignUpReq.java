@@ -10,7 +10,6 @@ public class PostSignUpReq {
     private String name;
     private Integer stateIdx;
     private String serveType;
-    private String birthday;
     private String startDate;
     private String endDate;
     private String strPrivate;

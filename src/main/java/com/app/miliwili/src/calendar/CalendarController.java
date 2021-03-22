@@ -6,6 +6,7 @@ import com.app.miliwili.src.calendar.dto.PostDDayReq;
 import com.app.miliwili.src.calendar.dto.PostDDayRes;
 import com.app.miliwili.src.calendar.dto.PostScheduleReq;
 import com.app.miliwili.src.calendar.dto.PostScheduleRes;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class CalendarController {
      * @return BaseResponse<PostScheduleRes>
      * @Auther shine
      */
+    @ApiOperation(value = "일정 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PostMapping("/calendars/schedule")
     public BaseResponse<PostScheduleRes> postSchedule(@RequestHeader("X-ACCESS-TOKEN") String token,

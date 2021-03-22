@@ -36,7 +36,7 @@ public class User extends BaseEntity {
     @Column(name = "socialId", nullable = false, length = 1000, updatable = false)
     private String socialId;
 
-    @Column(name = "birthday", nullable = false)
+    @Column(name = "birthday")
     private LocalDate birthday;
 
     @Column(name = "goal", length = 100)

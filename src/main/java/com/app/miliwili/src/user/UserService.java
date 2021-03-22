@@ -234,7 +234,7 @@ public class UserService {
      * 정기휴가 생성
      *
      * @param parameters
-     * @return PostLeaveRes
+     * @return PostVacationRes
      * @throws BaseException
      * @Auther shine
      */

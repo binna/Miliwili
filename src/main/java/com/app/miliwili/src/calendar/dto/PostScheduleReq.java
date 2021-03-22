@@ -10,13 +10,12 @@ import java.util.List;
 @Getter
 public class PostScheduleReq {
     private String color;
-    private String distinction;
+    private String scheduleType;
     private String title;
     private String startDate;
     private String endDate;
-    private String repetition;
     private String push;
     private String pushDeviceToken;
-    private List<ScheduleLeaveDataRes> scheduleLeaveData;
+    private List<ScheduleVacationReq> scheduleVacation;
     private List<WorkReq> toDoList;
 }

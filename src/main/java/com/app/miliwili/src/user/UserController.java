@@ -13,7 +13,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -123,12 +122,6 @@ public class UserController {
         }
         if (Objects.isNull(parameters.getServeType()) || parameters.getServeType().length() == 0) {
             return new BaseResponse<>(EMPTY_SERVE_TYPE);
-        }
-        if (Objects.isNull(parameters.getBirthday()) || parameters.getBirthday().length() == 0) {
-            return new BaseResponse<>(EMPTY_BIRTHDAY);
-        }
-        if (!Validation.isRegexDate(parameters.getBirthday())) {
-            return new BaseResponse<>(INVALID_BIRTHDAY);
         }
         if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
             return new BaseResponse<>(EMPTY_START_DATE);
