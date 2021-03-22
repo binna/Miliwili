@@ -232,7 +232,7 @@ public class UserService {
     }
 
     /**
-     * 정기휴가 생성
+     * 휴가 생성
      *
      * @param parameters
      * @return PostVacationRes
@@ -247,7 +247,7 @@ public class UserService {
                 .vacationType(parameters.getVacationType())
                 .title(parameters.getTitle())
                 .totalDays(parameters.getTotalDays())
-                .user(user)
+                .userInfo(user)
                 .build();
 
         try {
@@ -284,7 +284,7 @@ public class UserService {
             vacation.setUseDays(parameters.getUseDays());
         }
 
-        if (vacation.getUser().getId() != jwtService.getUserId()) {
+        if (vacation.getUserInfo().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
@@ -314,7 +314,7 @@ public class UserService {
     public void deleteVacation(Long vacationId) throws BaseException {
         Vacation vacation = userProvider.retrieveVacationById(vacationId);
 
-        if (vacation.getUser().getId() != jwtService.getUserId()) {
+        if (vacation.getUserInfo().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
@@ -400,10 +400,10 @@ public class UserService {
 
 
     private void setVacationData(UserInfo user) {
-        Vacation vacation1 = Vacation.builder().vacationType("정기").title("1차 정기휴가").user(user).totalDays(8).build();
-        Vacation vacation2 = Vacation.builder().vacationType("정기").title("2차 정기휴가").user(user).totalDays(8).build();
-        Vacation vacation3 = Vacation.builder().vacationType("정기").title("3차 정기휴가").user(user).totalDays(8).build();
-        Vacation vacation4 = Vacation.builder().vacationType("포상").title("포상휴가").user(user).totalDays(15).build();
+        Vacation vacation1 = Vacation.builder().vacationType("정기").title("1차 정기휴가").userInfo(user).totalDays(8).build();
+        Vacation vacation2 = Vacation.builder().vacationType("정기").title("2차 정기휴가").userInfo(user).totalDays(8).build();
+        Vacation vacation3 = Vacation.builder().vacationType("정기").title("3차 정기휴가").userInfo(user).totalDays(8).build();
+        Vacation vacation4 = Vacation.builder().vacationType("포상").title("포상휴가").userInfo(user).totalDays(15).build();
 
         final List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3, vacation4);
 
