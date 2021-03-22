@@ -30,7 +30,7 @@ public class ExerciseDetailSet extends BaseEntity {
     @Column(name = "setTime")
     private Integer setTime;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "exercise_routine_detail_id", nullable = false )
     private ExerciseRoutineDetail exerciseRoutineDetail;
 }

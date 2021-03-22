@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -131,7 +132,6 @@ public class ExerciseService {
     public Long createRoutine(PostExerciseRoutineReq param, long exerciseId) throws BaseException {
         ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
 
-        System.out.println("exerciseIduserId:"+exerciseInfo.getUser().getId()+"jwt Id"+jwtService.getUserId());
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(INVALID_USER);
         }
@@ -223,5 +223,31 @@ public class ExerciseService {
         return newRoutine.getId();
     }
 
+    /**
+     * 루틴 삭제
+     */
+    public String deleteRoutine(long exerciseId, long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
+            throw new BaseException(INVALID_USER);
+        }
+        List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
+        ExerciseRoutine routine = null;
+        int i=0;
+        for(i=0;i<routineList.size();i++){
+            if(routineList.get(i).getId() == routineId){
+                routine = routineList.get(i);
+            }
+        }
+        if(i == routineList.size()-1 || routine == null)
+            throw new BaseException(FAILED_FIND_DELETE_ROUTINE);
+
+        exerciseInfo.getExerciseRoutines().remove(routine);
+        routine.setExerciseInfo(null);
+        exerciseRoutineRepository.delete(routine);
+
+
+        return "\""+routine.getName()+"\""+"루틴이 삭제되었습니다";
+    }
 
 }

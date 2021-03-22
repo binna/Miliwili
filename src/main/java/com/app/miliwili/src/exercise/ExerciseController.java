@@ -187,5 +187,24 @@ public class ExerciseController {
     }
 
 
+    /**
+     * 루틴 삭제
+     * @return BaseResponse<MyRoutineInfo>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @DeleteMapping("/{exerciseId}/routines/{routineId}")
+    public BaseResponse<String> getMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                                              @PathVariable Long routineId){
+        try{
+            String resultStr = exerciseService.deleteRoutine(exerciseId,routineId);
+            return new BaseResponse<>(SUCCESS, resultStr);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+
 
 }
