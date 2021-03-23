@@ -50,8 +50,8 @@ public enum BaseResponseStatus {
     EMPTY_CONTENT(false, 2036, "내용을 입력해주세요."),
     INVALID_DATE(false, 2037, "날짜 형식을 확인해주세요."),
     INVALID_SOCIAL_TYPE(false, 2038, "가입 요청하는 소셜타입의 형식을 확인해주세요."),
-    EMPTY_D_DAY_TYPE(false, 3039, "디데일 구분을 입력해주세요."),
-    INVALID_D_DAY_TYPE(false, 2038, "유효하지 않은 디데이 타입입니다."),
+    EMPTY_D_DAY_TYPE(false, 3039, "디데이 구분을 입력해주세요."),
+    INVALID_D_DAY_TYPE(false, 2040, "유효하지 않은 디데이 타입입니다."),
 
 
 
