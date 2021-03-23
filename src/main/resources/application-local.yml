@@ -18,8 +18,8 @@ spring:
     username: sa
     password:
   jpa:
-    hibernate:
-      ddl-auto: create-drop
+#    hibernate:
+#      ddl-auto: create-drop
     generate-ddl: false
     show-sql: true
     properties:

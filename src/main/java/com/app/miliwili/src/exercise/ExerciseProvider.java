@@ -117,7 +117,7 @@ public class ExerciseProvider {
             }
         });
 
-        //지정한 의 모든 몸무게 정보 가져오기
+        //지정한 달의 모든 몸무게 정보 가져오기
         for(int i=0;i<allRecordList.size();i++){
             ExerciseWeightRecord record = allRecordList.get(i);
             if(record.getDateCreated().getYear() == viewYear && record.getDateCreated().getMonthValue() == viewMonth){
@@ -135,7 +135,7 @@ public class ExerciseProvider {
         int nowMonth = LocalDate.now().getMonthValue();
         int nowYear = LocalDate.now().getYear();
 
-        int wantMonth = nowMonth - 1;
+        int wantMonth = nowMonth ;
         int wantYear = nowYear;
 
         int lastIdx=0;
@@ -185,18 +185,16 @@ public class ExerciseProvider {
                 .monthWeight(monthWeight)
                 .monthWeightMonth(monthWeightMonth)
                 .dayWeightDay(dayWeightDayList(viewYear,viewMonth))
-                .dayWeight(dayWeightListWeight(dayweightList(viewYear, viewMonth,exerciseWeightList)))
-                .dayDif(dayWeightListDif(exerciseInfo.getGoalWeight(),dayweightList(viewYear, viewMonth,exerciseWeightList)))
+                .dayWeight(dayWeightListWeight((dayweightList(viewYear, viewMonth,exerciseWeightList)),viewYear,viewMonth))
+                .dayDif(dayWeightListDif(exerciseInfo.getGoalWeight(),dayweightList(viewYear, viewMonth,exerciseWeightList),viewYear,viewMonth))
                 .build();
 
-        System.out.println("making done");
         return getExerciseWeightRecordRes;
     }
 
     //몇월 몇일인지 출력
     public List<String> dayWeightDayList( int year, int month){
         List<String> dayList= new ArrayList<>();
-        System.out.println("dayList");
         LocalDate standardMonth = LocalDate.of(year,month,1);
         int moveDay = 1;
         int monthInt = standardMonth.getMonthValue();
@@ -215,15 +213,21 @@ public class ExerciseProvider {
 
     //몇월 몇일에 몸무게가 얼마였는지 출력  --> int형 --> 이후 차이 계산을 위해  --> 얘는 그대로 쓰이는데 없음
     public List<Double> dayweightList(int year, int month, List<ExerciseWeightRecord> recordList){
-        System.out.println("dayWeightList");
-
         List<Double> dayWeightList = new ArrayList<>();
         int index=0;
         int moveDay = 1;
         boolean isEndIndx=false;
         LocalDate standardMonth = LocalDate.of(year,month,1);
         LocalDate moveMonth = standardMonth;
-
+        if(recordList.size()==0){
+            String montStr = (month<10) ? ("0"+month) : (month+"");
+            LocalDate inputDate = LocalDate.parse((year+"-"+montStr+"-01"),DateTimeFormatter.ISO_DATE);
+            int lastDate = inputDate.lengthOfMonth();
+            for(int i=0;i<lastDate ; i++){
+                dayWeightList.add(0.0);
+            }
+            return dayWeightList;
+        }
         while(moveMonth.getMonthValue() == standardMonth.getMonthValue()){
             if(isEndIndx == true) {
                 dayWeightList.add(0.0);
@@ -252,15 +256,15 @@ public class ExerciseProvider {
             }
         }
 
-
-
         return dayWeightList;
     }
+
     //dayWeight변환
-    public List<String> dayWeightListWeight(List<Double> weightList){
+    public List<String> dayWeightListWeight(List<Double> weightList, int year, int month){
         System.out.println("ListWeight");
 
         List<String> changedList = new ArrayList<>();
+
         for(int i=0;i<weightList.size();i++){
             if(weightList.get(i) == 0.0){
                 changedList.add("정보 없음");
@@ -271,17 +275,25 @@ public class ExerciseProvider {
         return changedList;
     }
     //차이 변환
-    public List<Double> dayWeightListDif(double goalWeight,List<Double> weightList){
-        System.out.println("WeightDif");
-
+    public List<Double> dayWeightListDif(double goalWeight, List<Double> weightList, int year, int month){
         List<Double> changedList = new ArrayList<>();
-        for(int i=0;i<weightList.size();i++){
-            if(weightList.get(i) == 0.0){
+        if(weightList.size()==0){
+            LocalDate inputDate = LocalDate.parse((year+"-"+month+"-1"),DateTimeFormatter.ISO_DATE);
+            int lastDate = inputDate.lengthOfMonth();
+            for(int i=0;i<lastDate ; i++){
                 changedList.add(0.0);
-            }else {
-                changedList.add(Math.round((weightList.get(i)-goalWeight) * 100) / 100.0);
             }
+            return changedList;
+
         }
+            for (int i = 0; i < weightList.size(); i++) {
+                if (weightList.get(i) == 0.0) {
+                    changedList.add(0.0);
+                } else {
+                    changedList.add(Math.round((weightList.get(i) - goalWeight) * 100) / 100.0);
+                }
+            }
+
         return changedList;
     }
 
@@ -505,6 +517,15 @@ public class ExerciseProvider {
         }
     }
 
+
+    /***
+     * *****************************************************데이터 정제
+     */
+
+    /**
+     * Double형 Weight --> 만약 딱 나눠떨어지는 double이라면 그냥 int형태처럼 return
+     * 4.0 --> 4kg
+     */
     private String doubleWeightToString(Double weight) {
         Double weightMulti = weight*10;
         String weightStr = Integer.toString(weightMulti.intValue());
@@ -512,10 +533,6 @@ public class ExerciseProvider {
         String changedWeight = (lastStr != '0') ? weight+"kg" : (weight.intValue())+"kg";
         return changedWeight;
     }
-
-    /***
-     * *****************************************************데이터 정제
-     */
 
     /**
      * repeatDay String --> 보기 이쁜 String
