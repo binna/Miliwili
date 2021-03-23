@@ -25,6 +25,10 @@ public class PlanVacation {
     @Column(name = "vacationId", nullable = false)
     private Long vacationId;
 
+    @Builder.Default
+    @Column(name = "status", nullable = false, columnDefinition = "varchar(1) default 'Y'")
+    private String status = "Y";
+
     @ManyToOne
     @JoinColumn(name = "plan_id")
     private Plan plan;

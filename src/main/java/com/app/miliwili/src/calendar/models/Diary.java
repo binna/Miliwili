@@ -20,7 +20,7 @@ public class Diary {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "date", nullable = false, updatable = false)
     private LocalDate date;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")

@@ -360,7 +360,7 @@ public class UserController {
         if (Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
             return new BaseResponse<>(EMPTY_TITLE);
         }
-        if (parameters.getVacationType().length() < 20 || parameters.getTitle().length() < 20) {
+        if (parameters.getVacationType().length() >= 20 || parameters.getTitle().length() >= 20) {
             return new BaseResponse<>(EXCEED_MAX20);
         }
         if (Objects.isNull(parameters.getTotalDays())) {

@@ -5,6 +5,7 @@ import com.app.miliwili.src.calendar.dto.PlanVacationReq;
 import com.app.miliwili.src.calendar.dto.PlanVacationRes;
 import com.app.miliwili.src.calendar.dto.WorkReq;
 import com.app.miliwili.src.calendar.dto.WorkRes;
+import com.app.miliwili.src.calendar.models.Diary;
 import com.app.miliwili.src.calendar.models.Plan;
 import com.app.miliwili.src.calendar.models.PlanVacation;
 import com.app.miliwili.src.calendar.models.ToDoList;
@@ -22,6 +23,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Service
 public class CalendarProvider {
     private final PlanRepository planRepository;
+    private final DiaryRepository diaryRepository;
 
     /**
      * 정기휴가 스케줄 검색
@@ -43,7 +45,7 @@ public class CalendarProvider {
 //    }
 
     /**
-     * planId로 유효한 일정 조회
+     * planId로 유효한 일정조회
      *
      * @param planId
      * @return Plan
@@ -53,6 +55,19 @@ public class CalendarProvider {
     public Plan retrievePlanByIdAndStatusY(Long planId) throws BaseException {
         return planRepository.findByIdAndStatus(planId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_PLAN));
+    }
+
+    /**
+     * planId로 유효한 일정 다이어리 조회
+     *
+     * @param diaryId
+     * @return Diary
+     * @throws BaseException
+     */
+    @Transactional
+    public Diary retrieveDiaryById(Long diaryId) throws BaseException {
+        return diaryRepository.findById(diaryId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_DIARY));
     }
 
 
