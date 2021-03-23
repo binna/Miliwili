@@ -68,7 +68,9 @@ public enum BaseResponseStatus {
     INVALID_PRO_DATE(false, 2515, "진급 심사일 형식을 확인해주세요."),
     INVALID_STATEIDX(false, 2516, "복무형태는 1~4로 나타내야합니다."),
     INVALID_VIEW_DATE(false, 2517, "조회하고자 하는 날짜는 이번달 이전만 가능합니다"),
+    INVALID_MODIFY_DATE(false, 2518, "수정하고자 하는 날짜 형식을 확인해주세요."),
 
+    INVALID_WEIGHT(false, 2520, "몸무게는 Double형으로 설정해주세요."),
 
     EMPTY_START_DATE(false, 2700, "입대일을 입력해주세요."),
     EMPTY_END_DATE(false, 2701, "전역일을 입력해주세요."),
@@ -147,6 +149,12 @@ public enum BaseResponseStatus {
     FAILED_GET_DAILY_WEIGHT(false, 3533, "일일 체중 기록 조회에 실패하였습니다."),
     FAILED_GET_MONTH_WEIGHT_1(false, 3534, "월별 체중 기록 조회에 실패하였습니다.-1-월별 평균 조회 "),
     FAILED_GET_MONTH_WEIGHT_2(false, 3535, "월별 체중 기록 조회에 실패하였습니다.-2-웗별 일일 조회 "),
+    NOT_FOUND_EXERCISE_WEIGHT_RECORD(false, 3536, "해당날짜에 해당 회원의 체중기록이 존재하지 않습니다."),
+    FAILED_PATCH_DAILY_WEIGHT(false, 3537, "일일 체중 기록 수정에 실패하였습니다. "),
+
+    FAILED_FIND_DELETE_ROUTINE(false, 3538, "삭제하고자 하는 루틴의 ID와 일치하는 루틴이 존재하지 않습니다. "),
+    FAILED_FIND_GET_ROUTINE(false, 3539, "오늘 운동 완료된 루틴이 없습니다. "),
+    FAILED_RESET_ROTUINE_DONE(false, 3540, "운동 상태 리셋에 실패하였습니다. "),
 
 
 

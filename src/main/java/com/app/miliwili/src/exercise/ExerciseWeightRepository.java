@@ -15,12 +15,7 @@ import java.util.Optional;
 public interface ExerciseWeightRepository extends CrudRepository<ExerciseWeightRecord, Long> {
     List<ExerciseWeightRecord> findTop5ByExerciseInfo_IdAndStatusOrderByDateCreatedDesc(Long exerciseId, String status);
 
-    //체중 조회 --> 지정 월의 모든 날 정보 가져오기
-  //  @Query("select * from ExerciseWeightRecord where status == "Y"")
-   //
-    // List<ExerciseWeightRecord> findAllByExerciseInfo_IdAndStatusAndDateCreated_YearAndDateCreated_MonthValue(Long exerciseId, String status, Integer year, Integer month);
-
-
+    Optional<ExerciseWeightRecord> findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween(Long exerciseId, String status, LocalDateTime dateCreated, LocalDateTime dateCreatedNext);
 
 }
 
