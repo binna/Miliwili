@@ -273,7 +273,7 @@ public class ExerciseProvider {
             if(weightList.get(i) == 0.0){
                 changedList.add(0.0);
             }else {
-                changedList.add(Math.round((goalWeight-weightList.get(i)) * 100) / 100.0);
+                changedList.add(Math.round((weightList.get(i)-goalWeight) * 100) / 100.0);
             }
         }
         return changedList;
