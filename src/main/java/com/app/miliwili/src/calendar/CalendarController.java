@@ -273,11 +273,11 @@ public class CalendarController {
     @ApiOperation(value = "할일 완료 -> 미완료, 미완료 -> 완료 처리", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/calendars/plans/plans-work/{workId}")
-    public BaseResponse<WorkRes> deletePlanWork(@RequestHeader("X-ACCESS-TOKEN") String token,
+    public BaseResponse<WorkRes> updatePlanWork(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                 @PathVariable Long workId) {
         try {
-            WorkRes todolist = calendarService.deletePlanWork(workId);
-            return new BaseResponse<>(SUCCESS, todolist);
+            WorkRes work = calendarService.updatePlanWork(workId);
+            return new BaseResponse<>(SUCCESS, work);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
@@ -344,8 +344,8 @@ public class CalendarController {
     @ResponseBody
     @PatchMapping("/calendars/ddays/{ddayId}")
     public BaseResponse<PatchDDayRes> updateDDay(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                              @RequestBody(required = false) PatchDDayReq parameters,
-                                              @PathVariable Long ddayId) {
+                                                 @RequestBody(required = false) PatchDDayReq parameters,
+                                                 @PathVariable Long ddayId) {
         if(Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
             return new BaseResponse<>(EMPTY_TITLE);
         }
@@ -403,7 +403,7 @@ public class CalendarController {
      * @PathVariable Long ddayId
      * @Auther shine
      */
-    @ApiOperation(value = "D-Day 메모 생성", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "D-Day 다이어리 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PostMapping("/calendars/ddays/{ddayId}/ddays-diary")
     public BaseResponse<PostDiaryRes> postDDayDiary(@RequestHeader("X-ACCESS-TOKEN") String token,
@@ -437,7 +437,7 @@ public class CalendarController {
      * @PathVariable Long diaryId
      * @Auther shine
      */
-    @ApiOperation(value = "D-Day 메모 수정", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "D-Day 다이어리 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/calendars/ddays/ddays-diary/{diaryId}")
     public BaseResponse<PatchDiaryRes> updateDDayDiary(@RequestHeader("X-ACCESS-TOKEN") String token,
@@ -464,7 +464,7 @@ public class CalendarController {
      * @PathVariable Long diaryId
      * @Auther shine
      */
-    @ApiOperation(value = "D-Day 메모 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "D-Day 다이어리 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @DeleteMapping("/calendars/ddays/ddays-diary/{diaryId}")
     public BaseResponse<Void> deleteDDayDiary(@RequestHeader("X-ACCESS-TOKEN") String token,
@@ -486,7 +486,7 @@ public class CalendarController {
      * @PathVariable Long workId
      * @Auther shine
      */
-    @ApiOperation(value = "할일 완료 -> 미완료, 미완료 -> 완료 처리", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "준비물 완료 -> 미완료, 미완료 -> 완료 처리", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/calendars/ddays/ddays-work/{workId}")
     public BaseResponse<WorkRes> updateDDayWork(@RequestHeader("X-ACCESS-TOKEN") String token,
@@ -498,6 +498,4 @@ public class CalendarController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
-
 }

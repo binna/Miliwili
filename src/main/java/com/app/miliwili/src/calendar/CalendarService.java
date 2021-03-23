@@ -84,6 +84,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PatchPlanRes updatePlan(PatchPlanReq parameters, Long planId) throws BaseException {
         Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
 
@@ -136,6 +137,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public void deletePlan(Long planId) throws BaseException {
         Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
 
@@ -165,6 +167,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PostDiaryRes createPlanDiary(PostDiaryReq parameters, Long planId) throws BaseException {
         Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
 
@@ -202,6 +205,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PatchDiaryRes updatePlanDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
         PlanDiary diary = calendarProvider.retrievePlanDiaryById(diaryId);
 
@@ -231,6 +235,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public void deletePlanDiary(Long diaryId) throws BaseException {
         PlanDiary diary = calendarProvider.retrievePlanDiaryById(diaryId);
 
@@ -254,18 +259,18 @@ public class CalendarService {
      * @throws BaseException
      */
     @Transactional
-    public WorkRes deletePlanWork(Long workId) throws BaseException {
+    public WorkRes updatePlanWork(Long workId) throws BaseException {
         PlanWork work = calendarProvider.retrievePlanWorkById(workId);
 
         if (work.getPlan().getUserInfo().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
-        if(work.getProcessingStatus().equals("Y")) {
-            work.setProcessingStatus("N");
+        if (work.getProcessingStatus().equals("T")) {
+            work.setProcessingStatus("F");
         }
-        if(work.getProcessingStatus().equals("N")) {
-            work.setProcessingStatus("Y");
+        if (work.getProcessingStatus().equals("F")) {
+            work.setProcessingStatus("T");
         }
 
         try {
@@ -289,6 +294,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PostDDayRes createDDay(PostDDayReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
@@ -314,7 +320,7 @@ public class CalendarService {
                     .choiceCalendar(Validation.isString(savedDDay.getChoiceCalendar()))
                     .placeLat(Validation.isBigDecimal(savedDDay.getPlaceLat()))
                     .placeLon(Validation.isBigDecimal(savedDDay.getPlaceLon()))
-                    .works(calendarProvider.changeListDDayWorkToListWorkRes(savedDDay.getDdayWorks()))
+                    .work(calendarProvider.changeListDDayWorkToListWorkRes(savedDDay.getDdayWorks()))
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_D_DAY);
@@ -330,6 +336,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public PatchDDayRes updateDDay(PatchDDayReq parameters, Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
 
@@ -382,6 +389,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public void deleteDDay(Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
 
@@ -407,6 +415,7 @@ public class CalendarService {
      * @return PostDiaryRes
      * @throws BaseException
      */
+    @Transactional
     public PostDiaryRes createDDayDiary(PostDiaryReq parameters, Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
 
@@ -447,6 +456,7 @@ public class CalendarService {
      * @return PatchDiaryRes
      * @throws BaseException
      */
+    @Transactional
     public PatchDiaryRes updateDDayDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
         DDayDiary diary = calendarProvider.retrieveDDayDiaryById(diaryId);
 
@@ -476,6 +486,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public void deleteDDayDiary(Long diaryId) throws BaseException {
         DDayDiary diary = calendarProvider.retrieveDDayDiaryById(diaryId);
 
@@ -506,11 +517,11 @@ public class CalendarService {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
-        if (work.getProcessingStatus().equals("Y")) {
-            work.setProcessingStatus("N");
+        if (work.getProcessingStatus().equals("T")) {
+            work.setProcessingStatus("F");
         }
-        if (work.getProcessingStatus().equals("N")) {
-            work.setProcessingStatus("Y");
+        if (work.getProcessingStatus().equals("F")) {
+            work.setProcessingStatus("T");
         }
 
         try {
