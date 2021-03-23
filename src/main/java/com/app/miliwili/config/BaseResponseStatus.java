@@ -49,6 +49,7 @@ public enum BaseResponseStatus {
     EMPTY_DATE(false, 2035, "날짜을 입력해주세요."),
     EMPTY_CONTENT(false, 2036, "내용을 입력해주세요."),
     INVALID_DATE(false, 2037, "날짜 형식을 확인해주세요."),
+    INVALID_SOCIAL_TYPE(false, 2038, "가입 요청하는 소셜타입의 형식을 확인해주세요."),
 
 
 

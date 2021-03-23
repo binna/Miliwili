@@ -21,19 +21,19 @@ public class UserInfo extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false, length = 60)
     private String name;
 
     @Column(name = "stateIdx", nullable = false, updatable = false)
     private Integer stateIdx;
 
-    @Column(name = "serveType", nullable = false, length = 45)
+    @Column(name = "serveType", nullable = false, length = 30)
     private String serveType;
 
     @Column(name = "socialType", nullable = false, length = 1, updatable = false)
     private String socialType;
 
-    @Column(name = "socialId", nullable = false, length = 1000, updatable = false)
+    @Column(name = "socialId", nullable = false, columnDefinition = "TEXT", updatable = false)
     private String socialId;
 
     @Column(name = "birthday")
@@ -42,7 +42,7 @@ public class UserInfo extends BaseEntity {
     @Column(name = "goal", length = 100)
     private String goal;
 
-    @Column(name = "profileImg")
+    @Column(name = "profileImg", columnDefinition = "TEXT")
     private String profileImg;
 
     @Column(name = "startDate", nullable = false)
