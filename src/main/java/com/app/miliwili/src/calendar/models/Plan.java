@@ -27,7 +27,7 @@ public class Plan extends BaseEntity {
     @Column(name = "color", nullable = false, length = 30)
     private String color;
 
-    @Column(name = "planType", nullable = false, length = 10)
+    @Column(name = "planType", nullable = false, length = 10, updatable = false)
     private String planType;
 
     @Column(name = "title", nullable = false, length = 60)

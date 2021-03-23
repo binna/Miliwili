@@ -5,6 +5,7 @@ import com.app.miliwili.src.calendar.dto.*;
 import com.app.miliwili.src.calendar.models.DDay;
 import com.app.miliwili.src.calendar.models.Diary;
 import com.app.miliwili.src.calendar.models.Plan;
+import com.app.miliwili.src.calendar.models.PlanVacation;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
@@ -28,6 +29,7 @@ public class CalendarService {
     private final CalendarProvider calendarProvider;
     private final UserProvider userProvider;
 
+
     /**
      * 일정 생성
      *
@@ -40,7 +42,7 @@ public class CalendarService {
     public PostPlanRes createPlan(PostPlanReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        Plan newSchedule = Plan.builder()
+        Plan newPlan = Plan.builder()
                 .color(parameters.getColor())
                 .planType(parameters.getPlanType())
                 .title(parameters.getTitle())
@@ -50,34 +52,129 @@ public class CalendarService {
                 .build();
 
         if (Objects.nonNull(parameters.getPush()) && parameters.getPush().equals("Y")) {
-            newSchedule.setPush(parameters.getPush());
-            newSchedule.setPushDeviceToken(parameters.getPushDeviceToken());
+            newPlan.setPush(parameters.getPush());
+            newPlan.setPushDeviceToken(parameters.getPushDeviceToken());
         }
 
-        if (newSchedule.getPlanType().equals("휴가")) {
-            newSchedule.setPlanVacations(calendarProvider.changeListPlanVacationReqToSetPlanVacation(parameters.getPlanVacation(), newSchedule));
+        if (newPlan.getPlanType().equals("휴가")) {
+            newPlan.setPlanVacations(calendarProvider.changeListPlanVacationReqToSetPlanVacation(parameters.getPlanVacation(), newPlan));
         }
 
         if (Objects.nonNull(parameters.getToDoList())) {
-            newSchedule.setToDoLists(calendarProvider.changeListWorkReqToListToDoList(parameters.getToDoList(), newSchedule));
+            newPlan.setToDoLists(calendarProvider.changeListWorkReqToListToDoList(parameters.getToDoList(), newPlan));
         }
 
         try {
-            Plan savedSchedule = planRepository.save(newSchedule);
+            Plan savedPlan = planRepository.save(newPlan);
             return PostPlanRes.builder()
-                    .planId(savedSchedule.getId())
-                    .color(savedSchedule.getColor())
-                    .planType(savedSchedule.getPlanType())
-                    .title(savedSchedule.getTitle())
-                    .startDate(savedSchedule.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                    .endDate(savedSchedule.getEndDate().format(DateTimeFormatter.ISO_DATE))
-                    .push(savedSchedule.getPush())
-                    .planVacation(calendarProvider.changeSetPlanVacationToListPlanVacationRes(savedSchedule.getPlanVacations()))
-                    .toDoList(calendarProvider.changeListToDoListToListWorkRes(savedSchedule.getToDoLists()))
+                    .planId(savedPlan.getId())
+                    .color(savedPlan.getColor())
+                    .planType(savedPlan.getPlanType())
+                    .title(savedPlan.getTitle())
+                    .startDate(savedPlan.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(savedPlan.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .push(savedPlan.getPush())
+                    .planVacation(calendarProvider.changeSetPlanVacationToListPlanVacationRes(savedPlan.getPlanVacations()))
+                    .toDoList(calendarProvider.changeListToDoListToListWorkRes(savedPlan.getToDoLists()))
                     .build();
         } catch (Exception exception) {
             exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_PLAN);
+        }
+    }
+
+    /**
+     * 일정수정
+     *
+     * @param parameters
+     * @param planId
+     * @return PatchPlanRes
+     * @throws BaseException
+     */
+    public PatchPlanRes updatePlan(PatchPlanReq parameters, Long planId) throws BaseException {
+        Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
+
+        if (plan.getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
+        LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
+
+        plan.setColor(parameters.getColor());
+        plan.setTitle(parameters.getTitle());
+        plan.setStartDate(startDate);
+        plan.setEndDate(endDate);
+
+        if (plan.getPlanType().equals("면회") || plan.getPlanType().equals("외출")
+                || plan.getPlanType().equals("전투휴무") || plan.getPlanType().equals("당직")) {
+            if (startDate.isEqual(endDate)) {
+                throw new BaseException(ONLY_ON_THE_SAME_DAY);
+            }
+        } else if (plan.getPlanType().equals("일정") ||
+                plan.getPlanType().equals("휴가") || plan.getPlanType().equals("외박")) {
+            if (startDate.isBefore(endDate)) {
+                throw new BaseException(FASTER_THAN_CALENDAR_START_DATE);
+            }
+        } else {
+            throw new BaseException(INVALID_PLAN_TYPE);
+        }
+
+        if (Objects.nonNull(parameters.getPush()) && parameters.getPush().equals("Y")) {
+            plan.setPush(parameters.getPush());
+            plan.setPushDeviceToken(parameters.getPushDeviceToken());
+        }
+
+        if (plan.getPlanType().equals("휴가")) {
+            plan.getPlanVacations().clear();
+            plan.getPlanVacations().addAll(calendarProvider.changeListPlanVacationReqToSetPlanVacation(parameters.getPlanVacation(), plan));
+        }
+
+        if (Objects.nonNull(parameters.getToDoList())) {
+            plan.getToDoLists().clear();
+            plan.getToDoLists().addAll(calendarProvider.changeListWorkReqToListToDoList(parameters.getToDoList(), plan));
+        }
+
+        try {
+            Plan savedPlan = planRepository.save(plan);
+            return PatchPlanRes.builder()
+                    .planId(savedPlan.getId())
+                    .color(savedPlan.getColor())
+                    .planType(savedPlan.getPlanType())
+                    .title(savedPlan.getTitle())
+                    .startDate(savedPlan.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(savedPlan.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .push(savedPlan.getPush())
+                    .planVacation(calendarProvider.changeSetPlanVacationToListPlanVacationRes(savedPlan.getPlanVacations()))
+                    .toDoList(calendarProvider.changeListToDoListToListWorkRes(savedPlan.getToDoLists()))
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_PATCH_PLAN);
+        }
+    }
+
+    /**
+     * 일정삭제
+     *
+     * @param planId
+     * @throws BaseException
+     */
+    public void deletePlan(Long planId) throws BaseException {
+        Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
+
+        if (plan.getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
+        plan.setStatus("N");
+        for (PlanVacation planVacation : plan.getPlanVacations()) {
+            planVacation.setStatus("N");
+        }
+
+        try {
+            planRepository.save(plan);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_PLAN);
         }
     }
 
@@ -117,6 +214,57 @@ public class CalendarService {
             throw new BaseException(FAILED_TO_POST_DIARY);
         }
     }
+
+    /**
+     * 일정 다이어리 수정
+     *
+     * @param parameters
+     * @param diaryId
+     * @return PatchDiaryRes
+     * @throws BaseException
+     */
+    public PatchDiaryRes updateDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
+        Diary diary = calendarProvider.retrieveDiaryById(diaryId);
+
+        if (diary.getPlan().getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
+        diary.setContent(parameters.getContent());
+
+        try {
+            Diary savedDiary = diaryRepository.save(diary);
+            return PatchDiaryRes.builder()
+                    .diaryId(savedDiary.getId())
+                    .date(savedDiary.getDate().format(DateTimeFormatter.ISO_DATE))
+                    .title(savedDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
+                    .content(savedDiary.getContent())
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_PATCH_DIARY);
+        }
+    }
+
+    /**
+     * 일정 다이어리 삭제
+     *
+     * @param diaryId
+     * @throws BaseException
+     */
+    public void deleteDiary(Long diaryId) throws BaseException {
+        Diary diary = calendarProvider.retrieveDiaryById(diaryId);
+
+        if (diary.getPlan().getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
+        try {
+            diaryRepository.delete(diary);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_DIARY);
+        }
+    }
+
 
     private void checkDate(Plan plan, String diaryDate) throws BaseException {
         LocalDate date = LocalDate.parse(diaryDate, DateTimeFormatter.ISO_DATE);

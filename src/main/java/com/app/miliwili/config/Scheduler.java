@@ -1,12 +1,9 @@
 package com.app.miliwili.config;
 
 import com.app.miliwili.src.calendar.PlanRepository;
-import com.app.miliwili.src.calendar.ScheduleSelectRepository;
 import com.app.miliwili.src.calendar.models.Plan;
 import com.app.miliwili.src.exercise.ExerciseProvider;
-import com.app.miliwili.src.exercise.ExerciseRepository;
 import com.app.miliwili.src.exercise.ExerciseService;
-import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import com.app.miliwili.src.exercise.model.ExerciseRoutine;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.UserService;
@@ -28,8 +25,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Component
 public class Scheduler {
     private final UserRepository userRepository;
-    private final PlanRepository scheduleRepository;
-    private final ScheduleSelectRepository scheduleSelectRepository;
+    private final PlanRepository planRepository;
     private final UserService userService;
     private final FirebaseCloudMessage firebaseCloudMessageService;
     private final ExerciseProvider exerciseProvider;
@@ -60,7 +56,7 @@ public class Scheduler {
 
     @Scheduled(cron = "0 0 19 * * *")
     public void sendPushMessage() {
-        List<Plan> schedules = scheduleRepository.findByPushAndStatusAndStartDate("Y", "Y", LocalDate.now().plusDays(1));
+        List<Plan> schedules = planRepository.findByPushAndStatusAndStartDate("Y", "Y", LocalDate.now().plusDays(1));
 
         for (Plan schedule : schedules) {
             System.out.println(schedule.getStartDate() + ", " + schedule.getTitle());
