@@ -20,7 +20,6 @@ public class UserProvider {
     private final UserSelectRepository userSelectRepository;
     private final UserRepository userRepository;
     private final VacationRepository vacationRepository;
-    private final ScheduleSelectRepository scheduleSelectRepository;
     private final JwtService jwtService;
     private final CalendarProvider calendarProvider;
 

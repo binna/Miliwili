@@ -20,5 +20,5 @@ public class PostDDayRes {
     private final String choiceCalendar;
     private final BigDecimal placeLat;
     private final BigDecimal placeLon;
-    private final List<WorkRes> works;
+    private final List<WorkRes> work;
 }

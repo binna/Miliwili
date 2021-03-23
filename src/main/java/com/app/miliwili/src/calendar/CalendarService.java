@@ -266,11 +266,11 @@ public class CalendarService {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
-        if(work.getProcessingStatus().equals("Y")) {
-            work.setProcessingStatus("N");
+        if (work.getProcessingStatus().equals("T")) {
+            work.setProcessingStatus("F");
         }
-        if(work.getProcessingStatus().equals("N")) {
-            work.setProcessingStatus("Y");
+        if (work.getProcessingStatus().equals("F")) {
+            work.setProcessingStatus("T");
         }
 
         try {
@@ -320,7 +320,7 @@ public class CalendarService {
                     .choiceCalendar(Validation.isString(savedDDay.getChoiceCalendar()))
                     .placeLat(Validation.isBigDecimal(savedDDay.getPlaceLat()))
                     .placeLon(Validation.isBigDecimal(savedDDay.getPlaceLon()))
-                    .works(calendarProvider.changeListDDayWorkToListWorkRes(savedDDay.getDdayWorks()))
+                    .work(calendarProvider.changeListDDayWorkToListWorkRes(savedDDay.getDdayWorks()))
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_D_DAY);
@@ -517,11 +517,11 @@ public class CalendarService {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
-        if (work.getProcessingStatus().equals("Y")) {
-            work.setProcessingStatus("N");
+        if (work.getProcessingStatus().equals("T")) {
+            work.setProcessingStatus("F");
         }
-        if (work.getProcessingStatus().equals("N")) {
-            work.setProcessingStatus("Y");
+        if (work.getProcessingStatus().equals("F")) {
+            work.setProcessingStatus("T");
         }
 
         try {

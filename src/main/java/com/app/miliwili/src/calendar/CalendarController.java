@@ -486,7 +486,7 @@ public class CalendarController {
      * @PathVariable Long workId
      * @Auther shine
      */
-    @ApiOperation(value = "할일 완료 -> 미완료, 미완료 -> 완료 처리", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "준비물 완료 -> 미완료, 미완료 -> 완료 처리", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/calendars/ddays/ddays-work/{workId}")
     public BaseResponse<WorkRes> updateDDayWork(@RequestHeader("X-ACCESS-TOKEN") String token,
