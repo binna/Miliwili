@@ -264,6 +264,42 @@ public class ExerciseService {
         return "\""+routine.getName()+"\""+"루틴이 삭제되었습니다";
     }
 
+    /**
+     * 운동 리포트 생성
+     */
+    public String createExerciseReport(Long exerciseId, Long routineId, PostExerciseReportReq param) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+        String[] statusSplit = param.getExerciseStatus().split("#");
+        List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
+        if(statusSplit.length != detailList.size())
+            throw new BaseException(FAILED_GET_REPORT_SETSIZE);
+        for(int i=0;i<detailList.size();i++){
+            if(detailList.get(i).getSetCount() < Integer.parseInt(statusSplit[i]))
+                throw new BaseException(FAILED_GET_REPORT_SETCOUNT);
+        }
+
+        ExerciseReport newReport = ExerciseReport.builder()
+                .totalTime(param.getTotalTime())
+                .exerciseStatus(param.getExerciseStatus())
+                .reportText("")
+                .exerciseRoutine(routine)
+                .build();
+        routine.setDone("Y");
+        routine.addNewReport(newReport);
+        try {
+            exerciseRoutineRepository.save(routine);
+        }catch (Exception e){
+            throw new BaseException(FAILED_POST_REPORT);
+        }
+        return "success";
+    }
+
 
     /**
      * 운동 안한상태로 초기화

@@ -3,22 +3,14 @@ package com.app.miliwili.src.exercise;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.*;
-import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.utils.JwtService;
-import com.fasterxml.jackson.databind.ser.Serializers;
-import io.jsonwebtoken.Jwt;
-import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.jni.Local;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -475,6 +467,82 @@ public class ExerciseProvider {
         return exerciseRoutineRes;
     }
 
+
+
+    /**
+     * 운동 리포트 조회
+     */
+    public GetExerciseReportRes retrieveExerciseReport(Long exerciseId, Long routineId, String reportDate) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+        ExerciseRoutine routine = findRoutine(routineId, exerciseInfo);
+        if(routine.getDone().equals("N"))
+            throw new BaseException(FAILED_GET_REPORT_DONE);
+
+
+        ExerciseReport report = null;
+        LocalDate date = LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE);
+        for(ExerciseReport r: routine.getReports()){
+            if(r.getDateCreated().toLocalDate().equals(date)){
+                report = r;
+                break;
+            }
+        }
+        if(report == null)
+            throw new BaseException(FAILED_GET_REPORT);
+
+        String[] doneSplit = report.getExerciseStatus().split("#");
+
+        List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
+        List<ReportExercise> exerciseList = new ArrayList<>();
+
+        for( int k=0;k<detailList.size();k++){
+            ExerciseRoutineDetail detail = detailList.get(k);
+            List<ExerciseDetailSet> setList = detail.getDetailSets();
+            List<GetStartExerciseDetailSetRes> setResList = new ArrayList<>();
+
+            if(detail.getIsSame().equals("Y")){              //전세트 동일
+                setDetailSetToRes(detail, setList, setResList, true,0, detail.getSetCount());
+            }else {                                 //전세트 동일 아님
+                for (int i = 0; i < setList.size(); i++) {
+                    setDetailSetToRes(detail, setList, setResList,false, i, detail.getSetCount());
+                }
+            }
+
+            int doneSetInt = Integer.parseInt(doneSplit[k]);
+            int setCount = detail.getSetCount();
+            boolean isDone = (doneSetInt==setCount) ? true:false;
+            String doneOrNone = (isDone)? "완료":"미완";
+            String exerciseStatus = "("+doneSetInt+"/"+setCount+") "+doneOrNone;
+            ReportExercise reportExercise = ReportExercise.builder()
+                    .exerciseName(detail.getName())
+                    .exerciseStatus(exerciseStatus)
+                    .doneSet(Integer.parseInt(doneSplit[k]))
+                    .isDone(isDone)
+                    .setList(setResList)
+                    .build();
+            System.out.println(reportExercise.getExerciseName());
+            exerciseList.add(reportExercise);
+
+        }
+
+        GetExerciseReportRes getExerciseReportRes = GetExerciseReportRes.builder()
+                .totalTime(report.getTotalTime())
+                .reportDate(date.getMonthValue()+"월 "+date.getDayOfMonth()+"일")
+                .exerciseList(exerciseList)
+                .build();
+
+        return getExerciseReportRes;
+    }
+
+
+
+    /***
+     * *****************************************************데이터 정제
+     */
     /**
      * 운동 시작을 위한 루틴 조회 --> ExerciseDetailSet 데이터 정제를 위해
      * @param detail
@@ -484,7 +552,7 @@ public class ExerciseProvider {
      * @param setCount --> 총 세트
      */
     private void setDetailSetToRes(ExerciseRoutineDetail detail, List<ExerciseDetailSet> setList,
-                                       List<GetStartExerciseDetailSetRes> setResList, boolean isSame,int index, int setCount) {
+                                   List<GetStartExerciseDetailSetRes> setResList, boolean isSame,int index, int setCount) {
         int setCountInt = (isSame == true) ? setCount : index+1;
         if(detail.getRoutineTypeId() == 1) {
             String weightStr = Double.toString(setList.get(index).getSetWeight()*10);
@@ -516,12 +584,6 @@ public class ExerciseProvider {
             setResList.add(setRes);
         }
     }
-
-
-    /***
-     * *****************************************************데이터 정제
-     */
-
     /**
      * Double형 Weight --> 만약 딱 나눠떨어지는 double이라면 그냥 int형태처럼 return
      * 4.0 --> 4kg
@@ -599,11 +661,13 @@ public class ExerciseProvider {
                     .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISE_WEIGHT_RECORD));
     }
 
+
+
     /**
      *RoutineId로 루틴 찾기
      */
     @NotNull
-    private ExerciseRoutine findRoutine(long routineId, ExerciseInfo exerciseInfo) throws BaseException {
+    public ExerciseRoutine findRoutine(long routineId, ExerciseInfo exerciseInfo) throws BaseException {
         ExerciseRoutine routine = null;
         for(ExerciseRoutine r: exerciseInfo.getExerciseRoutines()){
             if(r.getId() == routineId){
