@@ -24,9 +24,10 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class CalendarProvider {
     private final PlanRepository planRepository;
     private final DiaryRepository diaryRepository;
+    private final ToDoListRepository toDoListRepository;
 
     /**
-     * 정기휴가 스케줄 검색
+     * 휴가 스케줄 검색
      *
      * @param Long userId
      * @return List<Schedule>
@@ -68,6 +69,19 @@ public class CalendarProvider {
     public Diary retrieveDiaryById(Long diaryId) throws BaseException {
         return diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_DIARY));
+    }
+
+    /**
+     * toDoListId로 유효한 할일조회
+     * 
+     * @param toDoListId
+     * @return ToDoList
+     * @throws BaseException
+     */
+    @Transactional
+    public ToDoList retrieveToDoListById(Long toDoListId) throws BaseException {
+        return toDoListRepository.findById(toDoListId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_TODOLIST));
     }
 
 

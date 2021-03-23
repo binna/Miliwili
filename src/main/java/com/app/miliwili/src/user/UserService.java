@@ -91,6 +91,7 @@ public class UserService {
             if (exception.getStatus() == NOT_FOUND_USER) {
                 return new PostLoginRes(false, null);
             }
+            throw new BaseException(FAILED_TO_GET_USER);
         }
 
         return new PostLoginRes(true, jwtService.createJwt(user.getId()));
@@ -135,7 +136,7 @@ public class UserService {
     /**
      * 사용자 정보 수정
      *
-     * @param PatchUserReq parameters
+     * @param parameters
      * @return PatchUserRes
      * @throws BaseException
      * @Auther shine
@@ -214,12 +215,13 @@ public class UserService {
     }
 
     /**
-     * 회원 삭제
+     * 회원삭제
      *
      * @return void
      * @throws BaseException
      * @Auther shine
      */
+    @Transactional
     public void deleteUser() throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
         user.setStatus("N");
@@ -230,6 +232,7 @@ public class UserService {
             throw new BaseException(FAILED_TO_DELETE_USER);
         }
     }
+
 
     /**
      * 휴가 생성
@@ -265,7 +268,7 @@ public class UserService {
     }
 
     /**
-     * 정기휴가 수정
+     * 휴가 수정
      *
      * @param parameters
      * @param vacationId
@@ -294,7 +297,7 @@ public class UserService {
                     .vacationId(savedVacation.getId())
                     .vacationType(savedVacation.getVacationType())
                     .title(savedVacation.getTitle())
-                    .useDays(savedVacation.getUseDays()/* TODO 더해줘야지 스케줄러에서 계산해서 */)
+                    .useDays(savedVacation.getUseDays()/* TODO 더해줘야지 일정에서 사용한 휴가 계산해서 */)
                     .totalDays(savedVacation.getTotalDays())
                     .build();
         } catch (Exception exception) {
@@ -303,7 +306,7 @@ public class UserService {
     }
 
     /**
-     * 정기휴가 삭제
+     * 휴가 삭제
      *
      * @param vacationId
      * @return void

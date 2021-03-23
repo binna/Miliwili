@@ -39,7 +39,7 @@ public class UserInfo extends BaseEntity {
     @Column(name = "birthday")
     private LocalDate birthday;
 
-    @Column(name = "goal", length = 100)
+    @Column(name = "goal", length = 75)
     private String goal;
 
     @Column(name = "profileImg", columnDefinition = "TEXT")
