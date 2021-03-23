@@ -90,8 +90,8 @@ public class UserController {
     @PostMapping("/users/login-kakao")
     public BaseResponse<PostLoginRes> postLoginKakao(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try {
-            PostLoginRes postLoginRes = userService.loginUser(SNSLogin.getUserIdFromKakao(token));
-            return new BaseResponse<>(SUCCESS, postLoginRes);
+            PostLoginRes login = userService.loginUser(SNSLogin.getUserIdFromKakao(token));
+            return new BaseResponse<>(SUCCESS, login);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
@@ -199,6 +199,11 @@ public class UserController {
             }
         }
 
+        if(Objects.nonNull(parameters.getGoal())) {
+            if(parameters.getGoal().length() >= 25) {
+                return new BaseResponse<>(EXCEED_MAX25);
+            }
+        }
         if (Objects.isNull(parameters.getSocialType()) || parameters.getSocialType().length() == 0) {
             return new BaseResponse<>(EMPTY_SOCIAL_TYPE);
         }
@@ -207,8 +212,8 @@ public class UserController {
         }
 
         try {
-            PostSignUpRes postSignUpRes = userService.createUser(parameters, token);
-            return new BaseResponse<>(SUCCESS, postSignUpRes);
+            PostSignUpRes signUp = userService.createUser(parameters, token);
+            return new BaseResponse<>(SUCCESS, signUp);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
@@ -317,7 +322,9 @@ public class UserController {
         }
 
         else if(Objects.nonNull(parameters.getGoal())) {
-            return new BaseResponse<>(EMPTY_GOAL);
+            if(parameters.getGoal().length() >= 25) {
+                return new BaseResponse<>(EXCEED_MAX25);
+            }
         }
 
         else {
@@ -325,8 +332,8 @@ public class UserController {
         }
 
         try {
-            PatchUserRes userRes = userService.updateUser(parameters);
-            return new BaseResponse<>(SUCCESS, userRes);
+            PatchUserRes user = userService.updateUser(parameters);
+            return new BaseResponse<>(SUCCESS, user);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

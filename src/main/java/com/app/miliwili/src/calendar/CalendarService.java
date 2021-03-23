@@ -2,10 +2,7 @@ package com.app.miliwili.src.calendar;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.dto.*;
-import com.app.miliwili.src.calendar.models.DDay;
-import com.app.miliwili.src.calendar.models.Diary;
-import com.app.miliwili.src.calendar.models.Plan;
-import com.app.miliwili.src.calendar.models.PlanVacation;
+import com.app.miliwili.src.calendar.models.*;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
@@ -24,6 +21,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class CalendarService {
     private final PlanRepository planRepository;
     private final DiaryRepository diaryRepository;
+    private final ToDoListRepository toDoListRepository;
     private final DDayRepository dDayRepository;
     private final JwtService jwtService;
     private final CalendarProvider calendarProvider;
@@ -262,6 +260,38 @@ public class CalendarService {
             diaryRepository.delete(diary);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_DIARY);
+        }
+    }
+
+
+    /**
+     * 할일 완료 -> 미완료, 미완료 -> 완료 처리
+     *
+     * @param todolistId
+     * @return WorkRes
+     * @throws BaseException
+     */
+    @Transactional
+    public WorkRes deleteToDoList(Long todolistId) throws BaseException {
+        ToDoList toDoList = calendarProvider.retrieveToDoListById(todolistId);
+
+        if(toDoList.getProcessingStatus().equals("Y")) {
+            toDoList.setProcessingStatus("N");
+
+        }
+        if(toDoList.getProcessingStatus().equals("N")) {
+            toDoList.setProcessingStatus("Y");
+        }
+
+        try {
+            ToDoList savedToDoList = toDoListRepository.save(toDoList);
+            return WorkRes.builder()
+                    .id(savedToDoList.getId())
+                    .content(savedToDoList.getContent())
+                    .processingStatus(savedToDoList.getProcessingStatus())
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_PATCH_TODOLIST);
         }
     }
 
