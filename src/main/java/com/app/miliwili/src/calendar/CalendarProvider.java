@@ -33,6 +33,7 @@ public class CalendarProvider {
      * @param planId
      * @return Plan
      * @throws BaseException
+     * @Auther shine
      */
     @Transactional
     public Plan retrievePlanByIdAndStatusY(Long planId) throws BaseException {
@@ -46,23 +47,25 @@ public class CalendarProvider {
      * @param diaryId
      * @return Diary
      * @throws BaseException
+     * @Auther shine
      */
     @Transactional
-    public PlanDiary retrieveDiaryById(Long diaryId) throws BaseException {
+    public PlanDiary retrievePlanDiaryById(Long diaryId) throws BaseException {
         return diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_DIARY));
     }
 
     /**
-     * toDoListId로 할일 조회
+     * workId로 할일 조회
      *
-     * @param toDoListId
-     * @return ToDoList
+     * @param workId
+     * @return PlanWork
      * @throws BaseException
+     * @Auther shine
      */
     @Transactional
-    public PlanWork retrieveToDoListById(Long toDoListId) throws BaseException {
-        return planWorkRepository.findById(toDoListId)
+    public PlanWork retrievePlanWorkById(Long workId) throws BaseException {
+        return planWorkRepository.findById(workId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_WORK));
     }
 
@@ -70,8 +73,9 @@ public class CalendarProvider {
      * ddayId로 유효한 디데이 조회
      *
      * @param ddayId
-     * @return
+     * @return DDay
      * @throws BaseException
+     * @Auther shine
      */
     @Transactional
     public DDay retrieveDDayByIdAndStatusY(Long ddayId) throws BaseException {
@@ -79,17 +83,34 @@ public class CalendarProvider {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_D_DAY));
     }
 
+    /**
+     * ddayId로 디데이 다이어리 조회
+     *
+     * @param ddayId
+     * @return DDayDiary
+     * @throws BaseException
+     * @Auther shine
+     */
     @Transactional
     public DDayDiary retrieveDDayDiaryById(Long ddayId) throws BaseException {
         return ddayDiaryRepository.findById(ddayId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_DIARY));
     }
 
+    /**
+     * workId로 준비물 조회
+     *
+     * @param workId
+     * @return DDayWork
+     * @throws BaseException
+     * @Auther shine
+     */
     @Transactional
     public DDayWork retrieveDDayWorkById(Long workId) throws BaseException {
         return ddayWorkRepository.findById(workId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_WORK));
     }
+
 
 
     /**
@@ -151,13 +172,13 @@ public class CalendarProvider {
     }
 
     /**
-     * List<ToDoList> -> List<WorkRes> 변경
+     * List<PlanWork> -> List<WorkRes> 변경
      *
      * @param parameters
      * @return List<WorkRes>
      * @Auther shine
      */
-    public List<WorkRes> changeListToDoListToListWorkRes(List<PlanWork> parameters) {
+    public List<WorkRes> changeListPlanWorkToListWorkRes(List<PlanWork> parameters) {
         if (Objects.isNull(parameters)) return null;
 
         return parameters.stream().map(toDoList -> {
@@ -189,13 +210,13 @@ public class CalendarProvider {
     }
 
     /**
-     * List<Supplies> -> List<WorkRes> 변경
+     * List<DDayWork> -> List<WorkRes> 변경
      *
      * @param parameters
      * @return List<WorkRes>
      * @Auther shine
      */
-    public List<WorkRes> changeListSuppliesToListWorkRes(List<DDayWork> parameters) {
+    public List<WorkRes> changeListDDayWorkToListWorkRes(List<DDayWork> parameters) {
         if (Objects.isNull(parameters)) return null;
 
         return parameters.stream().map(supplies -> {
@@ -206,7 +227,4 @@ public class CalendarProvider {
                     .build();
         }).collect(Collectors.toList());
     }
-
-
-
 }

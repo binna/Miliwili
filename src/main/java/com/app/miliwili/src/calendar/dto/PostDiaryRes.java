@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class PostDiaryRes {
-    private final Long id;
+    private final Long diaryId;
     private final String date;
     private final String title;
     private final String content;

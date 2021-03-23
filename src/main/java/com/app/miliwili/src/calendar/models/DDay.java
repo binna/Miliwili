@@ -25,7 +25,7 @@ public class DDay extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "ddayType", nullable = false, length = 10)
+    @Column(name = "ddayType", nullable = false, length = 10, updatable = false)
     private String ddayType;
 
     @Column(name = "title", nullable = false, length = 30)

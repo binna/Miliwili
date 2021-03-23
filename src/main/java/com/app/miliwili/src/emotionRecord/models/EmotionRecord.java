@@ -1,4 +1,4 @@
-package com.app.miliwili.src.calendar.models;
+package com.app.miliwili.src.emotionRecord.models;
 
 import com.app.miliwili.config.BaseEntity;
 import lombok.*;
