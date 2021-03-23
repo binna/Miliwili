@@ -71,6 +71,7 @@ public enum BaseResponseStatus {
     INVALID_MODIFY_DATE(false, 2518, "수정하고자 하는 날짜 형식을 확인해주세요."),
 
     INVALID_WEIGHT(false, 2520, "몸무게는 Double형으로 설정해주세요."),
+    INVALID_SETCOUNT(false, 2521, "운동정보에 입력하신 세트의 개수와 실제 세트들의 개수가 일치하지 않습니다."),
 
     EMPTY_START_DATE(false, 2700, "입대일을 입력해주세요."),
     EMPTY_END_DATE(false, 2701, "전역일을 입력해주세요."),
@@ -156,6 +157,7 @@ public enum BaseResponseStatus {
     FAILED_FIND_GET_ROUTINE(false, 3539, "오늘 운동 완료된 루틴이 없습니다. "),
     FAILED_RESET_ROTUINE_DONE(false, 3540, "운동 상태 리셋에 실패하였습니다. "),
 
+    NOT_FOUND_ROUTINE(false, 3550, "해당 루틴ID와 일치하는 루틴이 없습니다. "),
 
 
     // 4000 : Database 오류

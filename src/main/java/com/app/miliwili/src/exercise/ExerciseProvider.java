@@ -2,12 +2,10 @@ package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.exercise.dto.*;
-import com.app.miliwili.src.exercise.model.ExerciseInfo;
-import com.app.miliwili.src.exercise.model.ExerciseRoutine;
-import com.app.miliwili.src.exercise.model.ExerciseWeightRecord;
-import com.app.miliwili.src.exercise.model.QExerciseRoutine;
+import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.utils.JwtService;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import io.jsonwebtoken.Jwt;
 import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +35,13 @@ public class ExerciseProvider {
     private final JwtService jwtService;
 
 
+    /**
+     * ExerciseId로 ExerciseInfo Return
+     */
+    public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{
+        return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
+                .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
+    }
 
     /**
      * 일별 체중 조회
@@ -339,6 +344,93 @@ public class ExerciseProvider {
         return returnList;
 
     }
+    /**
+     * 오늘 운동 완료 처리된 루틴들 조회
+     */
+    public List<ExerciseRoutine> getCompleteRoutine() throws BaseException{
+        List<ExerciseRoutine> routineList = new ArrayList<>();
+        try {
+            routineList = exerciseRoutineRepository.findAllByStatusAndAndDone("Y", "Y");
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new BaseException(FAILED_FIND_GET_ROUTINE);
+        }
+        return routineList;
+    }
+
+    /**
+     * 운동 루틴 상세 조회 --> 루틴 수정전에 보여지기 위해
+     */
+    public GetExerciseRoutineRes retrieveRoutineDetailForPatchRoutine(long exerciseId, long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        ExerciseRoutine routine = null;
+        for(ExerciseRoutine r: exerciseInfo.getExerciseRoutines()){
+            if(r.getId() == routineId){
+                routine = r;
+                break;
+            }
+        }
+        if(routine == null)
+            throw new BaseException(NOT_FOUND_ROUTINE);
+//        if(routine.getId() == routineId)
+//            throw new BaseException(NOT_FOUND_ROUTINE);
+
+        List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
+        List<ExerciseDetailRes> detailResList = new ArrayList<>();
+
+        for( ExerciseRoutineDetail detail: detailList){
+            List<ExerciseDetailSet> setList = detail.getDetailSets();
+            List<ExerciseDetailSetRes> setResList = new ArrayList<>();
+
+            if(detail.getIsSame().equals("Y")){              //전세트 동일
+                ExerciseDetailSetRes setRes = ExerciseDetailSetRes.builder()
+                        .setStr(detail.getSetCount()+"세트")
+                        .weight((setList.get(0).getSetWeight()))
+                        .count(setList.get(0).getSetCount())
+                        .time(setList.get(0).getSetTime())
+                        .build();
+                setResList.add(setRes);
+            }else {                                 //전세트 동일 아님
+                for (int i = 0; i < setList.size(); i++) {
+                    ExerciseDetailSetRes setRes = ExerciseDetailSetRes.builder()
+                            .setStr((i + 1) + "세트")
+                            .weight(setList.get(i).getSetWeight())
+                            .count(setList.get(i).getSetCount())
+                            .time(setList.get(i).getSetTime())
+                            .build();
+                    setResList.add(setRes);
+                }
+            }
+            ExerciseDetailRes detailRes = ExerciseDetailRes.builder()
+                    .exerciseName(detail.getName())
+                    .exerciseType(detail.getRoutineTypeId())
+                    .setCount(detail.getSetCount())
+                    .isSetSame((detail.getIsSame().equals("Y")) ? true: false)
+                    .setDetailList(setResList)
+                    .build();
+            detailResList.add(detailRes);
+        }
+
+
+        GetExerciseRoutineRes exerciseRoutineRes = GetExerciseRoutineRes.builder()
+                .routineName(routine.getName())
+                .bodyPart(routine.getBodyPart())
+                .repeatDay(changeRepeatDayStrtoArrayList(routine.getRepeaDay()))
+                .detailResList(detailResList)
+                .build();
+
+        return exerciseRoutineRes;
+    }
+
+
+    /***
+     * *****************************************************데이터 정제
+     */
 
     /**
      * repeatDay String --> 보기 이쁜 String
@@ -381,27 +473,20 @@ public class ExerciseProvider {
 
         return resultStr;
     }
-
     /**
-     * 오늘 운동 완료 처리된 루틴들 조회
+     * repeatDayStr -> ArrayList
      */
-    public List<ExerciseRoutine> getCompleteRoutine() throws BaseException{
-        List<ExerciseRoutine> routineList = new ArrayList<>();
-        try {
-            routineList = exerciseRoutineRepository.findAllByStatusAndAndDone("Y", "Y");
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new BaseException(FAILED_FIND_GET_ROUTINE);
+    public List<Integer> changeRepeatDayStrtoArrayList(String repeatDay){
+        List<Integer> changedList= new ArrayList<>();
+        String[] splitArr = repeatDay.split("#");
+        for(String str: splitArr){
+            changedList.add(Integer.parseInt(str));
         }
-        return routineList;
+
+        return changedList;
     }
-    /**
-         * ExerciseId로 ExerciseInfo Return
-         */
-    public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{
-        return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
-            .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
-    }
+
+
 
     /**
      * 생성 날짜로 exerciseWeightRecord찾기

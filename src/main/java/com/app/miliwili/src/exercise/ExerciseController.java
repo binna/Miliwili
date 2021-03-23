@@ -227,6 +227,24 @@ public class ExerciseController {
         }
     }
 
+    /**
+     * 루틴 상세정보 조회 -> 루틴 수정을 위한
+     * @return BaseResponse<GetExerciseRoutineRes>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/routines/{routineId}/detail-exercises")
+    public BaseResponse<GetExerciseRoutineRes> getRoutineDetailForPatchRoutine(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                                                               @PathVariable Long routineId){
+        try{
+            GetExerciseRoutineRes resultRoutineRes = exerciseProvider.retrieveRoutineDetailForPatchRoutine(exerciseId,routineId);
+            return new BaseResponse<>(SUCCESS,resultRoutineRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+
+        }
+    }
 
 
 }

@@ -163,14 +163,14 @@ public class ExerciseService {
             //무게 + 개수
             if (newRoutineDetail.getRoutineTypeId() == 1) {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
-                System.out.println(totalArr[0]);
-                System.out.println(totalArr[1]);
+                validateCountLength(newRoutineDetail, totalArr);
                 for (int j = 0; j < totalArr.length; j++) {
                     String[] weightCount = totalArr[j].split("#");
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
                             .setIdx(j + 1)
                             .setWeight(Double.parseDouble(weightCount[0]))
                             .setCount(Integer.parseInt(weightCount[1]))
+                            .setTime(-1)
                             .exerciseRoutineDetail(newRoutineDetail)
                             .build();
                     //arr추가
@@ -181,10 +181,13 @@ public class ExerciseService {
             // 개수간
             else if (newRoutineDetail.getRoutineTypeId() == 2) {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                validateCountLength(newRoutineDetail, totalArr);
                 for (int j = 0; j < totalArr.length; j++) {
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
                             .setIdx(j + 1)
                             .setCount(Integer.parseInt(totalArr[j]))
+                            .setTime(-1)
+                            .setWeight(-1.0)
                             .exerciseRoutineDetail(newRoutineDetail)
                             .build();
                     //arr추가
@@ -195,10 +198,13 @@ public class ExerciseService {
             //시간
             else {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                validateCountLength(newRoutineDetail, totalArr);
                 for (int j = 0; j < totalArr.length; j++) {
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
                             .setIdx(j + 1)
                             .setTime(Integer.parseInt(totalArr[j]))
+                            .setWeight(-1.0)
+                            .setCount(-1)
                             .exerciseRoutineDetail(newRoutineDetail)
                             .build();
                     //arr추가
@@ -221,6 +227,13 @@ public class ExerciseService {
         System.out.println(exerciseInfo.getExerciseRoutines().get(0).getName());
 
         return newRoutine.getId();
+    }
+
+    private void validateCountLength(ExerciseRoutineDetail newRoutineDetail, String[] totalArr) throws BaseException {
+        if(newRoutineDetail.getIsSame().equals("N")) {
+            if (newRoutineDetail.getSetCount() != totalArr.length)
+                throw new BaseException(INVALID_SETCOUNT);
+        }
     }
 
     /**
