@@ -74,6 +74,7 @@ public enum BaseResponseStatus {
     INVALID_MODIFY_DATE(false, 2518, "수정하고자 하는 날짜 형식을 확인해주세요."),
 
     INVALID_WEIGHT(false, 2520, "몸무게는 Double형으로 설정해주세요."),
+    INVALID_SETCOUNT(false, 2521, "운동정보에 입력하신 세트의 개수와 실제 세트들의 개수가 일치하지 않습니다."),
 
     EMPTY_START_DATE(false, 2700, "입대일을 입력해주세요."),
     EMPTY_END_DATE(false, 2701, "전역일을 입력해주세요."),
@@ -86,6 +87,10 @@ public enum BaseResponseStatus {
     EMPTY_SERVE_TYPE(false, 2708, "하위 복무형태를 입력해주세요(육군, 해군 ..등)"),
 
     EMPTY_WEIGHT(false, 2800, "몸무게를 입력해주세요"),
+
+    EMPTY_TOTALTIME(false, 2810, "총 운동시간을 입력해주세요"),
+    EMPTY_EXERCISESTATUS(false, 2811, "운동 완료한 세트 개수 정보를 입력해주세요."),
+    EMPTY_ROUTINE_ID(false, 2812, "루틴 id를 입력해주세요!!!!!!!!!!!!!!!!!!!"),
 
 
 
@@ -160,6 +165,13 @@ public enum BaseResponseStatus {
     FAILED_FIND_GET_ROUTINE(false, 3539, "오늘 운동 완료된 루틴이 없습니다. "),
     FAILED_RESET_ROTUINE_DONE(false, 3540, "운동 상태 리셋에 실패하였습니다. "),
 
+    NOT_FOUND_ROUTINE(false, 3550, "해당 루틴ID와 일치하는 루틴이 없습니다. "),
+
+    FAILED_POST_REPORT(false, 3560, "운동 리포트 생성에 실패하였습니다."),
+    FAILED_GET_REPORT(false, 3561, "해당 날짜의 리포트 조회에 실패하였습니다."),
+    FAILED_GET_REPORT_DONE(false, 3562, "아직 루틴을 완료하지 않았기 때문에 운동 리포트 조회가 불가능합니다"),
+    FAILED_GET_REPORT_SETCOUNT(false, 3563, "완료된 세트의 개수가 운동 세트수보다 큽니다."),
+    FAILED_GET_REPORT_SETSIZE(false, 3564, "입력된 운동의 개수와 입력된 운동의 개수가 다릅니다."),
 
 
     // 4000 : Database 오류

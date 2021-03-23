@@ -2,24 +2,15 @@ package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.exercise.dto.*;
-import com.app.miliwili.src.exercise.model.ExerciseInfo;
-import com.app.miliwili.src.exercise.model.ExerciseRoutine;
-import com.app.miliwili.src.exercise.model.ExerciseWeightRecord;
-import com.app.miliwili.src.exercise.model.QExerciseRoutine;
-import com.app.miliwili.src.user.UserRepository;
+import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.utils.JwtService;
-import io.jsonwebtoken.Jwt;
-import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.jni.Local;
-import org.springframework.security.core.parameters.P;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,6 +28,13 @@ public class ExerciseProvider {
     private final JwtService jwtService;
 
 
+    /**
+     * ExerciseId로 ExerciseInfo Return
+     */
+    public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{
+        return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
+                .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
+    }
 
     /**
      * 일별 체중 조회
@@ -111,7 +109,7 @@ public class ExerciseProvider {
             }
         });
 
-        //지정한 의 모든 몸무게 정보 가져오기
+        //지정한 달의 모든 몸무게 정보 가져오기
         for(int i=0;i<allRecordList.size();i++){
             ExerciseWeightRecord record = allRecordList.get(i);
             if(record.getDateCreated().getYear() == viewYear && record.getDateCreated().getMonthValue() == viewMonth){
@@ -129,7 +127,7 @@ public class ExerciseProvider {
         int nowMonth = LocalDate.now().getMonthValue();
         int nowYear = LocalDate.now().getYear();
 
-        int wantMonth = nowMonth - 1;
+        int wantMonth = nowMonth ;
         int wantYear = nowYear;
 
         int lastIdx=0;
@@ -179,18 +177,16 @@ public class ExerciseProvider {
                 .monthWeight(monthWeight)
                 .monthWeightMonth(monthWeightMonth)
                 .dayWeightDay(dayWeightDayList(viewYear,viewMonth))
-                .dayWeight(dayWeightListWeight(dayweightList(viewYear, viewMonth,exerciseWeightList)))
-                .dayDif(dayWeightListDif(exerciseInfo.getGoalWeight(),dayweightList(viewYear, viewMonth,exerciseWeightList)))
+                .dayWeight(dayWeightListWeight((dayweightList(viewYear, viewMonth,exerciseWeightList)),viewYear,viewMonth))
+                .dayDif(dayWeightListDif(exerciseInfo.getGoalWeight(),dayweightList(viewYear, viewMonth,exerciseWeightList),viewYear,viewMonth))
                 .build();
 
-        System.out.println("making done");
         return getExerciseWeightRecordRes;
     }
 
     //몇월 몇일인지 출력
     public List<String> dayWeightDayList( int year, int month){
         List<String> dayList= new ArrayList<>();
-        System.out.println("dayList");
         LocalDate standardMonth = LocalDate.of(year,month,1);
         int moveDay = 1;
         int monthInt = standardMonth.getMonthValue();
@@ -209,15 +205,21 @@ public class ExerciseProvider {
 
     //몇월 몇일에 몸무게가 얼마였는지 출력  --> int형 --> 이후 차이 계산을 위해  --> 얘는 그대로 쓰이는데 없음
     public List<Double> dayweightList(int year, int month, List<ExerciseWeightRecord> recordList){
-        System.out.println("dayWeightList");
-
         List<Double> dayWeightList = new ArrayList<>();
         int index=0;
         int moveDay = 1;
         boolean isEndIndx=false;
         LocalDate standardMonth = LocalDate.of(year,month,1);
         LocalDate moveMonth = standardMonth;
-
+        if(recordList.size()==0){
+            String montStr = (month<10) ? ("0"+month) : (month+"");
+            LocalDate inputDate = LocalDate.parse((year+"-"+montStr+"-01"),DateTimeFormatter.ISO_DATE);
+            int lastDate = inputDate.lengthOfMonth();
+            for(int i=0;i<lastDate ; i++){
+                dayWeightList.add(0.0);
+            }
+            return dayWeightList;
+        }
         while(moveMonth.getMonthValue() == standardMonth.getMonthValue()){
             if(isEndIndx == true) {
                 dayWeightList.add(0.0);
@@ -246,15 +248,15 @@ public class ExerciseProvider {
             }
         }
 
-
-
         return dayWeightList;
     }
+
     //dayWeight변환
-    public List<String> dayWeightListWeight(List<Double> weightList){
+    public List<String> dayWeightListWeight(List<Double> weightList, int year, int month){
         System.out.println("ListWeight");
 
         List<String> changedList = new ArrayList<>();
+
         for(int i=0;i<weightList.size();i++){
             if(weightList.get(i) == 0.0){
                 changedList.add("정보 없음");
@@ -265,17 +267,25 @@ public class ExerciseProvider {
         return changedList;
     }
     //차이 변환
-    public List<Double> dayWeightListDif(double goalWeight,List<Double> weightList){
-        System.out.println("WeightDif");
-
+    public List<Double> dayWeightListDif(double goalWeight, List<Double> weightList, int year, int month){
         List<Double> changedList = new ArrayList<>();
-        for(int i=0;i<weightList.size();i++){
-            if(weightList.get(i) == 0.0){
+        if(weightList.size()==0){
+            LocalDate inputDate = LocalDate.parse((year+"-"+month+"-1"),DateTimeFormatter.ISO_DATE);
+            int lastDate = inputDate.lengthOfMonth();
+            for(int i=0;i<lastDate ; i++){
                 changedList.add(0.0);
-            }else {
-                changedList.add(Math.round((goalWeight-weightList.get(i)) * 100) / 100.0);
             }
+            return changedList;
+
         }
+            for (int i = 0; i < weightList.size(); i++) {
+                if (weightList.get(i) == 0.0) {
+                    changedList.add(0.0);
+                } else {
+                    changedList.add(Math.round((weightList.get(i) - goalWeight) * 100) / 100.0);
+                }
+            }
+
         return changedList;
     }
 
@@ -339,6 +349,252 @@ public class ExerciseProvider {
         return returnList;
 
     }
+    /**
+     * 오늘 운동 완료 처리된 루틴들 조회
+     */
+    public List<ExerciseRoutine> getCompleteRoutine() throws BaseException{
+        List<ExerciseRoutine> routineList = new ArrayList<>();
+        try {
+            routineList = exerciseRoutineRepository.findAllByStatusAndAndDone("Y", "Y");
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new BaseException(FAILED_FIND_GET_ROUTINE);
+        }
+        return routineList;
+    }
+
+    /**
+     * 운동 루틴 상세 조회 --> 루틴 수정전에 보여지기 위해
+     */
+    public GetExerciseRoutineRes retrieveRoutineDetailForPatchRoutine(long exerciseId, long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        ExerciseRoutine routine = findRoutine(routineId, exerciseInfo);
+
+        List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
+        List<ExerciseDetailRes> detailResList = new ArrayList<>();
+
+        for( ExerciseRoutineDetail detail: detailList){
+            List<ExerciseDetailSet> setList = detail.getDetailSets();
+            List<ExerciseDetailSetRes> setResList = new ArrayList<>();
+
+            if(detail.getIsSame().equals("Y")){              //전세트 동일
+                ExerciseDetailSetRes setRes = ExerciseDetailSetRes.builder()
+                        .setStr(detail.getSetCount()+"세트")
+                        .weight((setList.get(0).getSetWeight()))
+                        .count(setList.get(0).getSetCount())
+                        .time(setList.get(0).getSetTime())
+                        .build();
+                setResList.add(setRes);
+            }else {                                 //전세트 동일 아님
+                for (int i = 0; i < setList.size(); i++) {
+                    ExerciseDetailSetRes setRes = ExerciseDetailSetRes.builder()
+                            .setStr((i + 1) + "세트")
+                            .weight(setList.get(i).getSetWeight())
+                            .count(setList.get(i).getSetCount())
+                            .time(setList.get(i).getSetTime())
+                            .build();
+                    setResList.add(setRes);
+                }
+            }
+            ExerciseDetailRes detailRes = ExerciseDetailRes.builder()
+                    .exerciseName(detail.getName())
+                    .exerciseType(detail.getRoutineTypeId())
+                    .setCount(detail.getSetCount())
+                    .isSetSame((detail.getIsSame().equals("Y")) ? true: false)
+                    .setDetailList(setResList)
+                    .build();
+            detailResList.add(detailRes);
+        }
+
+
+        GetExerciseRoutineRes exerciseRoutineRes = GetExerciseRoutineRes.builder()
+                .routineName(routine.getName())
+                .bodyPart(routine.getBodyPart())
+                .repeatDay(changeRepeatDayStrtoArrayList(routine.getRepeaDay()))
+                .detailResList(detailResList)
+                .build();
+
+        return exerciseRoutineRes;
+    }
+
+
+
+    /**
+     * 루틴 상세 정보 조회 --> 운동 시작 때 필요
+     */
+    public GetStartExerciseRes retrieveRoutineInfoForStartExercise(long exerciseId, long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+        ExerciseRoutine routine = findRoutine(routineId, exerciseInfo);
+
+        List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
+        List<GetStartExerciseDetailRes> detailResList = new ArrayList<>();
+
+        for( ExerciseRoutineDetail detail: detailList){
+            List<ExerciseDetailSet> setList = detail.getDetailSets();
+            List<GetStartExerciseDetailSetRes> setResList = new ArrayList<>();
+
+            if(detail.getIsSame().equals("Y")){              //전세트 동일
+                setDetailSetToRes(detail, setList, setResList, true,0, detail.getSetCount());
+            }else {                                 //전세트 동일 아님
+                for (int i = 0; i < setList.size(); i++) {
+                    setDetailSetToRes(detail, setList, setResList,false, i, detail.getSetCount());
+
+                }
+            }
+            GetStartExerciseDetailRes detailRes = GetStartExerciseDetailRes.builder()
+                    .exerciseName(detail.getName())
+                    .setInfoList(setResList)
+                    .build();
+            detailResList.add(detailRes);
+        }
+
+
+        GetStartExerciseRes exerciseRoutineRes = GetStartExerciseRes.builder()
+                .routineName(routine.getName())
+                .repeatDay(repeatDayChange(routine.getRepeaDay()))
+                .exerciseList(detailResList)
+                .build();
+
+        return exerciseRoutineRes;
+    }
+
+
+
+    /**
+     * 운동 리포트 조회
+     */
+    public GetExerciseReportRes retrieveExerciseReport(Long exerciseId, Long routineId, String reportDate) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+        ExerciseRoutine routine = findRoutine(routineId, exerciseInfo);
+        if(routine.getDone().equals("N"))
+            throw new BaseException(FAILED_GET_REPORT_DONE);
+
+
+        ExerciseReport report = null;
+        LocalDate date = LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE);
+        for(ExerciseReport r: routine.getReports()){
+            if(r.getDateCreated().toLocalDate().equals(date)){
+                report = r;
+                break;
+            }
+        }
+        if(report == null)
+            throw new BaseException(FAILED_GET_REPORT);
+
+        String[] doneSplit = report.getExerciseStatus().split("#");
+
+        List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
+        List<ReportExercise> exerciseList = new ArrayList<>();
+
+        for( int k=0;k<detailList.size();k++){
+            ExerciseRoutineDetail detail = detailList.get(k);
+            List<ExerciseDetailSet> setList = detail.getDetailSets();
+            List<GetStartExerciseDetailSetRes> setResList = new ArrayList<>();
+
+            if(detail.getIsSame().equals("Y")){              //전세트 동일
+                setDetailSetToRes(detail, setList, setResList, true,0, detail.getSetCount());
+            }else {                                 //전세트 동일 아님
+                for (int i = 0; i < setList.size(); i++) {
+                    setDetailSetToRes(detail, setList, setResList,false, i, detail.getSetCount());
+                }
+            }
+
+            int doneSetInt = Integer.parseInt(doneSplit[k]);
+            int setCount = detail.getSetCount();
+            boolean isDone = (doneSetInt==setCount) ? true:false;
+            String doneOrNone = (isDone)? "완료":"미완";
+            String exerciseStatus = "("+doneSetInt+"/"+setCount+") "+doneOrNone;
+            ReportExercise reportExercise = ReportExercise.builder()
+                    .exerciseName(detail.getName())
+                    .exerciseStatus(exerciseStatus)
+                    .doneSet(Integer.parseInt(doneSplit[k]))
+                    .isDone(isDone)
+                    .setList(setResList)
+                    .build();
+            System.out.println(reportExercise.getExerciseName());
+            exerciseList.add(reportExercise);
+
+        }
+
+        GetExerciseReportRes getExerciseReportRes = GetExerciseReportRes.builder()
+                .totalTime(report.getTotalTime())
+                .reportDate(date.getMonthValue()+"월 "+date.getDayOfMonth()+"일")
+                .exerciseList(exerciseList)
+                .build();
+
+        return getExerciseReportRes;
+    }
+
+
+
+    /***
+     * *****************************************************데이터 정제
+     */
+    /**
+     * 운동 시작을 위한 루틴 조회 --> ExerciseDetailSet 데이터 정제를 위해
+     * @param detail
+     * @param setList
+     * @param setResList
+     * @param index --> -1 이면 전 세트 동일 , 아니면 for문에 돌아가는 i값받아오기
+     * @param setCount --> 총 세트
+     */
+    private void setDetailSetToRes(ExerciseRoutineDetail detail, List<ExerciseDetailSet> setList,
+                                   List<GetStartExerciseDetailSetRes> setResList, boolean isSame,int index, int setCount) {
+        int setCountInt = (isSame == true) ? setCount : index+1;
+        if(detail.getRoutineTypeId() == 1) {
+            String weightStr = Double.toString(setList.get(index).getSetWeight()*10);
+            char lastStr = weightStr.charAt(weightStr.length()-1);
+            String changedWeight = (lastStr == '0') ? setList.get(index).getSetWeight()+"kg" : (setList.get(index).getSetWeight().intValue())+"kg";
+
+            GetStartExerciseDetailSetRes setRes = GetStartExerciseDetailSetRes.builder()
+                    .setCount(setCountInt)
+                    .weight(doubleWeightToString(setList.get(index).getSetWeight()))
+                    .count(setList.get(index).getSetCount()+"개")
+                    .time(-1+"")
+                    .build();
+            setResList.add(setRes);
+        }else if(detail.getRoutineTypeId() ==2){
+            GetStartExerciseDetailSetRes setRes = GetStartExerciseDetailSetRes.builder()
+                    .setCount(setCountInt)
+                    .weight(-1+"")
+                    .count(setList.get(index).getSetCount()+"개")
+                    .time(-1+"")
+                    .build();
+            setResList.add(setRes);
+        }else{
+            GetStartExerciseDetailSetRes setRes = GetStartExerciseDetailSetRes.builder()
+                    .setCount(setCountInt)
+                    .weight(-1+"")
+                    .count(-1+"")
+                    .time(setList.get(index).getSetTime()+"분")
+                    .build();
+            setResList.add(setRes);
+        }
+    }
+    /**
+     * Double형 Weight --> 만약 딱 나눠떨어지는 double이라면 그냥 int형태처럼 return
+     * 4.0 --> 4kg
+     */
+    private String doubleWeightToString(Double weight) {
+        Double weightMulti = weight*10;
+        String weightStr = Integer.toString(weightMulti.intValue());
+        char lastStr = weightStr.charAt(weightStr.length()-1);
+        String changedWeight = (lastStr != '0') ? weight+"kg" : (weight.intValue())+"kg";
+        return changedWeight;
+    }
 
     /**
      * repeatDay String --> 보기 이쁜 String
@@ -381,27 +637,20 @@ public class ExerciseProvider {
 
         return resultStr;
     }
-
     /**
-     * 오늘 운동 완료 처리된 루틴들 조회
+     * repeatDayStr -> ArrayList
      */
-    public List<ExerciseRoutine> getCompleteRoutine() throws BaseException{
-        List<ExerciseRoutine> routineList = new ArrayList<>();
-        try {
-            routineList = exerciseRoutineRepository.findAllByStatusAndAndDone("Y", "Y");
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new BaseException(FAILED_FIND_GET_ROUTINE);
+    public List<Integer> changeRepeatDayStrtoArrayList(String repeatDay){
+        List<Integer> changedList= new ArrayList<>();
+        String[] splitArr = repeatDay.split("#");
+        for(String str: splitArr){
+            changedList.add(Integer.parseInt(str));
         }
-        return routineList;
+
+        return changedList;
     }
-    /**
-         * ExerciseId로 ExerciseInfo Return
-         */
-    public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{
-        return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
-            .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
-    }
+
+
 
     /**
      * 생성 날짜로 exerciseWeightRecord찾기
@@ -410,6 +659,25 @@ public class ExerciseProvider {
        return exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween
                (exerciseId, "Y", targetDate, targetNextDate)
                     .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISE_WEIGHT_RECORD));
+    }
+
+
+
+    /**
+     *RoutineId로 루틴 찾기
+     */
+    @NotNull
+    public ExerciseRoutine findRoutine(long routineId, ExerciseInfo exerciseInfo) throws BaseException {
+        ExerciseRoutine routine = null;
+        for(ExerciseRoutine r: exerciseInfo.getExerciseRoutines()){
+            if(r.getId() == routineId){
+                routine = r;
+                break;
+            }
+        }
+        if(routine == null)
+            throw new BaseException(NOT_FOUND_ROUTINE);
+        return routine;
     }
 
     /**

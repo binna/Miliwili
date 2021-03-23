@@ -41,9 +41,15 @@ public class ExerciseRoutine extends BaseEntity {
     @OneToMany(mappedBy = "exerciseRoutine", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ExerciseRoutineDetail> routineDetails = new ArrayList<>();
 
+    @OneToMany(mappedBy = "exerciseRoutine", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ExerciseReport> reports = new ArrayList<>();
+
     public void addRoutineDetail(ExerciseRoutineDetail detail){
         this.routineDetails.add(detail);
     }
 
+    public void addNewReport(ExerciseReport report){
+        this.reports.add(report);
+    }
 
 }

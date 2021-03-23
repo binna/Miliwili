@@ -227,6 +227,84 @@ public class ExerciseController {
         }
     }
 
+    /**
+     * 루틴 상세정보 조회 -> 루틴 수정을 위한
+     * @return BaseResponse<GetExerciseRoutineRes>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/routines/{routineId}/detail-exercises")
+    public BaseResponse<GetExerciseRoutineRes> getRoutineDetailForPatchRoutine(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                                                               @PathVariable Long routineId){
+        try{
+            GetExerciseRoutineRes resultRoutineRes = exerciseProvider.retrieveRoutineDetailForPatchRoutine(exerciseId,routineId);
+            return new BaseResponse<>(SUCCESS,resultRoutineRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
 
+        }
+    }
 
+    /**
+     * 루틴 상세정보 조회 -> 운동 시작을 위한
+     * @return BaseResponse<GetStartExerciseRes>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/routines/{routineId}/start-exercises")
+    public BaseResponse<GetStartExerciseRes> getRoutineDetailForStartExercise(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                                                               @PathVariable Long routineId){
+        try{
+            GetStartExerciseRes resultRoutineRes = exerciseProvider.retrieveRoutineInfoForStartExercise(exerciseId,routineId);
+            return new BaseResponse<>(SUCCESS,resultRoutineRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+
+        }
+    }
+
+    /**
+     * 운동 리포트 생성
+     * @return BaseResponse<Long>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @PostMapping("/{exerciseId}/routines/{routineId}/reports")
+    public BaseResponse<String> postExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
+                                                                  @RequestBody PostExerciseReportReq param){
+        //TODO : 검증더해야함
+        if(param.getExerciseStatus().length() == 0 || param.getExerciseStatus() == null)
+            return new BaseResponse<>(EMPTY_EXERCISESTATUS);
+        if(param.getTotalTime().length() == 0 || param.getTotalTime() == null)
+            return new BaseResponse<>(EMPTY_TOTALTIME);
+
+        try{
+            String reportId = exerciseService.createExerciseReport(exerciseId,routineId,param);
+            return new BaseResponse<>(SUCCESS, reportId);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 운동리포트 조회
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/routines/{routineId}/reports")
+    public BaseResponse<GetExerciseReportRes> getExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
+                                                                @RequestParam String reportDate){
+        if(!Validation.isRegexDate(reportDate))
+            return new BaseResponse<>(INVALID_DATE);
+
+        try{
+            GetExerciseReportRes reportRes = exerciseProvider.retrieveExerciseReport(exerciseId,routineId,reportDate);
+            return new BaseResponse<>(SUCCESS,reportRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+
+    }
 }

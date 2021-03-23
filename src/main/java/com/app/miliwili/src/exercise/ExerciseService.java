@@ -163,14 +163,14 @@ public class ExerciseService {
             //무게 + 개수
             if (newRoutineDetail.getRoutineTypeId() == 1) {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
-                System.out.println(totalArr[0]);
-                System.out.println(totalArr[1]);
+                validateCountLength(newRoutineDetail, totalArr);
                 for (int j = 0; j < totalArr.length; j++) {
                     String[] weightCount = totalArr[j].split("#");
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
                             .setIdx(j + 1)
                             .setWeight(Double.parseDouble(weightCount[0]))
                             .setCount(Integer.parseInt(weightCount[1]))
+                            .setTime(-1)
                             .exerciseRoutineDetail(newRoutineDetail)
                             .build();
                     //arr추가
@@ -181,10 +181,13 @@ public class ExerciseService {
             // 개수간
             else if (newRoutineDetail.getRoutineTypeId() == 2) {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                validateCountLength(newRoutineDetail, totalArr);
                 for (int j = 0; j < totalArr.length; j++) {
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
                             .setIdx(j + 1)
                             .setCount(Integer.parseInt(totalArr[j]))
+                            .setTime(-1)
+                            .setWeight(-1.0)
                             .exerciseRoutineDetail(newRoutineDetail)
                             .build();
                     //arr추가
@@ -195,10 +198,13 @@ public class ExerciseService {
             //시간
             else {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                validateCountLength(newRoutineDetail, totalArr);
                 for (int j = 0; j < totalArr.length; j++) {
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
                             .setIdx(j + 1)
                             .setTime(Integer.parseInt(totalArr[j]))
+                            .setWeight(-1.0)
+                            .setCount(-1)
                             .exerciseRoutineDetail(newRoutineDetail)
                             .build();
                     //arr추가
@@ -221,6 +227,13 @@ public class ExerciseService {
         System.out.println(exerciseInfo.getExerciseRoutines().get(0).getName());
 
         return newRoutine.getId();
+    }
+
+    private void validateCountLength(ExerciseRoutineDetail newRoutineDetail, String[] totalArr) throws BaseException {
+        if(newRoutineDetail.getIsSame().equals("N")) {
+            if (newRoutineDetail.getSetCount() != totalArr.length)
+                throw new BaseException(INVALID_SETCOUNT);
+        }
     }
 
     /**
@@ -249,6 +262,42 @@ public class ExerciseService {
 
 
         return "\""+routine.getName()+"\""+"루틴이 삭제되었습니다";
+    }
+
+    /**
+     * 운동 리포트 생성
+     */
+    public String createExerciseReport(Long exerciseId, Long routineId, PostExerciseReportReq param) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+        String[] statusSplit = param.getExerciseStatus().split("#");
+        List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
+        if(statusSplit.length != detailList.size())
+            throw new BaseException(FAILED_GET_REPORT_SETSIZE);
+        for(int i=0;i<detailList.size();i++){
+            if(detailList.get(i).getSetCount() < Integer.parseInt(statusSplit[i]))
+                throw new BaseException(FAILED_GET_REPORT_SETCOUNT);
+        }
+
+        ExerciseReport newReport = ExerciseReport.builder()
+                .totalTime(param.getTotalTime())
+                .exerciseStatus(param.getExerciseStatus())
+                .reportText("")
+                .exerciseRoutine(routine)
+                .build();
+        routine.setDone("Y");
+        routine.addNewReport(newReport);
+        try {
+            exerciseRoutineRepository.save(routine);
+        }catch (Exception e){
+            throw new BaseException(FAILED_POST_REPORT);
+        }
+        return "success";
     }
 
 
