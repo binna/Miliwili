@@ -1,34 +1,35 @@
 package com.app.miliwili.src.calendar.models;
 
+import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"plan"})
+@EqualsAndHashCode(callSuper = false, exclude = {"dday"})
 @Data
 @Entity
-@Table(name = "diary")
-public class Diary {
+@Table(name = "ddayWork")
+public class DDayWork extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "date", nullable = false, updatable = false)
-    private LocalDate date;
-
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "content", nullable = false)
     private String content;
 
+    @Builder.Default
+    @Column(name = "processingStatus", nullable = false, columnDefinition = "varchar(1) default 'F'")
+    private String processingStatus = "F";
+
     @ManyToOne
-    @JoinColumn(name = "plan_id", nullable = false)
-    private Plan plan;
+    @JoinColumn(name = "dday_id", nullable = false)
+    private DDay dday;
 
     @Override
     public String toString() {

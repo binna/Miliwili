@@ -5,15 +5,13 @@ import com.app.miliwili.src.calendar.dto.PlanVacationReq;
 import com.app.miliwili.src.calendar.dto.PlanVacationRes;
 import com.app.miliwili.src.calendar.dto.WorkReq;
 import com.app.miliwili.src.calendar.dto.WorkRes;
-import com.app.miliwili.src.calendar.models.Diary;
-import com.app.miliwili.src.calendar.models.Plan;
-import com.app.miliwili.src.calendar.models.PlanVacation;
-import com.app.miliwili.src.calendar.models.ToDoList;
+import com.app.miliwili.src.calendar.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,27 +21,11 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Service
 public class CalendarProvider {
     private final PlanRepository planRepository;
-    private final DiaryRepository diaryRepository;
-    private final ToDoListRepository toDoListRepository;
-
-    /**
-     * 휴가 스케줄 검색
-     *
-     * @param Long userId
-     * @return List<Schedule>
-     * @throws BaseException
-     * @Auther shine
-     */
-//    public List<Plan> retrieveOrdinaryLeaveScheduleByStatusY(Long userId) throws BaseException {
-//        List<Plan> schedules = null;
-//
-//        try {
-//            //schedules = scheduleRepository.findByUser_IdAndDistinctionAndStatusOrderByStartDate(userId, "정기휴가", "Y");
-//            return schedules;
-//        } catch (Exception exception) {
-//            throw new BaseException(FAILED_TO_GET_SCHEDULE);
-//        }
-//    }
+    private final PlanWorkRepository planWorkRepository;
+    private final PlanDiaryRepository diaryRepository;
+    private final DDayRepository ddayRepository;
+    private final DDayWorkRepository ddayWorkRepository;
+    private final DDayDiaryRepository ddayDiaryRepository;
 
     /**
      * planId로 유효한 일정조회
@@ -59,29 +41,54 @@ public class CalendarProvider {
     }
 
     /**
-     * planId로 유효한 일정 다이어리 조회
+     * planId로 일정 다이어리 조회
      *
      * @param diaryId
      * @return Diary
      * @throws BaseException
      */
     @Transactional
-    public Diary retrieveDiaryById(Long diaryId) throws BaseException {
+    public PlanDiary retrieveDiaryById(Long diaryId) throws BaseException {
         return diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_DIARY));
     }
 
     /**
-     * toDoListId로 유효한 할일조회
-     * 
+     * toDoListId로 할일 조회
+     *
      * @param toDoListId
      * @return ToDoList
      * @throws BaseException
      */
     @Transactional
-    public ToDoList retrieveToDoListById(Long toDoListId) throws BaseException {
-        return toDoListRepository.findById(toDoListId)
-                .orElseThrow(() -> new BaseException(NOT_FOUND_TODOLIST));
+    public PlanWork retrieveToDoListById(Long toDoListId) throws BaseException {
+        return planWorkRepository.findById(toDoListId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_WORK));
+    }
+
+    /**
+     * ddayId로 유효한 디데이 조회
+     *
+     * @param ddayId
+     * @return
+     * @throws BaseException
+     */
+    @Transactional
+    public DDay retrieveDDayByIdAndStatusY(Long ddayId) throws BaseException {
+        return ddayRepository.findByIdAndStatus(ddayId, "Y")
+                .orElseThrow(() -> new BaseException(NOT_FOUND_D_DAY));
+    }
+
+    @Transactional
+    public DDayDiary retrieveDDayDiaryById(Long ddayId) throws BaseException {
+        return ddayDiaryRepository.findById(ddayId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_DIARY));
+    }
+
+    @Transactional
+    public DDayWork retrieveDDayWorkById(Long workId) throws BaseException {
+        return ddayWorkRepository.findById(workId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_WORK));
     }
 
 
@@ -94,7 +101,7 @@ public class CalendarProvider {
      * @Auther shine
      */
     public Set<PlanVacation> changeListPlanVacationReqToSetPlanVacation(List<PlanVacationReq> parameters, Plan plan) {
-        if (parameters == null) return null;
+        if (Objects.isNull(parameters)) return null;
 
         return parameters.stream().map(scheduleVacationReq -> {
             return PlanVacation.builder()
@@ -113,7 +120,7 @@ public class CalendarProvider {
      * @Auther shine
      */
     public List<PlanVacationRes> changeSetPlanVacationToListPlanVacationRes(Set<PlanVacation> parameters) {
-        if (parameters == null) return null;
+        if (Objects.isNull(parameters)) return null;
 
         return parameters.stream().map(scheduleVacation -> {
             return PlanVacationRes.builder()
@@ -125,18 +132,18 @@ public class CalendarProvider {
     }
 
     /**
-     * List<WorkReq> -> List<ToDoList> 변경
+     * List<WorkReq> -> List<PlanWork> 변경
      *
      * @param parameters
      * @param plan
      * @return List<ToDoList>
      * @Auther shine
      */
-    public List<ToDoList> changeListWorkReqToListToDoList(List<WorkReq> parameters, Plan plan) {
-        if (parameters == null) return null;
+    public List<PlanWork> changeListWorkReqToListPlanWork(List<WorkReq> parameters, Plan plan) {
+        if (Objects.isNull(parameters)) return null;
 
         return parameters.stream().map(workReq -> {
-            return ToDoList.builder()
+            return PlanWork.builder()
                     .content(workReq.getContent())
                     .plan(plan)
                     .build();
@@ -150,15 +157,56 @@ public class CalendarProvider {
      * @return List<WorkRes>
      * @Auther shine
      */
-    public List<WorkRes> changeListToDoListToListWorkRes(List<ToDoList> parameters) {
-        if (parameters == null) return null;
+    public List<WorkRes> changeListToDoListToListWorkRes(List<PlanWork> parameters) {
+        if (Objects.isNull(parameters)) return null;
 
         return parameters.stream().map(toDoList -> {
             return WorkRes.builder()
-                    .id(toDoList.getId())
+                    .workId(toDoList.getId())
                     .content(toDoList.getContent())
                     .processingStatus(toDoList.getProcessingStatus())
                     .build();
         }).collect(Collectors.toList());
     }
+
+    /**
+     * List<WorkReq> -> List<DDayWork> 변경
+     *
+     * @param parameters
+     * @param dday
+     * @return List<Supplies>
+     * @Auther shine
+     */
+    public List<DDayWork> changeListWorkReqToListDDayWork(List<WorkReq> parameters, DDay dday) {
+        if (Objects.isNull(parameters)) return null;
+
+        return parameters.stream().map(workReq -> {
+            return DDayWork.builder()
+                    .content(workReq.getContent())
+                    .dday(dday)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * List<Supplies> -> List<WorkRes> 변경
+     *
+     * @param parameters
+     * @return List<WorkRes>
+     * @Auther shine
+     */
+    public List<WorkRes> changeListSuppliesToListWorkRes(List<DDayWork> parameters) {
+        if (Objects.isNull(parameters)) return null;
+
+        return parameters.stream().map(supplies -> {
+            return WorkRes.builder()
+                    .workId(supplies.getId())
+                    .content(supplies.getContent())
+                    .processingStatus(supplies.getProcessingStatus())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+
+
 }

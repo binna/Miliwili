@@ -17,5 +17,5 @@ public class PostPlanReq {
     private String push;
     private String pushDeviceToken;
     private List<PlanVacationReq> planVacation;
-    private List<WorkReq> toDoList;
+    private List<WorkReq> work;
 }

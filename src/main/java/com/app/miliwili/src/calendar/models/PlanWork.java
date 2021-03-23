@@ -12,8 +12,8 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = false, exclude = {"plan"})
 @Data
 @Entity
-@Table(name = "toDoList")
-public class ToDoList {
+@Table(name = "planWork")
+public class PlanWork {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

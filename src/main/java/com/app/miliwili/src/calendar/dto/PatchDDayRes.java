@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-public class PostDDayRes {
+public class PatchDDayRes {
     private final Long ddayId;
     private final String ddayType;
     private final String title;
@@ -20,5 +20,5 @@ public class PostDDayRes {
     private final String choiceCalendar;
     private final BigDecimal placeLat;
     private final BigDecimal placeLon;
-    private final List<WorkRes> works;
+    private final List<WorkRes> work;
 }

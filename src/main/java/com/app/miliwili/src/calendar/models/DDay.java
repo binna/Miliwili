@@ -3,27 +3,30 @@ package com.app.miliwili.src.calendar.models;
 import com.app.miliwili.config.BaseEntity;
 import com.app.miliwili.src.user.models.UserInfo;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = {"userInfo", "supplies", "memos"})
 @Data
 @Entity
-@Table(name = "dDay")
+@Table(name = "dday")
 public class DDay extends BaseEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "distinction", nullable = false, length = 10)
-    private String distinction;
+    @Column(name = "ddayType", nullable = false, length = 10)
+    private String ddayType;
 
     @Column(name = "title", nullable = false, length = 30)
     private String title;
@@ -31,11 +34,8 @@ public class DDay extends BaseEntity {
     @Column(name = "subtitle", nullable = false, length = 60)
     private String subtitle;
 
-    @Column(name = "startDay", nullable = false)
-    private LocalDate startDay;
-
-    @Column(name = "endDay", nullable = false)
-    private LocalDate endDay;
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 
     @Builder.Default
     @Column(name = "link", nullable = false, columnDefinition = "varchar(1) default 'N'")
@@ -55,6 +55,17 @@ public class DDay extends BaseEntity {
     @JoinColumn(name = "userInfo_id", nullable = false)
     private UserInfo userInfo;
 
-    @OneToMany(mappedBy = "dDay", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<Supplies> supplies;
+    @OrderBy("id asc")
+    @OneToMany(mappedBy = "dday", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<DDayWork> ddayWorks;
+
+    @OrderBy("date asc")
+    @OneToMany(mappedBy = "dday", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<DDayDiary> ddayDiaries;
+
+    @Override
+    public String toString() {
+        return ToStringBuilder
+                .reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 }
