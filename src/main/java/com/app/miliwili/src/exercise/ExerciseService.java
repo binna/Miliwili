@@ -1,10 +1,7 @@
 package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.exercise.dto.PatchExerciseGoalWeight;
-import com.app.miliwili.src.exercise.dto.PostExerciseFirstWeightReq;
-import com.app.miliwili.src.exercise.dto.PostExerciseRoutineReq;
-import com.app.miliwili.src.exercise.dto.PostExerciseWeightReq;
+import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.UserInfo;
@@ -14,7 +11,11 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -83,6 +84,27 @@ public class ExerciseService {
     }
 
     /**
+     * 데일리 몸무게 수정
+     */
+    public String modifyDailyWeight(PatchExerciseDailyWeightReq param, long exerciseId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        LocalDateTime targetDate = LocalDateTime.parse(param.getDayDate()+"T00:00:00");
+        LocalDateTime targetNextDate = LocalDateTime.parse((param.getDayDate()+"T23:59:59"));
+
+        ExerciseWeightRecord targetWeightRecord = exerciseProvider.getExerciseWiehgtRecord(exerciseId, targetDate,targetNextDate);
+        targetWeightRecord.setWeight(param.getDayWeight());
+
+        exerciseRepository.save(exerciseInfo);
+
+        return param.getDayWeight()+"kg으로 수정되었습니다.";
+    }
+
+    /**
      * 목표 몸무게 수정
      */
     public String modifyGoalWeight(PatchExerciseGoalWeight param, long exerciseId) throws BaseException{
@@ -104,13 +126,12 @@ public class ExerciseService {
     }
 
     /**
-     *
+     *루틴 만들기
      *
      */
-    public String createRoutine(PostExerciseRoutineReq param, long exerciseId) throws BaseException {
+    public Long createRoutine(PostExerciseRoutineReq param, long exerciseId) throws BaseException {
         ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
 
-        System.out.println("exerciseIduserId:"+exerciseInfo.getUser().getId()+"jwt Id"+jwtService.getUserId());
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(INVALID_USER);
         }
@@ -191,12 +212,52 @@ public class ExerciseService {
         exerciseInfo.addExerciseRoutine(newRoutine);
 
         try {
-            exerciseRepository.save(exerciseInfo);
+            //exerciseRepository.save(exerciseInfo);
+            //이게 문제가 될까????
+            exerciseRoutineRepository.save(newRoutine);
         }catch (Exception e){
-            e.printStackTrace();
-//            throw new BaseException()
+            throw new BaseException(FAILED_PATCH_DAILY_WEIGHT);
         }
-        return "yes!";
+        System.out.println(exerciseInfo.getExerciseRoutines().get(0).getName());
+
+        return newRoutine.getId();
+    }
+
+    /**
+     * 루틴 삭제
+     */
+    public String deleteRoutine(long exerciseId, long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
+            throw new BaseException(INVALID_USER);
+        }
+        List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
+        ExerciseRoutine routine = null;
+        int i=0;
+        for(i=0;i<routineList.size();i++){
+            if(routineList.get(i).getId() == routineId){
+                routine = routineList.get(i);
+            }
+        }
+        if(i == routineList.size()-1 || routine == null)
+            throw new BaseException(FAILED_FIND_DELETE_ROUTINE);
+
+        routine.setExerciseInfo(null);
+
+        exerciseInfo.getExerciseRoutines().remove(routine);
+        exerciseRoutineRepository.delete(routine);
+
+
+        return "\""+routine.getName()+"\""+"루틴이 삭제되었습니다";
+    }
+
+
+    /**
+     * 운동 안한상태로 초기화
+     */
+    public void resetRoutineDone(ExerciseRoutine routine){
+        routine.setDone("N");
+        exerciseRoutineRepository.save(routine);
     }
 
 

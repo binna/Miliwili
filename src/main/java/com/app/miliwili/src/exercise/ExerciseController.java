@@ -3,10 +3,12 @@ package com.app.miliwili.src.exercise;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.src.exercise.dto.*;
+import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -62,6 +64,28 @@ public class ExerciseController {
     }
 
     /**
+     * daily 체중 수정
+     * @return BaseResponse<String>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @PatchMapping("/{exerciseId}/weights")
+    public BaseResponse<String> patchDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PatchExerciseDailyWeightReq param,
+                                                 @PathVariable Long exerciseId){
+        if(!Validation.isRegexDate(param.getDayDate())){
+            return new BaseResponse<>(INVALID_MODIFY_DATE);
+        }
+
+        try{
+            String resultStr = exerciseService.modifyDailyWeight(param,exerciseId);
+            return new BaseResponse<>(SUCCESS,resultStr);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
      * 목표체중 수정
      * @return BaseResponse<String>
      * @RequestHeader X-ACCESS-TOKEN
@@ -100,24 +124,6 @@ public class ExerciseController {
         }
     }
 
-    /**
-     * 루틴 생성
-     * @return BaseResponse<String>
-     * @RequestHeader X-ACCESS-TOKEN
-     * @Auther vivi
-     */
-    @ResponseBody
-    @PostMapping("/{exerciseId}/routines")
-    public BaseResponse<String> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
-                                             @RequestBody PostExerciseRoutineReq param){
-        try{
-            String result = exerciseService.createRoutine(param,exerciseId);
-            return new BaseResponse<>(SUCCESS,result);
-        }catch (BaseException e){
-            e.printStackTrace();
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
 
     /**
      * 체중 기록 조회
@@ -142,6 +148,85 @@ public class ExerciseController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    /**
+     * 루틴 생성
+     * @return BaseResponse<String>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @PostMapping("/{exerciseId}/routines")
+    public BaseResponse<Long> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                           @RequestBody PostExerciseRoutineReq param){
+        try{
+            Long resultLong = exerciseService.createRoutine(param,exerciseId);
+            System.out.println(resultLong);
+            return new BaseResponse<>(SUCCESS,resultLong);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 전체 루틴 조회
+     * @return BaseResponse<MyRoutineInfo>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/all-routines")
+    public BaseResponse<List<MyRoutineInfo>> getMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId){
+        try{
+            List<MyRoutineInfo> myAllRoutineList = exerciseProvider.retrieveAllRoutineList(exerciseId);
+            return new BaseResponse<>(SUCCESS, myAllRoutineList);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+
+    /**
+     * 루틴 삭제
+     * @return BaseResponse<MyRoutineInfo>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @DeleteMapping("/{exerciseId}/routines/{routineId}")
+    public BaseResponse<String> deleteMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                                              @PathVariable Long routineId){
+        try{
+            String resultStr = exerciseService.deleteRoutine(exerciseId,routineId);
+            return new BaseResponse<>(SUCCESS, resultStr);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+
+    /**
+     * 특정 날짜의 루틴 조회
+     * @return BaseResponse<MyRoutineInfo>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/routines")
+    public BaseResponse<List<RoutineInfo>> getMyDateRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                                       @RequestParam String targetDate){
+        if(!Validation.isRegexDate(targetDate)){
+            return new BaseResponse<>(INVALID_MODIFY_DATE);
+        }
+        try{
+            List<RoutineInfo> resultList = exerciseProvider.retrieveDateRoutine(exerciseId, targetDate);
+            return new BaseResponse<>(SUCCESS, resultList);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
 
 
 }

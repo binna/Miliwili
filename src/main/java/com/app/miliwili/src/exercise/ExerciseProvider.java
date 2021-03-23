@@ -1,11 +1,11 @@
 package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.exercise.dto.GetExerciseDailyWeightRes;
-import com.app.miliwili.src.exercise.dto.GetExerciseWeightRecordReq;
-import com.app.miliwili.src.exercise.dto.GetExerciseWeightRecordRes;
+import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.ExerciseInfo;
+import com.app.miliwili.src.exercise.model.ExerciseRoutine;
 import com.app.miliwili.src.exercise.model.ExerciseWeightRecord;
+import com.app.miliwili.src.exercise.model.QExerciseRoutine;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.utils.JwtService;
 import io.jsonwebtoken.Jwt;
@@ -16,8 +16,11 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,7 @@ public class ExerciseProvider {
     private final ExerciseSelectRepository exerciseSelectRepository;
     private final ExerciseRepository exerciseRepository;
     private final ExerciseWeightRepository exerciseWeightRepository;
+    private final ExerciseRoutineRepository exerciseRoutineRepository;
     private final JwtService jwtService;
 
 
@@ -276,12 +280,136 @@ public class ExerciseProvider {
     }
 
 
-        /**
+    /**
+     * 사용자의 전체 루틴 조회
+     */
+    public List<MyRoutineInfo> retrieveAllRoutineList(long exerciseId) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
+            throw new BaseException(INVALID_USER);
+        }
+
+        List<ExerciseRoutine> routineList= exerciseInfo.getExerciseRoutines();
+        List<MyRoutineInfo> myAllRoutines = new ArrayList<>();
+        for(int i=0; i< routineList.size(); i++){
+            ExerciseRoutine routine = routineList.get(i);
+            MyRoutineInfo myRoutineInfo = MyRoutineInfo.builder()
+                    .routineName(routine.getName())
+                    .routineRepeatDay(repeatDayChange(routine.getRepeaDay()))
+                    .routineId(routine.getId())
+                    .build();
+            myAllRoutines.add(myRoutineInfo);
+        }
+        return myAllRoutines;
+    }
+
+    /**
+     * 특정 날짜 routine조회
+     */
+    public List<RoutineInfo> retrieveDateRoutine(long exerciseId, String targetDate) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
+        List<RoutineInfo> returnList = new ArrayList<>();
+
+        LocalDate target = LocalDate.parse(targetDate, DateTimeFormatter.ISO_DATE);
+        String dayofWeekStr = Integer.toString(target.getDayOfWeek().getValue());
+        System.out.println("toododododydyaya"+dayofWeekStr);
+        //1:일 2:월 3:화 4:수 5:목 6:금 7:토
+
+        for(int i=0;i<routineList.size();i++){
+            ExerciseRoutine routine = routineList.get(i);
+
+            if(routine.getRepeaDay().contains(dayofWeekStr) || routine.getRepeaDay().equals("8")){
+                RoutineInfo routineInfo = RoutineInfo.builder()
+                        .routineName(routine.getName())
+                        .routineRepeatDay(repeatDayChange(routine.getRepeaDay()))
+                        .isDoneRoutine((routine.getDone().equals("Y")) ? true : false)
+                        .routineId(routine.getId())
+                        .build();
+                returnList.add(routineInfo);
+            }
+        }
+
+        return returnList;
+
+    }
+
+    /**
+     * repeatDay String --> 보기 이쁜 String
+     */
+    public String repeatDayChange(String str){
+        String[] arr = str.split("#");
+        String changedStr = "";
+        for(int j=0;j<arr.length;j++){
+            switch (arr[j]){
+                case "1":
+                    changedStr+="월,";
+                    break;
+                case "2":
+                    changedStr+="화,";
+                    break;
+                case "3":
+                    changedStr+="수,";
+                    break;
+                case "4":
+                    changedStr+="목,";
+                    break;
+                case "5":
+                    changedStr+="금,";
+                    break;
+                case "6":
+                    changedStr+="토,";
+                    break;
+                case "7":
+                    changedStr+="일,";
+                    break;
+                case "8":
+                    changedStr+="매일,";
+                    break;
+                default:
+                    break;
+
+            }
+        }
+        String resultStr = changedStr.substring(0,changedStr.length()-1);
+
+        return resultStr;
+    }
+
+    /**
+     * 오늘 운동 완료 처리된 루틴들 조회
+     */
+    public List<ExerciseRoutine> getCompleteRoutine() throws BaseException{
+        List<ExerciseRoutine> routineList = new ArrayList<>();
+        try {
+            routineList = exerciseRoutineRepository.findAllByStatusAndAndDone("Y", "Y");
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new BaseException(FAILED_FIND_GET_ROUTINE);
+        }
+        return routineList;
+    }
+    /**
          * ExerciseId로 ExerciseInfo Return
          */
     public ExerciseInfo getExerciseInfo(long exerciseId) throws BaseException{
         return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
             .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
+    }
+
+    /**
+     * 생성 날짜로 exerciseWeightRecord찾기
+     */
+    public ExerciseWeightRecord getExerciseWiehgtRecord(long exerciseId, LocalDateTime targetDate, LocalDateTime targetNextDate) throws BaseException{
+       return exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween
+               (exerciseId, "Y", targetDate, targetNextDate)
+                    .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISE_WEIGHT_RECORD));
     }
 
     /**
