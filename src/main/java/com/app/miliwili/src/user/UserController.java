@@ -114,6 +114,9 @@ public class UserController {
         if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
             return new BaseResponse<>(EMPTY_NAME);
         }
+        if (parameters.getName().length() >= 20) {
+            return new BaseResponse<>(EXCEED_MAX20);
+        }
         if (Objects.isNull(parameters.getStateIdx())) {
             return new BaseResponse<>(EMPTY_STATEIDX);
         }
@@ -122,6 +125,9 @@ public class UserController {
         }
         if (Objects.isNull(parameters.getServeType()) || parameters.getServeType().length() == 0) {
             return new BaseResponse<>(EMPTY_SERVE_TYPE);
+        }
+        if (parameters.getServeType().length() >= 10) {
+            return new BaseResponse<>(EXCEED_MAX10);
         }
         if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
             return new BaseResponse<>(EMPTY_START_DATE);
@@ -196,6 +202,9 @@ public class UserController {
         if (Objects.isNull(parameters.getSocialType()) || parameters.getSocialType().length() == 0) {
             return new BaseResponse<>(EMPTY_SOCIAL_TYPE);
         }
+        if(!(parameters.getSocialType().equals("K") && parameters.getSocialType().equals("G"))) {
+            return new BaseResponse<>(INVALID_SOCIAL_TYPE);
+        }
 
         try {
             PostSignUpRes postSignUpRes = userService.createUser(parameters, token);
@@ -222,6 +231,9 @@ public class UserController {
         if(Objects.nonNull(parameters.getName()) || Objects.nonNull(parameters.getBirthday())) {
             if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
                 return new BaseResponse<>(EMPTY_NAME);
+            }
+            if (parameters.getServeType().length() >= 10) {
+                return new BaseResponse<>(EXCEED_MAX10);
             }
             if (Objects.isNull(parameters.getBirthday()) || parameters.getBirthday().length() == 0) {
                 return new BaseResponse<>(EMPTY_BIRTHDAY);
