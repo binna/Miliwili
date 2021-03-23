@@ -370,7 +370,7 @@ public class UserController {
      */
     @ApiOperation(value = "휴가 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PostMapping("/users/vacation")
+    @PostMapping("/users/vacations")
     public BaseResponse<PostVacationRes> postVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                       @RequestBody(required = false) PostVacationReq parameters) {
         if (Objects.isNull(parameters.getVacationType()) || parameters.getVacationType().length() == 0) {
@@ -401,11 +401,12 @@ public class UserController {
      * @return BaseResponse<PatchVacationRes>
      * @RequestBody PatchVacationReq parameters
      * @RequestHeader X-ACCESS-TOKEN
+     * @PathVariable Long vacationId
      * @Auther shine
      */
     @ApiOperation(value = "정기휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @PatchMapping("/users/vacation/{vacationId}")
+    @PatchMapping("/users/vacations/{vacationId}")
     public BaseResponse<PatchVacationRes> updateVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                          @RequestBody(required = false) PatchVacationReq parameters,
                                                          @PathVariable Long vacationId) {
@@ -437,12 +438,12 @@ public class UserController {
      * [DELETE] /app/users/vacation/:vacationId
      *
      * @return BaseResponse<Void>
-     * @PathVariable Long vacationId
      * @RequestHeader X-ACCESS-TOKEN
+     * @PathVariable Long vacationId
      * @Auther shine
      */
     @ApiOperation(value = "정기휴가 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
-    @DeleteMapping("/users/vacation/{vacationId}")
+    @DeleteMapping("/users/vacations/{vacationId}")
     public BaseResponse<Void> deleteVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
                                              @PathVariable Long vacationId) {
         try {
@@ -453,20 +454,6 @@ public class UserController {
         }
     }
 
-//    /**
-//     * @param token
-//     * @return
-//     */
-//    @ApiOperation(value = "정기휴가 조회", notes = "X-ACCESS-TOKEN jwt 필요")
-//    @GetMapping("/users/ordinary-leaves")
-//    public BaseResponse<List<GetLeaveRes>> getOrdinaryLeave(@RequestHeader("X-ACCESS-TOKEN") String token) {
-//        try {
-//            List<GetLeaveRes> LeaveRes = userProvider.retrieve();
-//            return new BaseResponse<>(SUCCESS, LeaveRes);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
 
 
     /**

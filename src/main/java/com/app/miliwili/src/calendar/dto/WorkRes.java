@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class WorkRes {
-    private final Long id;
+    private final Long workId;
     private final String content;
     private final String processingStatus;
 }

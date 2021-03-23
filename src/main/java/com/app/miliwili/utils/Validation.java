@@ -1,5 +1,7 @@
 package com.app.miliwili.utils;
 
+import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +22,15 @@ public class Validation {
         return isEmpty;
     }
 
+    public static BigDecimal isBigDecimal(BigDecimal parameter) {
+        if (Objects.isNull(parameter)) return null;
 
+        return parameter;
+    }
 
+    public static String isString(String parameter) {
+        if (Objects.isNull(parameter)) return null;
 
+        return parameter;
+    }
 }

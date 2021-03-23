@@ -4,17 +4,18 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PatchPlanReq {
-    private String color;
+public class PatchDDayReq {
     private String title;
-    private String startDate;
-    private String endDate;
-    private String push;
-    private String pushDeviceToken;
-    private List<PlanVacationReq> planVacation;
+    private String subTitle;
+    private String date;
+    private String link;
+    private String choiceCalendar;
+    private BigDecimal placeLat;
+    private BigDecimal placeLon;
     private List<WorkReq> work;
 }

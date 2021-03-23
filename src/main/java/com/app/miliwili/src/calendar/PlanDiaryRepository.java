@@ -1,8 +1,8 @@
 package com.app.miliwili.src.calendar;
 
-import com.app.miliwili.src.calendar.models.ToDoList;
+import com.app.miliwili.src.calendar.models.PlanDiary;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ToDoListRepository extends CrudRepository<ToDoList, Long> {;}
+public interface PlanDiaryRepository extends CrudRepository<PlanDiary, Long> {;}

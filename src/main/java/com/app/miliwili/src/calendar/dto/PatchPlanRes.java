@@ -18,5 +18,5 @@ public class PatchPlanRes {
     private final String endDate;
     private final String push;
     private final List<PlanVacationRes> planVacation;
-    private final List<WorkRes> toDoList;
+    private final List<WorkRes> work;
 }

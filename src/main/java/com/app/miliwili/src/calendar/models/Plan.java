@@ -52,7 +52,7 @@ public class Plan extends BaseEntity {
 
     @OrderBy("id asc")
     @OneToMany(mappedBy = "plan", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<ToDoList> toDoLists;
+    private List<PlanWork> planWorks;
 
     @OrderBy("id asc")
     @OneToMany(mappedBy = "plan", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -60,7 +60,7 @@ public class Plan extends BaseEntity {
 
     @OrderBy("date asc")
     @OneToMany(mappedBy = "plan", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Diary> diaries;
+    private Set<PlanDiary> planDiaries;
 
     @Override
     public String toString() {
