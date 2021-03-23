@@ -10,6 +10,7 @@ import io.jsonwebtoken.Jwt;
 import io.swagger.models.auth.In;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.jni.Local;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
@@ -368,17 +369,7 @@ public class ExerciseProvider {
             throw new BaseException(INVALID_USER);
         }
 
-        ExerciseRoutine routine = null;
-        for(ExerciseRoutine r: exerciseInfo.getExerciseRoutines()){
-            if(r.getId() == routineId){
-                routine = r;
-                break;
-            }
-        }
-        if(routine == null)
-            throw new BaseException(NOT_FOUND_ROUTINE);
-//        if(routine.getId() == routineId)
-//            throw new BaseException(NOT_FOUND_ROUTINE);
+        ExerciseRoutine routine = findRoutine(routineId, exerciseInfo);
 
         List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
         List<ExerciseDetailRes> detailResList = new ArrayList<>();
@@ -427,6 +418,100 @@ public class ExerciseProvider {
         return exerciseRoutineRes;
     }
 
+
+
+    /**
+     * 루틴 상세 정보 조회 --> 운동 시작 때 필요
+     */
+    public GetStartExerciseRes retrieveRoutineInfoForStartExercise(long exerciseId, long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+        ExerciseRoutine routine = findRoutine(routineId, exerciseInfo);
+
+        List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
+        List<GetStartExerciseDetailRes> detailResList = new ArrayList<>();
+
+        for( ExerciseRoutineDetail detail: detailList){
+            List<ExerciseDetailSet> setList = detail.getDetailSets();
+            List<GetStartExerciseDetailSetRes> setResList = new ArrayList<>();
+
+            if(detail.getIsSame().equals("Y")){              //전세트 동일
+                setDetailSetToRes(detail, setList, setResList, true,0, detail.getSetCount());
+            }else {                                 //전세트 동일 아님
+                for (int i = 0; i < setList.size(); i++) {
+                    setDetailSetToRes(detail, setList, setResList,false, i, detail.getSetCount());
+
+                }
+            }
+            GetStartExerciseDetailRes detailRes = GetStartExerciseDetailRes.builder()
+                    .exerciseName(detail.getName())
+                    .setInfoList(setResList)
+                    .build();
+            detailResList.add(detailRes);
+        }
+
+
+        GetStartExerciseRes exerciseRoutineRes = GetStartExerciseRes.builder()
+                .routineName(routine.getName())
+                .repeatDay(repeatDayChange(routine.getRepeaDay()))
+                .exerciseList(detailResList)
+                .build();
+
+        return exerciseRoutineRes;
+    }
+
+    /**
+     * 운동 시작을 위한 루틴 조회 --> ExerciseDetailSet 데이터 정제를 위해
+     * @param detail
+     * @param setList
+     * @param setResList
+     * @param index --> -1 이면 전 세트 동일 , 아니면 for문에 돌아가는 i값받아오기
+     * @param setCount --> 총 세트
+     */
+    private void setDetailSetToRes(ExerciseRoutineDetail detail, List<ExerciseDetailSet> setList,
+                                       List<GetStartExerciseDetailSetRes> setResList, boolean isSame,int index, int setCount) {
+        int setCountInt = (isSame == true) ? setCount : index+1;
+        if(detail.getRoutineTypeId() == 1) {
+            String weightStr = Double.toString(setList.get(index).getSetWeight()*10);
+            char lastStr = weightStr.charAt(weightStr.length()-1);
+            String changedWeight = (lastStr == '0') ? setList.get(index).getSetWeight()+"kg" : (setList.get(index).getSetWeight().intValue())+"kg";
+
+            GetStartExerciseDetailSetRes setRes = GetStartExerciseDetailSetRes.builder()
+                    .setCount(setCountInt)
+                    .weight(doubleWeightToString(setList.get(index).getSetWeight()))
+                    .count(setList.get(index).getSetCount()+"개")
+                    .time(-1+"")
+                    .build();
+            setResList.add(setRes);
+        }else if(detail.getRoutineTypeId() ==2){
+            GetStartExerciseDetailSetRes setRes = GetStartExerciseDetailSetRes.builder()
+                    .setCount(setCountInt)
+                    .weight(-1+"")
+                    .count(setList.get(index).getSetCount()+"개")
+                    .time(-1+"")
+                    .build();
+            setResList.add(setRes);
+        }else{
+            GetStartExerciseDetailSetRes setRes = GetStartExerciseDetailSetRes.builder()
+                    .setCount(setCountInt)
+                    .weight(-1+"")
+                    .count(-1+"")
+                    .time(setList.get(index).getSetTime()+"분")
+                    .build();
+            setResList.add(setRes);
+        }
+    }
+
+    private String doubleWeightToString(Double weight) {
+        Double weightMulti = weight*10;
+        String weightStr = Integer.toString(weightMulti.intValue());
+        char lastStr = weightStr.charAt(weightStr.length()-1);
+        String changedWeight = (lastStr != '0') ? weight+"kg" : (weight.intValue())+"kg";
+        return changedWeight;
+    }
 
     /***
      * *****************************************************데이터 정제
@@ -495,6 +580,23 @@ public class ExerciseProvider {
        return exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween
                (exerciseId, "Y", targetDate, targetNextDate)
                     .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISE_WEIGHT_RECORD));
+    }
+
+    /**
+     *RoutineId로 루틴 찾기
+     */
+    @NotNull
+    private ExerciseRoutine findRoutine(long routineId, ExerciseInfo exerciseInfo) throws BaseException {
+        ExerciseRoutine routine = null;
+        for(ExerciseRoutine r: exerciseInfo.getExerciseRoutines()){
+            if(r.getId() == routineId){
+                routine = r;
+                break;
+            }
+        }
+        if(routine == null)
+            throw new BaseException(NOT_FOUND_ROUTINE);
+        return routine;
     }
 
     /**

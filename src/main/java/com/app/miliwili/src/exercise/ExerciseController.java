@@ -246,5 +246,23 @@ public class ExerciseController {
         }
     }
 
+    /**
+     * 루틴 상세정보 조회 -> 운동 시작을 위한
+     * @return BaseResponse<GetStartExerciseRes>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/routines/{routineId}/start-exercises")
+    public BaseResponse<GetStartExerciseRes> getRoutineDetailForStartExercise(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                                                               @PathVariable Long routineId){
+        try{
+            GetStartExerciseRes resultRoutineRes = exerciseProvider.retrieveRoutineInfoForStartExercise(exerciseId,routineId);
+            return new BaseResponse<>(SUCCESS,resultRoutineRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+
+        }
+    }
 
 }
