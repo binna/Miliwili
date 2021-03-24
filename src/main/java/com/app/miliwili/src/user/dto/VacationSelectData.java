@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class VacationSelectDate {
+public class VacationSelectData {
     private final Long id;
     private final String title;
     private final Integer useDays;

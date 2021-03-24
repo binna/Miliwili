@@ -142,6 +142,7 @@ public enum BaseResponseStatus {
     NOT_FOUND_VACATION_PLAN(false, 3041, "일정에 등록된 휴가가 없습니다."),
     FAILED_TO_GET_VACATION_PLAN(false, 3042, "일정에 등록된 휴가 조회에 실패했습니다."),
     SET_VACATION_PLAN(false, 3043, "기본 휴가 세팅에 실패하였습니다."),
+    SET_DIARY(false, 3043, "기본 다이어리 세팅에 실패하였습니다."),
 
 
 

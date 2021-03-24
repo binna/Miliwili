@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,6 +60,7 @@ public class CalendarService {
 
         try {
             Plan savedPlan = planRepository.save(newPlan);
+            setPlanDiaryData(newPlan);
             return PostPlanRes.builder()
                     .planId(savedPlan.getId())
                     .color(savedPlan.getColor())
@@ -72,6 +75,23 @@ public class CalendarService {
         } catch (Exception exception) {
             exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_PLAN);
+        }
+    }
+
+    private void setPlanDiaryData(Plan plan) {
+        List<PlanDiary> diaryList = new ArrayList<>();
+
+        int day =  (int) ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate());
+        LocalDate targetDate = plan.getStartDate();
+
+        for(int i = 0; i <= day; i++) {
+            diaryList.add(PlanDiary.builder().date(targetDate).plan(plan).build());
+            targetDate = targetDate.plusDays(1);
+        }
+        try {
+            planDiaryRepository.saveAll(diaryList);
+        } catch (Exception exception) {
+            new BaseException(SET_DIARY);
         }
     }
 
@@ -157,45 +177,6 @@ public class CalendarService {
         }
     }
 
-
-    /**
-     * 일정 다이어리 생성
-     *
-     * @param parameters
-     * @param planId
-     * @return PostDiaryRes
-     * @throws BaseException
-     * @Auther shine
-     */
-    @Transactional
-    public PostDiaryRes createPlanDiary(PostDiaryReq parameters, Long planId) throws BaseException {
-        Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
-
-        PlanDiary newDiary = PlanDiary.builder()
-                .date(LocalDate.parse(parameters.getDate(), DateTimeFormatter.ISO_DATE))
-                .content(parameters.getContent())
-                .plan(plan)
-                .build();
-
-        if (plan.getUserInfo().getId() != jwtService.getUserId()) {
-            throw new BaseException(DO_NOT_AUTH_USER);
-        }
-
-        checkDate(plan, parameters.getDate());
-
-        try {
-            PlanDiary savedDiary = planDiaryRepository.save(newDiary);
-            return PostDiaryRes.builder()
-                    .diaryId(savedDiary.getId())
-                    .date(savedDiary.getDate().format(DateTimeFormatter.ISO_DATE))
-                    .title(savedDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
-                    .content(savedDiary.getContent())
-                    .build();
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_DIARY);
-        }
-    }
-
     /**
      * 일정 다이어리 수정
      *
@@ -206,7 +187,7 @@ public class CalendarService {
      * @Auther shine
      */
     @Transactional
-    public PatchDiaryRes updatePlanDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
+    public DiaryRes updatePlanDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
         PlanDiary diary = calendarProvider.retrievePlanDiaryById(diaryId);
 
         if (diary.getPlan().getUserInfo().getId() != jwtService.getUserId()) {
@@ -217,7 +198,7 @@ public class CalendarService {
 
         try {
             PlanDiary savedDiary = planDiaryRepository.save(diary);
-            return PatchDiaryRes.builder()
+            return DiaryRes.builder()
                     .diaryId(savedDiary.getId())
                     .date(savedDiary.getDate().format(DateTimeFormatter.ISO_DATE))
                     .title(savedDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
@@ -225,28 +206,6 @@ public class CalendarService {
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_PATCH_DIARY);
-        }
-    }
-
-    /**
-     * 일정 다이어리 삭제
-     *
-     * @param diaryId
-     * @throws BaseException
-     * @Auther shine
-     */
-    @Transactional
-    public void deletePlanDiary(Long diaryId) throws BaseException {
-        PlanDiary diary = calendarProvider.retrievePlanDiaryById(diaryId);
-
-        if (diary.getPlan().getUserInfo().getId() != jwtService.getUserId()) {
-            throw new BaseException(DO_NOT_AUTH_USER);
-        }
-
-        try {
-            planDiaryRepository.delete(diary);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_DELETE_DIARY);
         }
     }
 
@@ -416,7 +375,7 @@ public class CalendarService {
      * @throws BaseException
      */
     @Transactional
-    public PostDiaryRes createDDayDiary(PostDiaryReq parameters, Long ddayId) throws BaseException {
+    public DiaryRes createDDayDiary(PostDiaryReq parameters, Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
 
         DDayDiary newMemo = DDayDiary.builder()
@@ -437,7 +396,7 @@ public class CalendarService {
 
         try {
             DDayDiary savedMemo = ddayDiaryRepository.save(newMemo);
-            return PostDiaryRes.builder()
+            return DiaryRes.builder()
                     .diaryId(savedMemo.getId())
                     .date(savedMemo.getDate().format(DateTimeFormatter.ISO_DATE))
                     .title(savedMemo.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
@@ -457,7 +416,7 @@ public class CalendarService {
      * @throws BaseException
      */
     @Transactional
-    public PatchDiaryRes updateDDayDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
+    public DiaryRes updateDDayDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
         DDayDiary diary = calendarProvider.retrieveDDayDiaryById(diaryId);
 
         if (diary.getDday().getUserInfo().getId() != jwtService.getUserId()) {
@@ -468,7 +427,7 @@ public class CalendarService {
 
         try {
             DDayDiary savedDiary = ddayDiaryRepository.save(diary);
-            return PatchDiaryRes.builder()
+            return DiaryRes.builder()
                     .diaryId(savedDiary.getId())
                     .date(savedDiary.getDate().format(DateTimeFormatter.ISO_DATE))
                     .title(savedDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))

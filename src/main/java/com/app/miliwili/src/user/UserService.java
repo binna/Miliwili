@@ -144,7 +144,7 @@ public class UserService {
      * @Auther shine
      */
     @Transactional
-    public PatchUserRes updateUser(PatchUserReq parameters) throws BaseException {
+    public UserRes updateUser(PatchUserReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         if (Objects.nonNull(parameters.getName())) {
@@ -182,7 +182,7 @@ public class UserService {
         try {
             UserInfo savedUser = userRepository.save(user);
             if (Objects.nonNull(savedUser.getNormalPromotionState())) {
-                return PatchUserRes.builder()
+                return UserRes.builder()
                         .userId(savedUser.getId())
                         .name(savedUser.getName())
                         .birthday(savedUser.getBirthday().format(DateTimeFormatter.ISO_DATE))
@@ -199,7 +199,7 @@ public class UserService {
                         .goal(savedUser.getGoal())
                         .build();
             }
-            return PatchUserRes.builder()
+            return UserRes.builder()
                     .userId(savedUser.getId())
                     .name(savedUser.getName())
                     .birthday(savedUser.getBirthday().format(DateTimeFormatter.ISO_DATE))
@@ -372,9 +372,9 @@ public class UserService {
         Vacation vacation1 = Vacation.builder().title("정기휴가").userInfo(user).totalDays(24).build();
         Vacation vacation2 = Vacation.builder().title("포상휴가").userInfo(user).totalDays(15).build();
         Vacation vacation3 = Vacation.builder().title("기타휴가").userInfo(user).totalDays(0).build();
-        final List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3);
 
         try {
+            List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3);
             vacationRepository.saveAll(leaveList);
         } catch (Exception exception) {
             throw new BaseException(SET_VACATION_PLAN);

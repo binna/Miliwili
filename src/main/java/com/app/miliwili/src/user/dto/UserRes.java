@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class PatchUserRes {
+public class UserRes {
     private final Long userId;
     private final String name;
     private final String profileImg;
