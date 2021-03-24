@@ -5,6 +5,7 @@ import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
+import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -151,12 +152,12 @@ public class UserProvider {
      */
     public List<VacationRes> getVacation() throws BaseException{
         try {
-            List<VacationSelectDate> vacation = vacationSelectRepository.findVacationByUserIdAndStatusY(jwtService.getUserId());
-            return vacation.stream().map(vacationSelectDate -> {
+            List<VacationSelectDate> vacations = vacationSelectRepository.findVacationByUserIdAndStatusY(jwtService.getUserId());
+            return vacations.stream().map(vacationSelectDate -> {
                 return VacationRes.builder()
                         .vacationId(vacationSelectDate.getId())
                         .title(vacationSelectDate.getTitle())
-                        .useDays(vacationSelectDate.getUseDays() + vacationSelectDate.getCount())
+                        .useDays(vacationSelectDate.getUseDays() + Validation.isInteger(vacationSelectDate.getCount()))
                         .totalDays(vacationSelectDate.getTotalDays())
                         .build();
             }).collect(Collectors.toList());

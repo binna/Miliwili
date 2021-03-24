@@ -33,4 +33,10 @@ public class Validation {
 
         return parameter;
     }
+
+    public static Integer isInteger(Integer parameter) {
+        if (Objects.isNull(parameter)) return Integer.valueOf(0);
+
+        return parameter;
+    }
 }
