@@ -1,6 +1,7 @@
 package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.utils.JwtService;
@@ -25,6 +26,7 @@ public class ExerciseProvider {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseWeightRepository exerciseWeightRepository;
     private final ExerciseRoutineRepository exerciseRoutineRepository;
+    private final ExerciseReportRepository exerciseReportRepository;
     private final JwtService jwtService;
 
 
@@ -532,10 +534,53 @@ public class ExerciseProvider {
         GetExerciseReportRes getExerciseReportRes = GetExerciseReportRes.builder()
                 .totalTime(report.getTotalTime())
                 .reportDate(date.getMonthValue()+"월 "+date.getDayOfMonth()+"일")
+                .reportText(report.getReportText())
                 .exerciseList(exerciseList)
                 .build();
 
         return getExerciseReportRes;
+    }
+
+    /**
+     * 캘린더 운동 기록 조회
+     */
+    public List<String> retrieveCalendarReport(Long exerciseId, Integer viewYear, Integer viewMonth) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+        List<String> dateList = new ArrayList<>();
+        List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
+        System.out.println(routineList.size()+"routineList");
+
+
+        String startDateStr = viewYear+"-" + ((viewMonth>=10) ? viewMonth : ("0"+viewMonth))+"-01";
+        int targetLocallength = LocalDate.parse(startDateStr,DateTimeFormatter.ISO_DATE).lengthOfMonth(); //월의 마지막 날짜 계산
+        LocalDateTime targetDate = LocalDateTime.parse(startDateStr+"T00:00:00");
+
+        String starEndtDateStr = viewYear+"-" + ((viewMonth>=10) ? viewMonth : ("0"+viewMonth))+ "-"+targetLocallength;
+        LocalDateTime targetLastDate = LocalDateTime.parse(starEndtDateStr+"T23:59:59");
+
+        for(int i=0; i<routineList.size() ; i++){
+            List<ExerciseReport> reports;
+            try {
+                 reports= exerciseReportRepository.findExerciseReportByExerciseRoutine_IdAndStatusAndDateCreatedBetween(routineList.get(i).getId(),
+                        "Y", targetDate, targetLastDate);
+            }catch (Exception e){
+                throw new BaseException(FAILED_GET_REPORT);
+            }
+            System.out.println(reports.size()+"reports");
+
+
+            for(int j=0; j<reports.size();j++){
+                dateList.add(reports.get(j).getDateCreated().toLocalDate().toString());
+//                System.out.println(dateList.get(j));
+            }
+
+        }
+
+        return dateList;
     }
 
 
@@ -543,6 +588,8 @@ public class ExerciseProvider {
     /***
      * *****************************************************데이터 정제
      */
+
+
     /**
      * 운동 시작을 위한 루틴 조회 --> ExerciseDetailSet 데이터 정제를 위해
      * @param detail

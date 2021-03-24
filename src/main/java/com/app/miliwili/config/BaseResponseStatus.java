@@ -89,7 +89,9 @@ public enum BaseResponseStatus {
     EMPTY_EXERCISESTATUS(false, 2811, "운동 완료한 세트 개수 정보를 입력해주세요."),
     EMPTY_ROUTINE_ID(false, 2812, "루틴 id를 입력해주세요!!!!!!!!!!!!!!!!!!!"),
 
+    FULL_REPORT_TEXT(false, 2813, "글은 최대 300자입니다."),
 
+    INVALIED_VIEW_MONTH(false, 2820, "viewMonth는 1월부터 12월까지 입력해야합니다."),
 
 
 

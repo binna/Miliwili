@@ -5,15 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetExerciseReportRes {
-    private String totalTime;
+public class PatchExerciseReportReq {
     private String reportDate;
     private String reportText;
-    private List<ReportExercise> exerciseList;
 }
