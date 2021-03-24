@@ -245,6 +245,28 @@ public class CalendarController {
 
 
     /**
+     * 디데이 조회 API
+     * [GET] /app/calendars/ddays/:ddayId
+     *
+     * @return BaseResponse<GetDDayRes>
+     * @Token X-ACCESS-TOKEN
+     * @PathVariable Long ddayId
+     * @Auther shine
+     */
+    @ApiOperation(value = "일정 id로 상세조회", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ResponseBody
+    @GetMapping("/calendars/ddays/{ddayId}")
+    public BaseResponse<GetDDayRes> getDDay(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                            @PathVariable Long ddayId) {
+        try {
+            GetDDayRes dday = calendarProvider.getDDay(ddayId);
+            return new BaseResponse<>(SUCCESS, dday);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
      * D-Day 생성 API
      * [POST] /app/calendars/ddays
      *

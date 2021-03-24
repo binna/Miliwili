@@ -117,6 +117,7 @@ public class CalendarProvider {
      * @return PlanVacation
      * @throws BaseException
      */
+    @Transactional
     public PlanVacation retrievePlanVacationByIdAndStatusY(Long vacationId) throws BaseException {
         return planVacationRepository.findByVacationIdAndStatus(vacationId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION_PLAN));
@@ -124,11 +125,12 @@ public class CalendarProvider {
 
     /**
      * planId로 일정 상세조회
-     * 
+     *
      * @param workId
      * @return GetPlanRes
      * @throws BaseException
      */
+    @Transactional
     public GetPlanRes getPlan(Long planId) throws BaseException {
         Plan plan = retrievePlanByIdAndStatusY(planId);
 
@@ -143,11 +145,45 @@ public class CalendarProvider {
                 .build();
     }
 
-    private String getDateInfo(Plan plan) {
-        if (plan.getStartDate().isEqual(plan.getEndDate())) {
-            return plan.getStartDate().format(DateTimeFormatter.ofPattern("yy.MM.dd"));
-        }
-        return plan.getStartDate().format(DateTimeFormatter.ofPattern("yy.MM.dd")) + " ~ " + plan.getEndDate().format(DateTimeFormatter.ofPattern("yy.MM.dd"));
+    /**
+     * ddayId로 디데이 상세조회
+     * @param ddayId
+     * @return GetDDayRes
+     * @throws BaseException
+     */
+    @Transactional
+    public GetDDayRes getDDay(Long ddayId) throws BaseException {
+        DDay dday = retrieveDDayByIdAndStatusY(ddayId);
+
+        return GetDDayRes.builder()
+                .ddayId(dday.getId())
+                .date(dday.getDate().format(DateTimeFormatter.ISO_DATE))
+                .dateInfo(dday.getDate().format(DateTimeFormatter.ofPattern("yy.MM.dd")))
+                .ddayType(dday.getDdayType())
+                .work(changeListDDayWorkToListWorkRes(dday.getDdayWorks()))
+                .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
+                .build();
+    }
+
+
+    /**
+     * Set<DDayDiary> -> List<DiaryRes> 변경
+     *
+     * @param parameters
+     * @return List<DiaryRes>
+     * @Auther shine
+     */
+    public List<DiaryRes> changeSetDDayDiaryTOListDiaryRes(Set<DDayDiary> parameters) {
+        if (Objects.isNull(parameters)) return null;
+
+        return parameters.stream().map(dDayDiary -> {
+            return DiaryRes.builder()
+                    .diaryId(dDayDiary.getId())
+                    .date(dDayDiary.getDate().format(DateTimeFormatter.ISO_DATE))
+                    .title(dDayDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
+                    .content(dDayDiary.getContent())
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -155,6 +191,7 @@ public class CalendarProvider {
      *
      * @param parameters
      * @return List<DiaryRes>
+     * @Auther shine
      */
     public List<DiaryRes> changeSetPlanDiaryToListDiaryRes(Set<PlanDiary> parameters) {
         if (Objects.isNull(parameters)) return null;
@@ -282,5 +319,13 @@ public class CalendarProvider {
                     .processingStatus(supplies.getProcessingStatus())
                     .build();
         }).collect(Collectors.toList());
+    }
+
+
+    private String getDateInfo(Plan plan) {
+        if (plan.getStartDate().isEqual(plan.getEndDate())) {
+            return plan.getStartDate().format(DateTimeFormatter.ofPattern("yy.MM.dd"));
+        }
+        return plan.getStartDate().format(DateTimeFormatter.ofPattern("yy.MM.dd")) + " ~ " + plan.getEndDate().format(DateTimeFormatter.ofPattern("yy.MM.dd"));
     }
 }

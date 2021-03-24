@@ -126,9 +126,10 @@ public class UserService {
             throw new BaseException(DUPLICATED_USER);
         }
 
+        setVacationData(newUser);
+
         try {
             UserInfo savedUser = userRepository.save(newUser);
-            setVacationData(newUser);
             return new PostSignUpRes(savedUser.getId(), jwtService.createJwt(savedUser.getId()));
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_SIGNUP_USER);

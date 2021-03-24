@@ -57,10 +57,10 @@ public class CalendarService {
         setPushMessage(parameters.getPush(), parameters.getPushDeviceToken(), newPlan);
         setPlanVacation(newPlan.getPlanType(), parameters.getPlanVacation(), newPlan);
         setWorks(parameters.getWork(), newPlan);
+        setPlanDiaryData(newPlan);
 
         try {
             Plan savedPlan = planRepository.save(newPlan);
-            setPlanDiaryData(newPlan);
             return PostPlanRes.builder()
                     .planId(savedPlan.getId())
                     .color(savedPlan.getColor())
@@ -75,23 +75,6 @@ public class CalendarService {
         } catch (Exception exception) {
             exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_PLAN);
-        }
-    }
-
-    private void setPlanDiaryData(Plan plan) {
-        List<PlanDiary> diaryList = new ArrayList<>();
-
-        int day =  (int) ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate());
-        LocalDate targetDate = plan.getStartDate();
-
-        for(int i = 0; i <= day; i++) {
-            diaryList.add(PlanDiary.builder().date(targetDate).plan(plan).build());
-            targetDate = targetDate.plusDays(1);
-        }
-        try {
-            planDiaryRepository.saveAll(diaryList);
-        } catch (Exception exception) {
-            new BaseException(SET_DIARY);
         }
     }
 
@@ -266,6 +249,7 @@ public class CalendarService {
         setSubTitle(parameters.getSubTitle(), newDDay);
         setChoiceCalendar(newDDay, parameters.getDdayType(), parameters.getChoiceCalendar());
         setLinkOrPlaceOrWork(parameters.getDdayType(), parameters.getLink(), parameters.getPlaceLat(), parameters.getPlaceLon(), parameters.getWork(), newDDay);
+        setDDayDiatyData(newDDay);
 
         try {
             DDay savedDDay = ddayRepository.save(newDDay);
@@ -283,6 +267,17 @@ public class CalendarService {
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_D_DAY);
+        }
+    }
+
+    private void setDDayDiatyData(DDay dday) {
+        if(dday.getDdayType().equals("생일")) {
+            DDayDiary diary = DDayDiary.builder().date(dday.getDate()).dday(dday).build();
+            try {
+                ddayDiaryRepository.save(diary);
+            } catch (Exception exception) {
+                new BaseException(SET_DIARY);
+            }
         }
     }
 
@@ -438,28 +433,6 @@ public class CalendarService {
         }
     }
 
-    /**
-     * D-Day 다이어리 삭제
-     *
-     * @param ddayId
-     * @throws BaseException
-     * @Auther shine
-     */
-    @Transactional
-    public void deleteDDayDiary(Long diaryId) throws BaseException {
-        DDayDiary diary = calendarProvider.retrieveDDayDiaryById(diaryId);
-
-        if (diary.getDday().getUserInfo().getId() != jwtService.getUserId()) {
-            throw new BaseException(DO_NOT_AUTH_USER);
-        }
-
-        try {
-            ddayDiaryRepository.delete(diary);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_DELETE_DIARY);
-        }
-    }
-
 
     /**
      * 준비물 준비 완료 -> 미완료, 미완료 -> 완료로 처리
@@ -496,6 +469,23 @@ public class CalendarService {
     }
 
 
+
+    private void setPlanDiaryData(Plan plan) {
+        List<PlanDiary> diaryList = new ArrayList<>();
+
+        int day =  (int) ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate());
+        LocalDate targetDate = plan.getStartDate();
+
+        for(int i = 0; i <= day; i++) {
+            diaryList.add(PlanDiary.builder().date(targetDate).plan(plan).build());
+            targetDate = targetDate.plusDays(1);
+        }
+        try {
+            planDiaryRepository.saveAll(diaryList);
+        } catch (Exception exception) {
+            new BaseException(SET_DIARY);
+        }
+    }
 
     private void setLinkOrPlaceOrWork(String ddayType, String link, BigDecimal placeLat, BigDecimal placeLon, List<WorkReq> work, DDay dday) {
         if(ddayType.equals("자격증") || ddayType.equals("수능")) {
