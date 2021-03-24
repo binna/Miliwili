@@ -61,7 +61,7 @@ public class EmotionRecordService {
         }
     }
 
-    public EmotionRecordRes deleteEmotionRecord(Long emotionRecordId) throws BaseException {
+    public void deleteEmotionRecord(Long emotionRecordId) throws BaseException {
         EmotionRecord emotionRecord = emotionRecordProvider.retrieveEmotionRecordByIdAndStatusY(emotionRecordId);
 
         if(emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {

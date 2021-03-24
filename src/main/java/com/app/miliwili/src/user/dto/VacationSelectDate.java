@@ -7,10 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class PatchVacationRes {
-    private final Long vacationId;
-    private final String vacationType;
+public class VacationSelectDate {
+    private final Long id;
     private final String title;
     private final Integer useDays;
     private final Integer totalDays;
+    private final Integer count;
 }

@@ -19,10 +19,7 @@ public class Vacation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "vacationType", nullable = false, length = 60, updatable = false)
-    private String vacationType;
-
-    @Column(name = "title", nullable = false, length = 60)
+    @Column(name = "title", nullable = false, length = 60, updatable = false)
     private String title;
 
     @Builder.Default

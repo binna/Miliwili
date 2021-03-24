@@ -1,6 +1,7 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.src.calendar.CalendarProvider;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.NormalPromotionState;
@@ -25,6 +26,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Service
 public class UserService {
     private final UserProvider userProvider;
+    private final CalendarProvider calendarProvider;
     private final SNSLogin snsLogin;
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -233,40 +235,6 @@ public class UserService {
         }
     }
 
-
-    /**
-     * 휴가 생성
-     *
-     * @param parameters
-     * @return PostVacationRes
-     * @throws BaseException
-     * @Auther shine
-     */
-    @Transactional
-    public PostVacationRes createVacation(PostVacationReq parameters) throws BaseException {
-        UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
-
-        Vacation newVacation = Vacation.builder()
-                .vacationType(parameters.getVacationType())
-                .title(parameters.getTitle())
-                .totalDays(parameters.getTotalDays())
-                .userInfo(user)
-                .build();
-
-        try {
-            Vacation savedVacation = vacationRepository.save(newVacation);
-            return PostVacationRes.builder()
-                    .vacationId(savedVacation.getId())
-                    .vacationType(savedVacation.getVacationType())
-                    .title(savedVacation.getTitle())
-                    .useDays(savedVacation.getUseDays())
-                    .totalDays(savedVacation.getTotalDays())
-                    .build();
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_VACATION);
-        }
-    }
-
     /**
      * 휴가 수정
      *
@@ -277,15 +245,12 @@ public class UserService {
      * @Auther shine
      */
     @Transactional
-    public PatchVacationRes updateVacation(PatchVacationReq parameters, Long vacationId) throws BaseException {
+    public VacationRes updateVacation(VacationReq parameters, Long vacationId) throws BaseException {
         Vacation vacation = userProvider.retrieveVacationById(vacationId);
+        int count = getPlanVacationCount(vacationId);
 
-        vacation.setTitle(parameters.getTitle());
-        vacation.setTotalDays(parameters.getTotalDays());
-
-        if (Objects.nonNull(parameters.getUseDays())) {
-            vacation.setUseDays(parameters.getUseDays());
-        }
+        setTotalDays(parameters.getTotalDays(), vacation);
+        setUseDays(parameters.getUseDays(), vacation);
 
         if (vacation.getUserInfo().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
@@ -293,11 +258,10 @@ public class UserService {
 
         try {
             Vacation savedVacation = vacationRepository.save(vacation);
-            return PatchVacationRes.builder()
+            return VacationRes.builder()
                     .vacationId(savedVacation.getId())
-                    .vacationType(savedVacation.getVacationType())
                     .title(savedVacation.getTitle())
-                    .useDays(savedVacation.getUseDays()/* TODO 더해줘야지 일정에서 사용한 휴가 계산해서 */)
+                    .useDays(savedVacation.getUseDays() + count)
                     .totalDays(savedVacation.getTotalDays())
                     .build();
         } catch (Exception exception) {
@@ -305,28 +269,6 @@ public class UserService {
         }
     }
 
-    /**
-     * 휴가 삭제
-     *
-     * @param vacationId
-     * @return void
-     * @throws BaseException
-     * @Auther shine
-     */
-    @Transactional
-    public void deleteVacation(Long vacationId) throws BaseException {
-        Vacation vacation = userProvider.retrieveVacationById(vacationId);
-
-        if (vacation.getUserInfo().getId() != jwtService.getUserId()) {
-            throw new BaseException(DO_NOT_AUTH_USER);
-        }
-
-        try {
-            vacationRepository.delete(vacation);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_DELETE_VACATION);
-        }
-    }
 
 
     /**
@@ -402,15 +344,41 @@ public class UserService {
     }
 
 
-    private void setVacationData(UserInfo user) {
-        Vacation vacation1 = Vacation.builder().vacationType("정기").title("1차 정기휴가").userInfo(user).totalDays(8).build();
-        Vacation vacation2 = Vacation.builder().vacationType("정기").title("2차 정기휴가").userInfo(user).totalDays(8).build();
-        Vacation vacation3 = Vacation.builder().vacationType("정기").title("3차 정기휴가").userInfo(user).totalDays(8).build();
-        Vacation vacation4 = Vacation.builder().vacationType("포상").title("포상휴가").userInfo(user).totalDays(15).build();
 
-        final List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3, vacation4);
+    private void setUseDays(Integer useDays, Vacation vacation) {
+        if (Objects.nonNull(useDays)) {
+            vacation.setUseDays(useDays);
+        }
+    }
 
-        vacationRepository.saveAll(leaveList);
+    private void setTotalDays(Integer totalDays, Vacation vacation) {
+        if (Objects.nonNull(totalDays)) {
+            vacation.setTotalDays(totalDays);
+        }
+    }
+
+    private int getPlanVacationCount(Long vacationId) throws BaseException {
+        try {
+            return calendarProvider.retrievePlanVacationByIdAndStatusY(vacationId).getCount();
+        } catch (BaseException exception) {
+            if (exception.getStatus() == NOT_FOUND_VACATION_PLAN) {
+                return  0;
+            }
+            throw new BaseException(FAILED_TO_GET_VACATION_PLAN);
+        }
+    }
+
+    private void setVacationData(UserInfo user) throws BaseException {
+        Vacation vacation1 = Vacation.builder().title("정기휴가").userInfo(user).totalDays(24).build();
+        Vacation vacation2 = Vacation.builder().title("포상휴가").userInfo(user).totalDays(15).build();
+        Vacation vacation3 = Vacation.builder().title("기타휴가").userInfo(user).totalDays(0).build();
+        final List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3);
+
+        try {
+            vacationRepository.saveAll(leaveList);
+        } catch (Exception exception) {
+            throw new BaseException(SET_VACATION_PLAN);
+        }
     }
 
     private void setSocial(String socialType, String token, UserInfo user) throws BaseException {
