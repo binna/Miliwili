@@ -35,11 +35,11 @@ public class VacationSelectRepository extends QuerydslRepositorySupport {
         QPlanVacation planVacation = QPlanVacation.planVacation;
 
         return queryFactory
-                .select(Projections.fields(VacationSelectDate.class,
+                .select(Projections.constructor(VacationSelectDate.class,
                         vacation.id.as("id"), vacation.title.as("title"),
                         vacation.useDays.as("useDays"), vacation.totalDays.as("totalDays"),
                         ExpressionUtils.as(
-                                JPAExpressions.select(planVacation.vacationId)
+                                JPAExpressions.select(planVacation.count)
                                 .from(planVacation)
                                 .where(planVacation.vacationId.eq(vacation.id), planVacation.status.eq("Y")),
                                 "count"

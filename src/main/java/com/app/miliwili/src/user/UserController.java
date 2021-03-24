@@ -208,7 +208,7 @@ public class UserController {
         if (Objects.isNull(parameters.getSocialType()) || parameters.getSocialType().length() == 0) {
             return new BaseResponse<>(EMPTY_SOCIAL_TYPE);
         }
-        if (!(parameters.getSocialType().equals("K") && parameters.getSocialType().equals("G"))) {
+        if (!(parameters.getSocialType().equals("K") || parameters.getSocialType().equals("G"))) {
             return new BaseResponse<>(INVALID_SOCIAL_TYPE);
         }
 
@@ -363,7 +363,7 @@ public class UserController {
      * @PathVariable Long vacationId
      * @Auther shine
      */
-    @ApiOperation(value = "정기휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/users/vacations/{vacationId}")
     public BaseResponse<VacationRes> updateVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
@@ -385,10 +385,13 @@ public class UserController {
      * 내 휴가조회 API
      * [GET] /app/users/vacation
      *
-     * @return
+     * @return List<VacationRes>
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
      */
+    @ApiOperation(value = "휴가 조회", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ResponseBody
+    @GetMapping("/users/vacations")
     public BaseResponse<List<VacationRes>> getVacation(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try {
             List<VacationRes> vacation = userProvider.getVacation();

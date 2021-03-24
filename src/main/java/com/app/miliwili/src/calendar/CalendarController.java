@@ -66,13 +66,13 @@ public class CalendarController {
         LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
         if (parameters.getPlanType().equals("면회") || parameters.getPlanType().equals("외출")
                 || parameters.getPlanType().equals("전투휴무") || parameters.getPlanType().equals("당직")) {
-            if (startDate.isEqual(endDate)) {
+            if (!startDate.isEqual(endDate)) {
                 return new BaseResponse<>(ONLY_ON_THE_SAME_DAY);
             }
         }
         else if (parameters.getPlanType().equals("일정") ||
                 parameters.getPlanType().equals("휴가") || parameters.getPlanType().equals("외박")) {
-            if (startDate.isBefore(endDate)) {
+            if (startDate.isAfter(endDate)) {
                 return new BaseResponse<>(FASTER_THAN_CALENDAR_START_DATE);
             }
         }
