@@ -334,14 +334,25 @@ public class ExerciseProvider {
         System.out.println("toododododydyaya"+dayofWeekStr);
         //1:일 2:월 3:화 4:수 5:목 6:금 7:토
 
+        LocalDateTime targetReportDate = LocalDateTime.parse(target+"T00:00:00");
+        LocalDateTime targetReportLastDate = LocalDateTime.parse(target+"T23:59:59");
+
         for(int i=0;i<routineList.size();i++){
             ExerciseRoutine routine = routineList.get(i);
+            Boolean isDone = (routine.getDone().equals("Y")) ? true : false;
+
+            //그 날짜에 루틴의 운동 기록이 있다면 true처리 
+            List<ExerciseReport> reports = routine.getReports();
+            for(ExerciseReport r : reports){
+                if(r.getDateCreated().isAfter(targetReportDate) && r.getDateCreated().isBefore(targetReportLastDate))
+                    isDone = true;
+            }
 
             if(routine.getRepeaDay().contains(dayofWeekStr) || routine.getRepeaDay().equals("8")){
                 RoutineInfo routineInfo = RoutineInfo.builder()
                         .routineName(routine.getName())
                         .routineRepeatDay(repeatDayChange(routine.getRepeaDay()))
-                        .isDoneRoutine((routine.getDone().equals("Y")) ? true : false)
+                        .isDoneRoutine(isDone)
                         .routineId(routine.getId())
                         .build();
                 returnList.add(routineInfo);
