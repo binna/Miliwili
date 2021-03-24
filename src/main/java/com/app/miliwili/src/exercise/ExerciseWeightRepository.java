@@ -13,9 +13,9 @@ import java.util.Optional;
 
 @Repository
 public interface ExerciseWeightRepository extends CrudRepository<ExerciseWeightRecord, Long> {
-    List<ExerciseWeightRecord> findTop5ByExerciseInfo_IdAndStatusOrderByDateCreatedDesc(Long exerciseId, String status);
+    List<ExerciseWeightRecord> findTop5ByExerciseInfo_IdAndStatusOrderByExerciseDateDesc(Long exerciseId, String status);
 
-    Optional<ExerciseWeightRecord> findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween(Long exerciseId, String status, LocalDateTime dateCreated, LocalDateTime dateCreatedNext);
+    List<ExerciseWeightRecord> findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate(Long exerciseId, String status, LocalDate targetDate);
 
 }
 

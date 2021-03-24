@@ -4,6 +4,7 @@ import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Builder
 @AllArgsConstructor
@@ -20,6 +21,9 @@ public class ExerciseWeightRecord extends BaseEntity {
 
     @Column(name = "weight", nullable = false)
     private Double weight;
+
+    @Column(name = "exerciseDate")
+    private LocalDate exerciseDate;
 
     @ManyToOne
     @JoinColumn(name = "exercise_id", nullable = false )

@@ -52,7 +52,7 @@ public class ExerciseProvider {
         }
 
         try{
-            exerciseDailyWeightList = exerciseWeightRepository.findTop5ByExerciseInfo_IdAndStatusOrderByDateCreatedDesc(exerciseId,"Y");
+            exerciseDailyWeightList = exerciseWeightRepository.findTop5ByExerciseInfo_IdAndStatusOrderByExerciseDateDesc(exerciseId,"Y");
         }catch (Exception e){
             e.printStackTrace();
             throw new BaseException(FAILED_GET_DAILY_WEIGHT);
@@ -107,14 +107,14 @@ public class ExerciseProvider {
         Collections.sort(allRecordList, new Comparator<ExerciseWeightRecord>() {
             @Override
             public int compare(ExerciseWeightRecord o1, ExerciseWeightRecord o2) {
-                return o1.getDateCreated().compareTo(o2.getDateCreated());
+                return o1.getExerciseDate().compareTo(o2.getExerciseDate());
             }
         });
 
         //지정한 달의 모든 몸무게 정보 가져오기
         for(int i=0;i<allRecordList.size();i++){
             ExerciseWeightRecord record = allRecordList.get(i);
-            if(record.getDateCreated().getYear() == viewYear && record.getDateCreated().getMonthValue() == viewMonth){
+            if(record.getExerciseDate().getYear() == viewYear && record.getExerciseDate().getMonthValue() == viewMonth){
                 exerciseWeightList.add(record);
             }
         }
@@ -144,7 +144,7 @@ public class ExerciseProvider {
 
             for (int i = 0; i < allRecordList.size(); i++) {
                 ExerciseWeightRecord record = allRecordList.get(i);
-                if (record.getDateCreated().getYear() == wantYear && record.getDateCreated().getMonthValue() == wantMonth) {
+                if (record.getExerciseDate().getYear() == wantYear && record.getExerciseDate().getMonthValue() == wantMonth) {
                     monthWeightList.add(record);
                 }
 
@@ -232,7 +232,7 @@ public class ExerciseProvider {
                 }
                 continue;
             }
-            if(moveMonth.isEqual(recordList.get(index).getDateCreated().toLocalDate())){
+            if(moveMonth.isEqual(recordList.get(index).getExerciseDate())){
                 dayWeightList.add(recordList.get(index).getWeight());
                 if(index == recordList.size()-1) {
                     isEndIndx = true;
@@ -709,15 +709,15 @@ public class ExerciseProvider {
     }
 
 
-
-    /**
-     * 생성 날짜로 exerciseWeightRecord찾기
-     */
-    public ExerciseWeightRecord getExerciseWiehgtRecord(long exerciseId, LocalDateTime targetDate, LocalDateTime targetNextDate) throws BaseException{
-       return exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween
-               (exerciseId, "Y", targetDate, targetNextDate)
-                    .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISE_WEIGHT_RECORD));
-    }
+//
+//    /**
+//     * 생성 날짜로 exerciseWeightRecord찾기
+//     */
+//    public ExerciseWeightRecord getExerciseWiehgtRecord(long exerciseId, LocalDateTime targetDate, LocalDateTime targetNextDate) throws BaseException{
+//       return exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween
+//               (exerciseId, "Y", targetDate, targetNextDate)
+//                    .orElseThrow(() -> null);
+//    }
 
 
 
@@ -753,7 +753,7 @@ public class ExerciseProvider {
 
     public List<String> getDailyWeightTodailyDaytList(List<ExerciseWeightRecord>  dailyWeight){
         List<String> changedList = dailyWeight.stream().map(ExerciseWeightRecord -> {
-            LocalDate day = ExerciseWeightRecord.getDateCreated().toLocalDate();
+            LocalDate day = ExerciseWeightRecord.getExerciseDate();
             int monthValue = day.getMonthValue();
             int dayValue = day.getDayOfMonth();
 

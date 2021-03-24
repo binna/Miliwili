@@ -171,6 +171,8 @@ public enum BaseResponseStatus {
     FAILED_GET_REPORT_SETCOUNT(false, 3563, "완료된 세트의 개수가 운동 세트수보다 큽니다."),
     FAILED_GET_REPORT_SETSIZE(false, 3564, "입력된 운동의 개수와 입력된 운동의 개수가 다릅니다."),
 
+    FAILED_TO_GET_MONTH_WEIGHT_3(false, 3570, "월별 체중 기록 조회에 실패하였습니다."),
+
 
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");
