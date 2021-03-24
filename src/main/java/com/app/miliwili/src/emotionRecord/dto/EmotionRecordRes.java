@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 public class EmotionRecordRes {
     private final Long emotionRecordId;
+    private final String date;
     private final String content;
     private final String emotion;
 }

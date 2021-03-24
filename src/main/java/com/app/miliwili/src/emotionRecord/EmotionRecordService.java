@@ -9,6 +9,8 @@ import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
@@ -23,9 +25,12 @@ public class EmotionRecordService {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         EmotionRecord newEmotionRecord = EmotionRecord.builder()
+                .date(LocalDate.now())
                 .content(parameters.getContent())
                 .emoticon(parameters.getEmotion())
                 .build();
+
+        // 기존에 등록되어있는지 검자하는 로직 필요
 
         try {
             EmotionRecord savedEmotionRecord = emotionRecordRepository.save(newEmotionRecord);
