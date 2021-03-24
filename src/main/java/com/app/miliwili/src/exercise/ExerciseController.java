@@ -273,7 +273,7 @@ public class ExerciseController {
      */
     @ResponseBody
     @PostMapping("/{exerciseId}/routines/{routineId}/reports")
-    public BaseResponse<String> postExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
+    public BaseResponse<Long> postExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
                                                                   @RequestBody PostExerciseReportReq param){
         //TODO : 검증더해야함
         if(param.getExerciseStatus().length() == 0 || param.getExerciseStatus() == null)
@@ -282,7 +282,7 @@ public class ExerciseController {
             return new BaseResponse<>(EMPTY_TOTALTIME);
 
         try{
-            String reportId = exerciseService.createExerciseReport(exerciseId,routineId,param);
+            Long reportId = exerciseService.createExerciseReport(exerciseId,routineId,param);
             return new BaseResponse<>(SUCCESS, reportId);
         }catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
@@ -307,4 +307,63 @@ public class ExerciseController {
         }
 
     }
+
+    /**
+     * 운동 리포트 삭제
+     */
+    @ResponseBody
+    @DeleteMapping("/{exerciseId}/routines/{routineId}/reports")
+    public BaseResponse<String> delteRoutineExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
+                                                           @RequestParam String reportDate){
+        if(!Validation.isRegexDate(reportDate))
+            return new BaseResponse<>(INVALID_DATE);
+
+        try{
+            String reportRes = exerciseService.deleteExerciseReport(exerciseId,routineId,reportDate);
+            return new BaseResponse<>(SUCCESS,reportRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 운동 리포트 수정
+     */
+    @ResponseBody
+    @PatchMapping("/{exerciseId}/routines/{routineId}/reports")
+    public BaseResponse<String> patchExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
+                                                           @RequestBody PatchExerciseReportReq param){
+        if(!Validation.isRegexDate(param.getReportDate()))
+            return new BaseResponse<>(INVALID_DATE);
+
+        if(param.getReportText().length()>300)
+            return new BaseResponse<>(FULL_REPORT_TEXT);
+
+        try{
+            String reportRes = exerciseService.modifyExerciseReport(exerciseId,routineId,param);
+            return new BaseResponse<>(SUCCESS,reportRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 운동리포트 달력 조회
+     */
+    @ResponseBody
+    @GetMapping("/{exerciseId}/reports")
+    public BaseResponse<List<String>> getCalendarReports(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+                                                    @RequestParam Integer viewYear, @RequestParam Integer viewMonth){
+
+        if(viewMonth<=0 || viewMonth>12)
+            return new BaseResponse<>(INVALIED_VIEW_MONTH);
+
+        try{
+            List<String> reportRes = exerciseProvider.retrieveCalendarReport(exerciseId,viewYear,viewMonth);
+            return new BaseResponse<>(SUCCESS,reportRes);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
 }

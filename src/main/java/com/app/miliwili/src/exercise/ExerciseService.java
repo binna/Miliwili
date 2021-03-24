@@ -27,6 +27,8 @@ public class ExerciseService {
     private final ExerciseRoutineRepository exerciseRoutineRepository;
     private final ExerciseRoutineDetailRepository exerciseRoutineDetailRepository;
     private final ExerciseDetailSetRepository exerciseDetailSetRepository;
+    private final ExerciseReportRepository exerciseReportRepository;
+    private final ExerciseWeightRepository exerciseWeightRepository;
     private final ExerciseProvider exerciseProvider;
     private final UserProvider userProvider;
     private final JwtService jwtService;
@@ -70,6 +72,7 @@ public class ExerciseService {
         ExerciseWeightRecord weightRecord = ExerciseWeightRecord.builder()
                 .weight(param.getDayWeight())
                 .exerciseInfo(exerciseInfo)
+                .exerciseDate(LocalDate.now())
                 .build();
 
         exerciseInfo.addWeightRecord(weightRecord);
@@ -93,13 +96,32 @@ public class ExerciseService {
             throw new BaseException(INVALID_USER);
         }
 
-        LocalDateTime targetDate = LocalDateTime.parse(param.getDayDate()+"T00:00:00");
-        LocalDateTime targetNextDate = LocalDateTime.parse((param.getDayDate()+"T23:59:59"));
+       // LocalDateTime targetDate = LocalDateTime.parse(param.getDayDate()+"T00:00:00");
+      //  LocalDateTime targetNextDate = LocalDateTime.parse((param.getDayDate()+"T23:59:59"));
+        LocalDate targetDate = LocalDate.parse(param.getDayDate(), DateTimeFormatter.ISO_DATE);
 
-        ExerciseWeightRecord targetWeightRecord = exerciseProvider.getExerciseWiehgtRecord(exerciseId, targetDate,targetNextDate);
-        targetWeightRecord.setWeight(param.getDayWeight());
+        List<ExerciseWeightRecord> targetWeightRecord;
+        try {
+            targetWeightRecord = exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate
+                    (exerciseId, "Y", targetDate);
+        }catch (Exception e){
+            throw new BaseException(FAILED_TO_GET_MONTH_WEIGHT_3);
+        }
 
-        exerciseRepository.save(exerciseInfo);
+        if (targetWeightRecord.size() != 0) {
+            targetWeightRecord.get(0).setWeight(param.getDayWeight());
+            exerciseWeightRepository.save(targetWeightRecord.get(0));
+
+        }else{
+            ExerciseWeightRecord newWiehgtRecord = ExerciseWeightRecord.builder()
+                    .weight(param.getDayWeight())
+                    .exerciseInfo(exerciseInfo)
+                    .exerciseDate(targetDate)
+                    .build();
+            exerciseWeightRepository.save(newWiehgtRecord);
+
+        }
+
 
         return param.getDayWeight()+"kg으로 수정되었습니다.";
     }
@@ -267,7 +289,7 @@ public class ExerciseService {
     /**
      * 운동 리포트 생성
      */
-    public String createExerciseReport(Long exerciseId, Long routineId, PostExerciseReportReq param) throws BaseException{
+    public Long createExerciseReport(Long exerciseId, Long routineId, PostExerciseReportReq param) throws BaseException{
         ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
 
         if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
@@ -293,14 +315,78 @@ public class ExerciseService {
         routine.setDone("Y");
         routine.addNewReport(newReport);
         try {
+            exerciseReportRepository.save(newReport);
             exerciseRoutineRepository.save(routine);
         }catch (Exception e){
             throw new BaseException(FAILED_POST_REPORT);
         }
-        return "success";
+        return newReport.getId();
     }
 
+    /**
+     * 운동 리포트 삭제
+     */
+    public String deleteExerciseReport(Long exerciseId, Long routineId, String reportDate) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
 
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+
+        ExerciseReport report = null;
+        LocalDate date = LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE);
+        for(ExerciseReport r: routine.getReports()){
+            if(r.getDateCreated().toLocalDate().equals(date)){
+                report = r;
+                break;
+            }
+        }
+        if(report == null)
+            throw new BaseException(FAILED_GET_REPORT);
+
+        report.setStatus("N");
+        report.setExerciseRoutine(null);
+        routine.getReports().remove(report);
+        exerciseRoutineRepository.save(routine);
+        exerciseReportRepository.save(report);
+
+        return "success";
+
+
+    }
+
+    /**
+     * 운동 리포트 수정
+     */
+    public String modifyExerciseReport(Long exerciseId, Long routineId, PatchExerciseReportReq param) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+
+        ExerciseReport report = null;
+        LocalDate date = LocalDate.parse(param.getReportDate(), DateTimeFormatter.ISO_DATE);
+        for(ExerciseReport r: routine.getReports()){
+            if(r.getDateCreated().toLocalDate().equals(date)){
+                report = r;
+                break;
+            }
+        }
+        if(report == null)
+            throw new BaseException(FAILED_GET_REPORT);
+
+        report.setReportText(param.getReportText());
+        exerciseReportRepository.save(report);
+
+        return "success";
+
+
+    }
     /**
      * 운동 안한상태로 초기화
      */

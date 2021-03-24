@@ -11,6 +11,6 @@ import java.util.Optional;
 @ResponseBody
 public interface ExerciseReportRepository extends CrudRepository<ExerciseReport, Long> {
 
-  //  Optional<ExerciseWeightRecord> findExerciseReportByRoutineAndStatusAndDateCreatedBetween(Long exerciseId, String status, LocalDateTime dateCreated, LocalDateTime dateCreatedNext);
+    List<ExerciseReport> findExerciseReportByExerciseRoutine_IdAndStatusAndDateCreatedBetween(Long routineId,String status, LocalDateTime dateCreated, LocalDateTime dateCreatedNext);
 
 }
