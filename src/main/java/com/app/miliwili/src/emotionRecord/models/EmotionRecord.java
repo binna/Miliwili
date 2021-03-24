@@ -1,14 +1,17 @@
 package com.app.miliwili.src.emotionRecord.models;
 
 import com.app.miliwili.config.BaseEntity;
+import com.app.miliwili.src.user.models.UserInfo;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = "userInfo")
 @Data
 @Entity
 @Table(name = "emotionRecord")
@@ -18,9 +21,19 @@ public class EmotionRecord extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "emoticon", nullable = false)
+    @Column(name = "emoticon", nullable = false, columnDefinition = "TEXT")
     private String emoticon;
+
+    @OneToOne
+    @JoinColumn(name = "userInfo_id", nullable = false)
+    private UserInfo userInfo;
+
+    @Override
+    public String toString() {
+        return ToStringBuilder
+                .reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 }
