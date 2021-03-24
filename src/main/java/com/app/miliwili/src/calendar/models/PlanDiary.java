@@ -23,7 +23,7 @@ public class PlanDiary {
     @Column(name = "date", nullable = false, updatable = false)
     private LocalDate date;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @ManyToOne

@@ -35,7 +35,6 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                 .fetch();
     }
 
-
     /**
      * stateIdx 조회
      */
@@ -66,11 +65,4 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                 .fetch();
 
     }
-
-
-    /**
-     * user정보 찾기
-     */
-
-
 }

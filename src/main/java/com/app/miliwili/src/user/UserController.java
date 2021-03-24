@@ -49,6 +49,26 @@ public class UserController {
     }
 
     /**
+     * 내 회원정보 조회 API
+     * [GET]
+     *
+     * @return BaseResponse<UserRes>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther shine
+     */
+    @ApiOperation(value = "내 회원정보 조회", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ResponseBody
+    @GetMapping("/users")
+    public BaseResponse<UserRes> getUser(@RequestHeader("X-ACCESS-TOKEN") String token) {
+        try {
+            UserRes user = userProvider.getUser();
+            return new BaseResponse<>(SUCCESS, user);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
      * 구글 로그인 API
      * [POST] /app/users/login-google
      *
@@ -232,8 +252,8 @@ public class UserController {
     @ApiOperation(value = "회원정보 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/users")
-    public BaseResponse<PatchUserRes> updateUser(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                 @RequestBody(required = false) PatchUserReq parameters) {
+    public BaseResponse<UserRes> updateUser(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                            @RequestBody(required = false) PatchUserReq parameters) {
         if (Objects.nonNull(parameters.getName()) || Objects.nonNull(parameters.getBirthday())) {
             if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
                 return new BaseResponse<>(EMPTY_NAME);
@@ -327,7 +347,7 @@ public class UserController {
         }
 
         try {
-            PatchUserRes user = userService.updateUser(parameters);
+            UserRes user = userService.updateUser(parameters);
             return new BaseResponse<>(SUCCESS, user);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Builder
 @AllArgsConstructor
@@ -20,6 +21,9 @@ public class EmotionRecord extends BaseEntity {
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;

@@ -1,16 +1,13 @@
 package com.app.miliwili.src.calendar;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.calendar.dto.PlanVacationReq;
-import com.app.miliwili.src.calendar.dto.PlanVacationRes;
-import com.app.miliwili.src.calendar.dto.WorkReq;
-import com.app.miliwili.src.calendar.dto.WorkRes;
+import com.app.miliwili.src.calendar.dto.*;
 import com.app.miliwili.src.calendar.models.*;
-import com.app.miliwili.src.user.VacationSelectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -28,7 +25,6 @@ public class CalendarProvider {
     private final DDayWorkRepository ddayWorkRepository;
     private final DDayDiaryRepository ddayDiaryRepository;
     private final PlanVacationRepository planVacationRepository;
-    private final VacationSelectRepository planVacationSelectRepository;
 
     /**
      * planId로 유효한 일정조회
@@ -121,15 +117,96 @@ public class CalendarProvider {
      * @return PlanVacation
      * @throws BaseException
      */
+    @Transactional
     public PlanVacation retrievePlanVacationByIdAndStatusY(Long vacationId) throws BaseException {
         return planVacationRepository.findByVacationIdAndStatus(vacationId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION_PLAN));
     }
 
+    /**
+     * planId로 일정 상세조회
+     *
+     * @param workId
+     * @return GetPlanRes
+     * @throws BaseException
+     */
+    @Transactional
+    public GetPlanRes getPlan(Long planId) throws BaseException {
+        Plan plan = retrievePlanByIdAndStatusY(planId);
+
+        return GetPlanRes.builder()
+                .planId(plan.getId())
+                .startDate(plan.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                .endDate(plan.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                .dateInfo(getDateInfo(plan))
+                .planType(plan.getPlanType())
+                .work(changeListPlanWorkToListWorkRes(plan.getPlanWorks()))
+                .diary(changeSetPlanDiaryToListDiaryRes(plan.getPlanDiaries()))
+                .build();
+    }
+
+    /**
+     * ddayId로 디데이 상세조회
+     * @param ddayId
+     * @return GetDDayRes
+     * @throws BaseException
+     */
+    @Transactional
+    public GetDDayRes getDDay(Long ddayId) throws BaseException {
+        DDay dday = retrieveDDayByIdAndStatusY(ddayId);
+
+        return GetDDayRes.builder()
+                .ddayId(dday.getId())
+                .date(dday.getDate().format(DateTimeFormatter.ISO_DATE))
+                .dateInfo(dday.getDate().format(DateTimeFormatter.ofPattern("yy.MM.dd")))
+                .ddayType(dday.getDdayType())
+                .work(changeListDDayWorkToListWorkRes(dday.getDdayWorks()))
+                .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
+                .build();
+    }
 
 
+    /**
+     * Set<DDayDiary> -> List<DiaryRes> 변경
+     *
+     * @param parameters
+     * @return List<DiaryRes>
+     * @Auther shine
+     */
+    public List<DiaryRes> changeSetDDayDiaryTOListDiaryRes(Set<DDayDiary> parameters) {
+        if (Objects.isNull(parameters)) return null;
 
-        /**
+        return parameters.stream().map(dDayDiary -> {
+            return DiaryRes.builder()
+                    .diaryId(dDayDiary.getId())
+                    .date(dDayDiary.getDate().format(DateTimeFormatter.ISO_DATE))
+                    .title(dDayDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
+                    .content(dDayDiary.getContent())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * Set<PlanDiary> -> List<DiaryRes> 변경
+     *
+     * @param parameters
+     * @return List<DiaryRes>
+     * @Auther shine
+     */
+    public List<DiaryRes> changeSetPlanDiaryToListDiaryRes(Set<PlanDiary> parameters) {
+        if (Objects.isNull(parameters)) return null;
+
+        return parameters.stream().map(planDiary -> {
+            return DiaryRes.builder()
+                    .diaryId(planDiary.getId())
+                    .date(planDiary.getDate().format(DateTimeFormatter.ISO_DATE))
+                    .title(planDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
+                    .content(planDiary.getContent())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    /**
      * List<PlanVacationReq> -> Set<PlanVacation> 변경
      *
      * @param parameters
@@ -173,7 +250,7 @@ public class CalendarProvider {
      *
      * @param parameters
      * @param plan
-     * @return List<ToDoList>
+     * @return List<PlanWork>
      * @Auther shine
      */
     public List<PlanWork> changeListWorkReqToListPlanWork(List<WorkReq> parameters, Plan plan) {
@@ -242,5 +319,13 @@ public class CalendarProvider {
                     .processingStatus(supplies.getProcessingStatus())
                     .build();
         }).collect(Collectors.toList());
+    }
+
+
+    private String getDateInfo(Plan plan) {
+        if (plan.getStartDate().isEqual(plan.getEndDate())) {
+            return plan.getStartDate().format(DateTimeFormatter.ofPattern("yy.MM.dd"));
+        }
+        return plan.getStartDate().format(DateTimeFormatter.ofPattern("yy.MM.dd")) + " ~ " + plan.getEndDate().format(DateTimeFormatter.ofPattern("yy.MM.dd"));
     }
 }

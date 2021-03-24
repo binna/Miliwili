@@ -25,17 +25,18 @@ public class VacationSelectRepository extends QuerydslRepositorySupport {
     }
 
     /**
-     * 회원 휴가 조회
+     * 회원 휴가 조회(일정에서 사용 횟수 반영!)
      * 
      * @param userId
      * @return List<VacationSelectDate>
+     * @Auther shine
      */
-    public List<VacationSelectDate> findVacationByUserIdAndStatusY(Long userId) {
+    public List<VacationSelectData> findVacationByUserIdAndStatusY(Long userId) {
         QVacation vacation = QVacation.vacation;
         QPlanVacation planVacation = QPlanVacation.planVacation;
 
         return queryFactory
-                .select(Projections.constructor(VacationSelectDate.class,
+                .select(Projections.constructor(VacationSelectData.class,
                         vacation.id.as("id"), vacation.title.as("title"),
                         vacation.useDays.as("useDays"), vacation.totalDays.as("totalDays"),
                         ExpressionUtils.as(

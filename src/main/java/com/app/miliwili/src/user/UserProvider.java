@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -150,9 +152,9 @@ public class UserProvider {
      * @throws BaseException
      * @Auther shine
      */
-    public List<VacationRes> getVacation() throws BaseException{
+    public List<VacationRes> getVacation() throws BaseException {
         try {
-            List<VacationSelectDate> vacations = vacationSelectRepository.findVacationByUserIdAndStatusY(jwtService.getUserId());
+            List<VacationSelectData> vacations = vacationSelectRepository.findVacationByUserIdAndStatusY(jwtService.getUserId());
             return vacations.stream().map(vacationSelectDate -> {
                 return VacationRes.builder()
                         .vacationId(vacationSelectDate.getId())
@@ -163,6 +165,51 @@ public class UserProvider {
             }).collect(Collectors.toList());
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_VACATION);
+        }
+    }
+
+    /**
+     * 내 회원정보 조회
+     *
+     * @return UserRes
+     * @throws BaseException
+     * @Auther shine
+     */
+    public UserRes getUser() throws BaseException {
+        try {
+            UserInfo user = retrieveUserByIdAndStatusY(jwtService.getUserId());
+            if (Objects.nonNull(user.getNormalPromotionState())) {
+                return UserRes.builder()
+                        .userId(user.getId())
+                        .name(user.getName())
+                        .birthday(user.getBirthday().format(DateTimeFormatter.ISO_DATE))
+                        .profileImg(user.getProfileImg())
+                        .stateIdx(user.getStateIdx())
+                        .serveType(user.getServeType())
+                        .startDate(user.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                        .endDate(user.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                        .strPrivate(user.getNormalPromotionState().getFirstDate().format(DateTimeFormatter.ISO_DATE))
+                        .strCorporal(user.getNormalPromotionState().getSecondDate().format(DateTimeFormatter.ISO_DATE))
+                        .strSergeant(user.getNormalPromotionState().getThirdDate().format(DateTimeFormatter.ISO_DATE))
+                        .hobong(user.getNormalPromotionState().getHobong())
+                        .normalPromotionStateIdx(user.getNormalPromotionState().getStateIdx())
+                        .goal(user.getGoal())
+                        .build();
+            }
+            return UserRes.builder()
+                    .userId(user.getId())
+                    .name(user.getName())
+                    .birthday(user.getBirthday().format(DateTimeFormatter.ISO_DATE))
+                    .profileImg(user.getProfileImg())
+                    .stateIdx(user.getStateIdx())
+                    .serveType(user.getServeType())
+                    .startDate(user.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(user.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .proDate(user.getAbnormalPromotionState().getProDate().format(DateTimeFormatter.ISO_DATE))
+                    .goal(user.getGoal())
+                    .build();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_USER);
         }
     }
 }

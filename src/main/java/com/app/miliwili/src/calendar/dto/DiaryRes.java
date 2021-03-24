@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class PostDiaryRes {
+public class DiaryRes {
     private final Long diaryId;
     private final String date;
     private final String title;

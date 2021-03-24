@@ -7,9 +7,4 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface VacationRepository extends CrudRepository<Vacation, Long> {
-
-
-
-    List<Vacation> findByUserInfo_IdOrderById(Long userid);
-}
+public interface VacationRepository extends CrudRepository<Vacation, Long> {;}
