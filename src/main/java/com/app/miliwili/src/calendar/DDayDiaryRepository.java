@@ -5,5 +5,4 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DDayDiaryRepository extends CrudRepository<DDayDiary, Long> {
-}
+public interface DDayDiaryRepository extends CrudRepository<DDayDiary, Long> {;}

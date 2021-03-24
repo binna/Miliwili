@@ -128,6 +128,11 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_D_DAY(false, 3033, "D-Day 조회에 실패하였습니다."),
     NOT_FOUND_WORK(false, 3034, "존재하지 않는 할일/준비물 입니다."),
     FAILED_TO_PATCH_WORK(false, 3035, "할일/준비물 수정에 실패하였습니다."),
+    NOT_FOUND_EMOTION_RECORD(false, 3036, "존재하지 않는 감정기록 입니다."),
+    FAILED_TO_POST_EMOTION_RECORD(false, 3037, "감정기록 등록에 실패하였습니다."),
+    FAILED_TO_PATCH_EMOTION_RECORD(false, 3038, "감정기록 수정에 실패하였습니다."),
+    FAILED_TO_DELETE_EMOTION_RECORD(false, 3039, "감정기록 삭제에 실패하였습니다."),
+    FAILED_TO_GET_EMOTION_RECORD(false, 3040, "감정기록 조회에 실패하였습니다."),
 
 
 
