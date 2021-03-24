@@ -52,6 +52,7 @@ public enum BaseResponseStatus {
     INVALID_SOCIAL_TYPE(false, 2038, "가입 요청하는 소셜타입의 형식을 확인해주세요."),
     EMPTY_D_DAY_TYPE(false, 3039, "디데이 구분을 입력해주세요."),
     INVALID_D_DAY_TYPE(false, 2040, "유효하지 않은 디데이 타입입니다."),
+    CHOOSE_BETWEEN_TOTAL_OR_USE(false, 2041, "사용한 휴가일수나 총 휴가일수 중 하나는 입력해주셔야 합니다."),
 
 
 
@@ -138,7 +139,9 @@ public enum BaseResponseStatus {
     FAILED_TO_PATCH_EMOTION_RECORD(false, 3038, "감정기록 수정에 실패하였습니다."),
     FAILED_TO_DELETE_EMOTION_RECORD(false, 3039, "감정기록 삭제에 실패하였습니다."),
     FAILED_TO_GET_EMOTION_RECORD(false, 3040, "감정기록 조회에 실패하였습니다."),
-
+    NOT_FOUND_VACATION_PLAN(false, 3041, "일정에 등록된 휴가가 없습니다."),
+    FAILED_TO_GET_VACATION_PLAN(false, 3042, "일정에 등록된 휴가 조회에 실패했습니다."),
+    SET_VACATION_PLAN(false, 3043, "기본 휴가 세팅에 실패하였습니다."),
 
 
 

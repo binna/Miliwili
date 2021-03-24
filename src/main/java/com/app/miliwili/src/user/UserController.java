@@ -13,6 +13,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -199,15 +200,15 @@ public class UserController {
             }
         }
 
-        if(Objects.nonNull(parameters.getGoal())) {
-            if(parameters.getGoal().length() >= 25) {
+        if (Objects.nonNull(parameters.getGoal())) {
+            if (parameters.getGoal().length() >= 25) {
                 return new BaseResponse<>(EXCEED_MAX25);
             }
         }
         if (Objects.isNull(parameters.getSocialType()) || parameters.getSocialType().length() == 0) {
             return new BaseResponse<>(EMPTY_SOCIAL_TYPE);
         }
-        if(!(parameters.getSocialType().equals("K") && parameters.getSocialType().equals("G"))) {
+        if (!(parameters.getSocialType().equals("K") && parameters.getSocialType().equals("G"))) {
             return new BaseResponse<>(INVALID_SOCIAL_TYPE);
         }
 
@@ -233,7 +234,7 @@ public class UserController {
     @PatchMapping("/users")
     public BaseResponse<PatchUserRes> updateUser(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                  @RequestBody(required = false) PatchUserReq parameters) {
-        if(Objects.nonNull(parameters.getName()) || Objects.nonNull(parameters.getBirthday())) {
+        if (Objects.nonNull(parameters.getName()) || Objects.nonNull(parameters.getBirthday())) {
             if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
                 return new BaseResponse<>(EMPTY_NAME);
             }
@@ -246,9 +247,7 @@ public class UserController {
             if (!Validation.isRegexDate(parameters.getBirthday())) {
                 return new BaseResponse<>(INVALID_BIRTHDAY);
             }
-        }
-
-        else if(Objects.nonNull(parameters.getStrPrivate()) || Objects.nonNull(parameters.getStrCorporal()) || Objects.nonNull(parameters.getStrSergeant())
+        } else if (Objects.nonNull(parameters.getStrPrivate()) || Objects.nonNull(parameters.getStrCorporal()) || Objects.nonNull(parameters.getStrSergeant())
                 || Objects.nonNull(parameters.getProDate())) {
             if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
                 return new BaseResponse<>(EMPTY_START_DATE);
@@ -319,15 +318,11 @@ public class UserController {
                     }
                 }
             }
-        }
-
-        else if(Objects.nonNull(parameters.getGoal())) {
-            if(parameters.getGoal().length() >= 25) {
+        } else if (Objects.nonNull(parameters.getGoal())) {
+            if (parameters.getGoal().length() >= 25) {
                 return new BaseResponse<>(EXCEED_MAX25);
             }
-        }
-
-        else {
+        } else {
             return new BaseResponse<>(EMPTY_ALL);
         }
 
@@ -358,42 +353,6 @@ public class UserController {
         }
     }
 
-
-    /**
-     * 휴가생성 API
-     * [POST] /app/users/vacation
-     *
-     * @return BaseResponse<PostVacationRes>
-     * @RequestBody PostVacationReq parameters
-     * @RequestHeader X-ACCESS-TOKEN
-     * @Auther shine
-     */
-    @ApiOperation(value = "휴가 생성", notes = "X-ACCESS-TOKEN jwt 필요")
-    @ResponseBody
-    @PostMapping("/users/vacations")
-    public BaseResponse<PostVacationRes> postVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                      @RequestBody(required = false) PostVacationReq parameters) {
-        if (Objects.isNull(parameters.getVacationType()) || parameters.getVacationType().length() == 0) {
-            return new BaseResponse<>(EMPTY_VACATION_TYPE);
-        }
-        if (Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
-            return new BaseResponse<>(EMPTY_TITLE);
-        }
-        if (parameters.getVacationType().length() >= 20 || parameters.getTitle().length() >= 20) {
-            return new BaseResponse<>(EXCEED_MAX20);
-        }
-        if (Objects.isNull(parameters.getTotalDays())) {
-            return new BaseResponse<>(EMPTY_TOTAL_DAYS);
-        }
-
-        try {
-            PostVacationRes vacation = userService.createVacation(parameters);
-            return new BaseResponse<>(SUCCESS, vacation);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
     /**
      * 휴가수정 API
      * [PATCH] /app/users/vacation/:vacationId
@@ -407,26 +366,15 @@ public class UserController {
     @ApiOperation(value = "정기휴가 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/users/vacations/{vacationId}")
-    public BaseResponse<PatchVacationRes> updateVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                         @RequestBody(required = false) PatchVacationReq parameters,
-                                                         @PathVariable Long vacationId) {
-        if (Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
-            return new BaseResponse<>(EMPTY_TITLE);
-        }
-        if (parameters.getTitle().length() < 20) {
-            return new BaseResponse<>(EXCEED_MAX20);
-        }
-        if (Objects.isNull(parameters.getTotalDays())) {
-            return new BaseResponse<>(EMPTY_TOTAL_DAYS);
-        }
-        if (Objects.nonNull(parameters.getUseDays())) {
-            if (parameters.getUseDays() > parameters.getTotalDays()) {
-                return new BaseResponse<>(NOT_BE_GREATER_THAN_TOTAL_DAYS);
-            }
+    public BaseResponse<VacationRes> updateVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                    @RequestBody(required = false) VacationReq parameters,
+                                                    @PathVariable Long vacationId) {
+        if (Objects.isNull(parameters.getUseDays()) && Objects.isNull(parameters.getTotalDays())) {
+            return new BaseResponse<>(CHOOSE_BETWEEN_TOTAL_OR_USE);
         }
 
         try {
-            PatchVacationRes vacation = userService.updateVacation(parameters, vacationId);
+            VacationRes vacation = userService.updateVacation(parameters, vacationId);
             return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -434,26 +382,21 @@ public class UserController {
     }
 
     /**
-     * 휴가삭제 API
-     * [DELETE] /app/users/vacation/:vacationId
+     * 내 휴가조회 API
+     * [GET] /app/users/vacation
      *
-     * @return BaseResponse<Void>
+     * @return
      * @RequestHeader X-ACCESS-TOKEN
-     * @PathVariable Long vacationId
      * @Auther shine
      */
-    @ApiOperation(value = "정기휴가 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
-    @DeleteMapping("/users/vacations/{vacationId}")
-    public BaseResponse<Void> deleteVacation(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                             @PathVariable Long vacationId) {
+    public BaseResponse<List<VacationRes>> getVacation(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try {
-            userService.deleteVacation(vacationId);
-            return new BaseResponse<>(SUCCESS);
+            List<VacationRes> vacation = userProvider.getVacation();
+            return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
 
 
     /**

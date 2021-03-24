@@ -6,6 +6,7 @@ import com.app.miliwili.src.calendar.dto.PlanVacationRes;
 import com.app.miliwili.src.calendar.dto.WorkReq;
 import com.app.miliwili.src.calendar.dto.WorkRes;
 import com.app.miliwili.src.calendar.models.*;
+import com.app.miliwili.src.user.VacationSelectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,8 @@ public class CalendarProvider {
     private final DDayRepository ddayRepository;
     private final DDayWorkRepository ddayWorkRepository;
     private final DDayDiaryRepository ddayDiaryRepository;
+    private final PlanVacationRepository planVacationRepository;
+    private final VacationSelectRepository planVacationSelectRepository;
 
     /**
      * planId로 유효한 일정조회
@@ -111,9 +114,22 @@ public class CalendarProvider {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_WORK));
     }
 
-
-
     /**
+     * vacationId로 일정휴가 조회
+     *
+     * @param vacationId
+     * @return PlanVacation
+     * @throws BaseException
+     */
+    public PlanVacation retrievePlanVacationByIdAndStatusY(Long vacationId) throws BaseException {
+        return planVacationRepository.findByVacationIdAndStatus(vacationId, "Y")
+                .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION_PLAN));
+    }
+
+
+
+
+        /**
      * List<PlanVacationReq> -> Set<PlanVacation> 변경
      *
      * @param parameters
