@@ -331,7 +331,6 @@ public class ExerciseProvider {
 
         LocalDate target = LocalDate.parse(targetDate, DateTimeFormatter.ISO_DATE);
         String dayofWeekStr = Integer.toString(target.getDayOfWeek().getValue());
-        System.out.println("toododododydyaya"+dayofWeekStr);
         //1:일 2:월 3:화 4:수 5:목 6:금 7:토
 
         LocalDateTime targetReportDate = LocalDateTime.parse(target+"T00:00:00");
@@ -637,7 +636,7 @@ public class ExerciseProvider {
                     .setCount(setCountInt)
                     .weight(-1+"")
                     .count(-1+"")
-                    .time(setList.get(index).getSetTime()+"분")
+                    .time(secToTimeFormat(setList.get(index).getSetTime()))
                     .build();
             setResList.add(setRes);
         }
@@ -765,6 +764,15 @@ public class ExerciseProvider {
         return changedList;
     }
 
+    public String secToTimeFormat(int sec){
+        int hour, min;
+        min = sec / 60;
+        hour = min / 60;
+        sec = sec % 60;
+        min = min % 60;
+        return hour+"시간 "+min+"분 "+sec+"초 ";
+
+    }
 }
 
 
