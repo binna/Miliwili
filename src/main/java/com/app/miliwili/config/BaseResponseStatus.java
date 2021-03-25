@@ -53,7 +53,7 @@ public enum BaseResponseStatus {
     EMPTY_D_DAY_TYPE(false, 3039, "디데이 구분을 입력해주세요."),
     INVALID_D_DAY_TYPE(false, 2040, "유효하지 않은 디데이 타입입니다."),
     CHOOSE_BETWEEN_TOTAL_OR_USE(false, 2041, "사용한 휴가일수나 총 휴가일수 중 하나는 입력해주셔야 합니다."),
-
+    EMPTY_EMOTION(false, 2036, "감정 이모티콘 URL 입력해주세요."),
 
 
 
@@ -144,7 +144,8 @@ public enum BaseResponseStatus {
     NOT_FOUND_VACATION_PLAN(false, 3041, "일정에 등록된 휴가가 없습니다."),
     FAILED_TO_GET_VACATION_PLAN(false, 3042, "일정에 등록된 휴가 조회에 실패했습니다."),
     SET_VACATION_PLAN(false, 3043, "기본 휴가 세팅에 실패하였습니다."),
-    SET_DIARY(false, 3043, "기본 다이어리 세팅에 실패하였습니다."),
+    ALREADY_EXIST_EMOTION_RECORD(false, 3044, "이미 해당 날짜에는 감정일기가 존재합니다."),
+
 
 
 

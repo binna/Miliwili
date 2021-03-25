@@ -13,7 +13,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.app.miliwili.config.BaseResponseStatus.*;
+import static com.app.miliwili.config.BaseResponseStatus.FAILED_TO_GET_EMOTION_RECORD;
+import static com.app.miliwili.config.BaseResponseStatus.NOT_FOUND_EMOTION_RECORD;
 
 @RequiredArgsConstructor
 @Service
@@ -21,20 +22,54 @@ public class EmotionRecordProvider {
     private final EmotionRecordRepository emotionRecordRepository;
     private final JwtService jwtService;
 
+    /**
+     * emotionRecordId로 유효한 감정일기 조회
+     *
+     * @param emotionRecordId
+     * @return EmotionRecord
+     * @throws BaseException
+     * @Auther shine
+     */
     public EmotionRecord retrieveEmotionRecordByIdAndStatusY(Long emotionRecordId) throws BaseException {
         return emotionRecordRepository.findByIdAndStatus(emotionRecordId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_EMOTION_RECORD));
     }
 
+    /**
+     * 날짜로 내 유효한 감정일기 조회
+     *
+     * @param date
+     * @return EmotionRecord
+     * @throws BaseException
+     * @Auther shine
+     */
     public EmotionRecord retrieveEmotionByDateAndUserIdAndStatusY(String date) throws BaseException {
         return emotionRecordRepository
                 .findByDateAndUserInfo_idAndStatus(LocalDate.parse(date, DateTimeFormatter.ISO_DATE), jwtService.getUserId(), "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_EMOTION_RECORD));
     }
 
+    /**
+     * 날짜로 존재하는 감정일기 여부 확인
+     *
+     * @param date
+     * @return boolean
+     * @Auther shine
+     */
+    public boolean isEmotionRecordByDateAndStatusY(LocalDate date) {
+        return emotionRecordRepository.existsByDateAndStatus(date, "Y");
+    }
+
+    /**
+     * 월별 내 유효한 감정일기 조회
+     *
+     * @param month
+     * @return List<EmotionRecord>
+     * @throws BaseException
+     */
     public List<EmotionRecord> retrieveEmotionByStatusYAndDateBetween(String month) throws BaseException {
-        LocalDate start = LocalDate.parse((month + "01"), DateTimeFormatter.ISO_DATE);
-        LocalDate end = LocalDate.parse((month + start.with(TemporalAdjusters.lastDayOfMonth())), DateTimeFormatter.ISO_DATE);
+        LocalDate start = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
+        LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
 
         try {
             return emotionRecordRepository.findByStatusAndDateBetween("Y", start, end);
@@ -43,6 +78,14 @@ public class EmotionRecordProvider {
         }
     }
 
+    /**
+     * 감정기록 월별 조회
+     *
+     * @param month
+     * @return List<EmotionRecordRes>
+     * @throws BaseException
+     * @Auther shine
+     */
     public List<EmotionRecordRes> getEmotionRecordFromMonth(String month) throws BaseException {
         List<EmotionRecord> emotionRecords = retrieveEmotionByStatusYAndDateBetween(month);
 
@@ -57,6 +100,14 @@ public class EmotionRecordProvider {
 
     }
 
+    /**
+     * 감정기록 일별 조회
+     *
+     * @param date
+     * @return EmotionRecordRes
+     * @throws BaseException
+     * @Auther shine
+     */
     public EmotionRecordRes getEmotionRecordFromDate(String date) throws BaseException {
         EmotionRecord emotionRecord = retrieveEmotionByDateAndUserIdAndStatusY(date);
 

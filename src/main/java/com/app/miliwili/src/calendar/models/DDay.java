@@ -31,14 +31,14 @@ public class DDay extends BaseEntity {
     @Column(name = "title", nullable = false, length = 30)
     private String title;
 
-    @Column(name = "subtitle", nullable = false, length = 60)
+    @Column(name = "subtitle", length = 60)
     private String subtitle;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @Builder.Default
-    @Column(name = "link", nullable = false, columnDefinition = "varchar(1) default 'N'")
+    @Column(name = "link", nullable = false, columnDefinition = "TEXT default 'N'")
     private String link = "N";
 
     @Builder.Default

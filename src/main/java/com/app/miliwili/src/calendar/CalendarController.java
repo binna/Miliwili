@@ -294,7 +294,7 @@ public class CalendarController {
         if (parameters.getTitle().length() >= 10) {
             return new BaseResponse<>(EXCEED_MAX10);
         }
-        if (parameters.getSubTitle().length() >= 20) {
+        if (Objects.nonNull(parameters.getSubTitle()) && parameters.getSubTitle().length() >= 20) {
             return new BaseResponse<>(EXCEED_MAX20);
         }
         if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {

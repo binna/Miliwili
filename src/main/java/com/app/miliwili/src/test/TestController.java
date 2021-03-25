@@ -1,5 +1,6 @@
 package com.app.miliwili.src.test;
 
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +22,16 @@ public class TestController {
      * [GET] /test/log
      * @return BaseResponse<List<UserInfoRes>>
      */
+    @ApiOperation(value = "로그테스트 API")
     @ResponseBody
     @GetMapping("/log")
     public String getAll() {
-//        trace, debug 레벨은 Console X, 파일 로깅 X
-//        logger.trace("TRACE Level 테스트");
-//        logger.debug("DEBUG Level 테스트");
-
-//        info 레벨은 Console 로깅 O, 파일 로깅 X
+        // info 레벨은 Console 로깅 O, 파일 로깅 X
         logger.info("INFO Level 테스트");
-//        warn 레벨은 Console 로깅 O, 파일 로깅 O
+        // warn 레벨은 Console 로깅 O, 파일 로깅 O
         logger.warn("Warn Level 테스트");
-//        error 레벨은 Console 로깅 O, 파일 로깅 O (app.log 뿐만 아니라 error.log 에도 로깅 됨)
-//        app.log 와 error.log 는 날짜가 바뀌면 자동으로 *.gz 으로 압축 백업됨
+        // error 레벨은 Console 로깅 O, 파일 로깅 O (app.log 뿐만 아니라 error.log 에도 로깅 됨)
+        // app.log 와 error.log 는 날짜가 바뀌면 자동으로 *.gz 으로 압축 백업됨
         logger.error("ERROR Level 테스트");
 
         return "Success Test";
