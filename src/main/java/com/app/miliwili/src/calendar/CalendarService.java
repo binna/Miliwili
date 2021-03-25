@@ -549,7 +549,7 @@ public class CalendarService {
         else if (plan.getPlanType().equals("일정") ||
                 plan.getPlanType().equals("휴가") || plan.getPlanType().equals("외박")) {
             if (startDate.isBefore(endDate)) {
-                throw new BaseException(FASTER_THAN_CALENDAR_START_DATE);
+                throw new BaseException(FASTER_THAN_PLAN_START_DATE);
             }
         }
         else {
