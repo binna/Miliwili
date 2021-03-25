@@ -167,99 +167,11 @@ public class ExerciseService {
                 .build();
 
 
-      //  System.out.println(exerciseInfo.getExerciseRoutines().get(0).getRoutineDetails());
-
         saveExerciseRoutine(param, exerciseInfo, newRoutine);
 
         return newRoutine.getId();
     }
 
-    private void saveExerciseRoutine(PostExerciseRoutineReq param, ExerciseInfo exerciseInfo, ExerciseRoutine newRoutine) throws BaseException {
-        for (int i = 0; i < param.getDetailName().size(); i++) {
-            ExerciseRoutineDetail newRoutineDetail = ExerciseRoutineDetail.builder()
-                    .sequence(i + 1)
-                    .name(param.getDetailName().get(i))
-                    .routineTypeId(param.getDetailType().get(i))
-                    .setCount(param.getDetailSet().get(i))
-                    .isSame((param.getDetailSetEqual().get(i)) ? "Y" : "N")
-                    .exerciseRoutine(newRoutine)
-                    .detailSets(new ArrayList<>())
-                    .build();
-            System.out.println(newRoutineDetail.getName());
-//            exerciseRoutineDetailRepository.save(newRoutineDetail);
-
-            //무게 + 개수
-            if (newRoutineDetail.getRoutineTypeId() == 1) {
-                String[] totalArr = param.getDetailTypeContext().get(i).split("/");
-                validateCountLength(newRoutineDetail, totalArr);
-                for (int j = 0; j < totalArr.length; j++) {
-                    String[] weightCount = totalArr[j].split("#");
-                    ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
-                            .setIdx(j + 1)
-                            .setWeight(Double.parseDouble(weightCount[0]))
-                            .setCount(Integer.parseInt(weightCount[1]))
-                            .setTime(-1)
-                            .exerciseRoutineDetail(newRoutineDetail)
-                            .build();
-                    //arr추가
-                    newRoutineDetail.addDetailSet(newDetailSet);
-                }
-
-            }
-            // 개수간
-            else if (newRoutineDetail.getRoutineTypeId() == 2) {
-                String[] totalArr = param.getDetailTypeContext().get(i).split("/");
-                validateCountLength(newRoutineDetail, totalArr);
-                for (int j = 0; j < totalArr.length; j++) {
-                    ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
-                            .setIdx(j + 1)
-                            .setCount(Integer.parseInt(totalArr[j]))
-                            .setTime(-1)
-                            .setWeight(-1.0)
-                            .exerciseRoutineDetail(newRoutineDetail)
-                            .build();
-                    //arr추가
-                    newRoutineDetail.addDetailSet(newDetailSet);
-
-                }
-            }
-            //시간
-            else {
-                String[] totalArr = param.getDetailTypeContext().get(i).split("/");
-                validateCountLength(newRoutineDetail, totalArr);
-                for (int j = 0; j < totalArr.length; j++) {
-                    ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
-                            .setIdx(j + 1)
-                            .setTime(Integer.parseInt(totalArr[j]))
-                            .setWeight(-1.0)
-                            .setCount(-1)
-                            .exerciseRoutineDetail(newRoutineDetail)
-                            .build();
-                    //arr추가
-                    newRoutineDetail.addDetailSet(newDetailSet);
-
-                }
-            }
-            //arr추가
-            newRoutine.addRoutineDetail(newRoutineDetail);
-        }
-        exerciseInfo.addExerciseRoutine(newRoutine);
-
-        try {
-            //exerciseRepository.save(exerciseInfo);
-            //이게 문제가 될까????
-            exerciseRoutineRepository.save(newRoutine);
-        }catch (Exception e){
-            throw new BaseException(FAILED_PATCH_DAILY_WEIGHT);
-        }
-    }
-
-    private void validateCountLength(ExerciseRoutineDetail newRoutineDetail, String[] totalArr) throws BaseException {
-        if(newRoutineDetail.getIsSame().equals("N")) {
-            if (newRoutineDetail.getSetCount() != totalArr.length)
-                throw new BaseException(INVALID_SETCOUNT);
-        }
-    }
 
     /**
      * 루틴 수정
@@ -431,5 +343,98 @@ public class ExerciseService {
         exerciseRoutineRepository.save(routine);
     }
 
+    /**
+     * 루틴 저장
+     * @param param
+     * @param exerciseInfo
+     * @param newRoutine
+     * @throws BaseException
+     */
+    private void saveExerciseRoutine(PostExerciseRoutineReq param, ExerciseInfo exerciseInfo, ExerciseRoutine newRoutine) throws BaseException {
+        for (int i = 0; i < param.getDetailName().size(); i++) {
+            ExerciseRoutineDetail newRoutineDetail = ExerciseRoutineDetail.builder()
+                    .sequence(i + 1)
+                    .name(param.getDetailName().get(i))
+                    .routineTypeId(param.getDetailType().get(i))
+                    .setCount(param.getDetailSet().get(i))
+                    .isSame((param.getDetailSetEqual().get(i)) ? "Y" : "N")
+                    .exerciseRoutine(newRoutine)
+                    .detailSets(new ArrayList<>())
+                    .build();
+            System.out.println(newRoutineDetail.getName());
+//            exerciseRoutineDetailRepository.save(newRoutineDetail);
+
+            //무게 + 개수
+            if (newRoutineDetail.getRoutineTypeId() == 1) {
+                String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                validateCountLength(newRoutineDetail, totalArr);
+                for (int j = 0; j < totalArr.length; j++) {
+                    String[] weightCount = totalArr[j].split("#");
+                    ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
+                            .setIdx(j + 1)
+                            .setWeight(Double.parseDouble(weightCount[0]))
+                            .setCount(Integer.parseInt(weightCount[1]))
+                            .setTime(-1)
+                            .exerciseRoutineDetail(newRoutineDetail)
+                            .build();
+                    //arr추가
+                    newRoutineDetail.addDetailSet(newDetailSet);
+                }
+
+            }
+            // 개수간
+            else if (newRoutineDetail.getRoutineTypeId() == 2) {
+                String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                validateCountLength(newRoutineDetail, totalArr);
+                for (int j = 0; j < totalArr.length; j++) {
+                    ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
+                            .setIdx(j + 1)
+                            .setCount(Integer.parseInt(totalArr[j]))
+                            .setTime(-1)
+                            .setWeight(-1.0)
+                            .exerciseRoutineDetail(newRoutineDetail)
+                            .build();
+                    //arr추가
+                    newRoutineDetail.addDetailSet(newDetailSet);
+
+                }
+            }
+            //시간
+            else {
+                String[] totalArr = param.getDetailTypeContext().get(i).split("/");
+                validateCountLength(newRoutineDetail, totalArr);
+                for (int j = 0; j < totalArr.length; j++) {
+                    ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
+                            .setIdx(j + 1)
+                            .setTime(Integer.parseInt(totalArr[j]))
+                            .setWeight(-1.0)
+                            .setCount(-1)
+                            .exerciseRoutineDetail(newRoutineDetail)
+                            .build();
+                    //arr추가
+                    newRoutineDetail.addDetailSet(newDetailSet);
+
+                }
+            }
+            //arr추가
+            newRoutine.addRoutineDetail(newRoutineDetail);
+        }
+        exerciseInfo.addExerciseRoutine(newRoutine);
+
+        try {
+            //exerciseRepository.save(exerciseInfo);
+            //이게 문제가 될까????
+            exerciseRoutineRepository.save(newRoutine);
+        }catch (Exception e){
+            throw new BaseException(FAILED_PATCH_DAILY_WEIGHT);
+        }
+    }
+
+    private void validateCountLength(ExerciseRoutineDetail newRoutineDetail, String[] totalArr) throws BaseException {
+        if(newRoutineDetail.getIsSame().equals("N")) {
+            if (newRoutineDetail.getSetCount() != totalArr.length)
+                throw new BaseException(INVALID_SETCOUNT);
+        }
+    }
 
 }
