@@ -83,7 +83,6 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public PostLoginRes loginUser(String socialId) throws BaseException {
         UserInfo user = null;
 
@@ -108,7 +107,6 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public PostSignUpRes createUser(PostSignUpReq parameters, String token) throws BaseException {
         UserInfo newUser = UserInfo.builder()
                 .name(parameters.getName())
@@ -126,11 +124,15 @@ public class UserService {
             throw new BaseException(DUPLICATED_USER);
         }
 
-        setVacationData(newUser);
-
         try {
-            UserInfo savedUser = userRepository.save(newUser);
-            return new PostSignUpRes(savedUser.getId(), jwtService.createJwt(savedUser.getId()));
+            newUser = userRepository.save(newUser);
+            setVacationData(newUser);
+            return new PostSignUpRes(newUser.getId(), jwtService.createJwt(newUser.getId()));
+        } catch (BaseException exception) {
+            if(exception.getStatus() == SET_VACATION_PLAN) {
+                userRepository.delete(newUser);
+            }
+            throw new BaseException(FAILED_TO_SIGNUP_USER);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_SIGNUP_USER);
         }
@@ -144,7 +146,6 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public UserRes updateUser(PatchUserReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
@@ -224,7 +225,6 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public void deleteUser() throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
         user.setStatus("N");
@@ -245,7 +245,6 @@ public class UserService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public VacationRes updateVacation(VacationReq parameters, Long vacationId) throws BaseException {
         Vacation vacation = userProvider.retrieveVacationById(vacationId);
         int count = getPlanVacationCount(vacationId);

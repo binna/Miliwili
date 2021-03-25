@@ -15,9 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -42,7 +40,6 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public PostPlanRes createPlan(PostPlanReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
@@ -57,7 +54,7 @@ public class CalendarService {
         setPushMessage(parameters.getPush(), parameters.getPushDeviceToken(), newPlan);
         setPlanVacation(newPlan.getPlanType(), parameters.getPlanVacation(), newPlan);
         setWorks(parameters.getWork(), newPlan);
-        setPlanDiaryData(newPlan);
+        newPlan.setPlanDiaries(getPlanDiaryData(newPlan));
 
         try {
             Plan savedPlan = planRepository.save(newPlan);
@@ -87,7 +84,6 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public PatchPlanRes updatePlan(PatchPlanReq parameters, Long planId) throws BaseException {
         Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
 
@@ -140,7 +136,6 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public void deletePlan(Long planId) throws BaseException {
         Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
 
@@ -169,7 +164,6 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public DiaryRes updatePlanDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
         PlanDiary diary = calendarProvider.retrievePlanDiaryById(diaryId);
 
@@ -200,7 +194,6 @@ public class CalendarService {
      * @return WorkRes
      * @throws BaseException
      */
-    @Transactional
     public WorkRes updatePlanWork(Long workId) throws BaseException {
         PlanWork work = calendarProvider.retrievePlanWorkById(workId);
 
@@ -236,7 +229,6 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public PostDDayRes createDDay(PostDDayReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
@@ -249,7 +241,7 @@ public class CalendarService {
         setSubTitle(parameters.getSubTitle(), newDDay);
         setChoiceCalendar(newDDay, parameters.getDdayType(), parameters.getChoiceCalendar());
         setLinkOrPlaceOrWork(parameters.getDdayType(), parameters.getLink(), parameters.getPlaceLat(), parameters.getPlaceLon(), parameters.getWork(), newDDay);
-        setDDayDiatyData(newDDay);
+        newDDay.setDdayDiaries(getDDayDiaries(newDDay));
 
         try {
             DDay savedDDay = ddayRepository.save(newDDay);
@@ -270,16 +262,7 @@ public class CalendarService {
         }
     }
 
-    private void setDDayDiatyData(DDay dday) {
-        if(dday.getDdayType().equals("생일")) {
-            DDayDiary diary = DDayDiary.builder().date(dday.getDate()).dday(dday).build();
-            try {
-                ddayDiaryRepository.save(diary);
-            } catch (Exception exception) {
-                new BaseException(SET_DIARY);
-            }
-        }
-    }
+
 
     /**
      * D-Day 수정
@@ -290,7 +273,6 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public PatchDDayRes updateDDay(PatchDDayReq parameters, Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
 
@@ -343,7 +325,6 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public void deleteDDay(Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
 
@@ -369,7 +350,6 @@ public class CalendarService {
      * @return PostDiaryRes
      * @throws BaseException
      */
-    @Transactional
     public DiaryRes createDDayDiary(PostDiaryReq parameters, Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
 
@@ -410,7 +390,6 @@ public class CalendarService {
      * @return PatchDiaryRes
      * @throws BaseException
      */
-    @Transactional
     public DiaryRes updateDDayDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
         DDayDiary diary = calendarProvider.retrieveDDayDiaryById(diaryId);
 
@@ -470,8 +449,13 @@ public class CalendarService {
 
 
 
-    private void setPlanDiaryData(Plan plan) {
-        List<PlanDiary> diaryList = new ArrayList<>();
+    private Set<DDayDiary> getDDayDiaries(DDay dday) {
+        if(dday.getDdayType().equals("생일")) return null;
+        return Set.of(DDayDiary.builder().date(dday.getDate()).dday(dday).build());
+    }
+
+    private Set<PlanDiary> getPlanDiaryData(Plan plan) {
+        Set<PlanDiary> diaryList = new HashSet<>();
 
         int day =  (int) ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate());
         LocalDate targetDate = plan.getStartDate();
@@ -480,11 +464,8 @@ public class CalendarService {
             diaryList.add(PlanDiary.builder().date(targetDate).plan(plan).build());
             targetDate = targetDate.plusDays(1);
         }
-        try {
-            planDiaryRepository.saveAll(diaryList);
-        } catch (Exception exception) {
-            new BaseException(SET_DIARY);
-        }
+
+        return diaryList;
     }
 
     private void setLinkOrPlaceOrWork(String ddayType, String link, BigDecimal placeLat, BigDecimal placeLon, List<WorkReq> work, DDay dday) {
