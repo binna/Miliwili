@@ -169,6 +169,12 @@ public class ExerciseService {
 
       //  System.out.println(exerciseInfo.getExerciseRoutines().get(0).getRoutineDetails());
 
+        saveExerciseRoutine(param, exerciseInfo, newRoutine);
+
+        return newRoutine.getId();
+    }
+
+    private void saveExerciseRoutine(PostExerciseRoutineReq param, ExerciseInfo exerciseInfo, ExerciseRoutine newRoutine) throws BaseException {
         for (int i = 0; i < param.getDetailName().size(); i++) {
             ExerciseRoutineDetail newRoutineDetail = ExerciseRoutineDetail.builder()
                     .sequence(i + 1)
@@ -246,9 +252,6 @@ public class ExerciseService {
         }catch (Exception e){
             throw new BaseException(FAILED_PATCH_DAILY_WEIGHT);
         }
-        System.out.println(exerciseInfo.getExerciseRoutines().get(0).getName());
-
-        return newRoutine.getId();
     }
 
     private void validateCountLength(ExerciseRoutineDetail newRoutineDetail, String[] totalArr) throws BaseException {
@@ -256,6 +259,39 @@ public class ExerciseService {
             if (newRoutineDetail.getSetCount() != totalArr.length)
                 throw new BaseException(INVALID_SETCOUNT);
         }
+    }
+
+    /**
+     * 루틴 수정
+     */
+    public String modifyRoutine(PostExerciseRoutineReq param, long exerciseId, long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
+            throw new BaseException(INVALID_USER);
+        }
+
+        List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
+        ExerciseRoutine routine = null;
+        for(ExerciseRoutine r : routineList){
+            if(r.getId() == routineId){
+                routine = r;
+                break;
+            }
+        }
+        if(routine == null)
+            throw new BaseException(NOT_FOUND_ROUTINE);
+
+
+        routine.setName(param.getRoutineName());
+        routine.setBodyPart(param.getBodyPart());
+        routine.setRepeaDay(param.getRepeatDay());
+        routine.getRoutineDetails().clear();
+
+        saveExerciseRoutine(param, exerciseInfo, routine);
+
+        return "success";
+
     }
 
     /**

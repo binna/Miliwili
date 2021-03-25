@@ -170,6 +170,25 @@ public class ExerciseController {
     }
 
     /**
+     * 루틴 수정
+     * @return BaseResponse<String>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ResponseBody
+    @PatchMapping("/{exerciseId}/routines/{routineId}")
+    public BaseResponse<String> patchRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,@PathVariable Long routineId,
+                                           @RequestBody PostExerciseRoutineReq param){
+        try{
+            String resultStr = exerciseService.modifyRoutine(param,exerciseId,routineId);
+            return new BaseResponse<>(SUCCESS,resultStr);
+        }catch (BaseException e){
+            e.printStackTrace();
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
      * 전체 루틴 조회
      * @return BaseResponse<MyRoutineInfo>
      * @RequestHeader X-ACCESS-TOKEN
