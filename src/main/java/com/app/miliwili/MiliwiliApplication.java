@@ -1,6 +1,8 @@
 package com.app.miliwili;
 
 import com.app.miliwili.src.calendar.PlanRepository;
+import com.app.miliwili.src.emotionRecord.EmotionRecordRepository;
+import com.app.miliwili.src.emotionRecord.models.EmotionRecord;
 import com.app.miliwili.src.user.VacationRepository;
 import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
@@ -27,6 +29,7 @@ import java.util.List;
 @SpringBootApplication
 public class MiliwiliApplication implements CommandLineRunner {
     private final UserRepository userRepository;
+    private final EmotionRecordRepository emotionRecordRepository;
     private final VacationRepository vacationRepository;
     private final PlanRepository scheduleRepository;
 
@@ -114,5 +117,35 @@ public class MiliwiliApplication implements CommandLineRunner {
         final List<UserInfo> userList =
                 Arrays.asList(userKaKao1, userKaKao2, userKaKao3, userKaKao4, userKaKao5);
         userRepository.saveAll(userList);
+
+
+        EmotionRecord emotionRecord1 = EmotionRecord.builder()
+                .date(LocalDate.parse("2021-03-01", DateTimeFormatter.ISO_DATE))
+                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+        EmotionRecord emotionRecord2 = EmotionRecord.builder()
+                .date(LocalDate.parse("2021-03-10", DateTimeFormatter.ISO_DATE))
+                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+        EmotionRecord emotionRecord3 = EmotionRecord.builder()
+                .date(LocalDate.parse("2021-03-15", DateTimeFormatter.ISO_DATE))
+                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+        EmotionRecord emotionRecord4 = EmotionRecord.builder()
+                .date(LocalDate.parse("2021-03-20", DateTimeFormatter.ISO_DATE))
+                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+        EmotionRecord emotionRecord5 = EmotionRecord.builder()
+                .date(LocalDate.parse("2021-03-25", DateTimeFormatter.ISO_DATE))
+                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+        EmotionRecord emotionRecord6 = EmotionRecord.builder()
+                .date(LocalDate.parse("2021-03-31", DateTimeFormatter.ISO_DATE))
+                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+        EmotionRecord emotionRecord7 = EmotionRecord.builder()
+                .date(LocalDate.parse("2021-04-01", DateTimeFormatter.ISO_DATE))
+                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+        EmotionRecord emotionRecord8 = EmotionRecord.builder()
+                .date(LocalDate.parse("2021-01-01", DateTimeFormatter.ISO_DATE))
+                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+        final List<EmotionRecord> emotionRecordList
+                = Arrays.asList(emotionRecord1, emotionRecord2, emotionRecord3, emotionRecord4,
+                                emotionRecord5, emotionRecord6, emotionRecord7, emotionRecord8);
+        emotionRecordRepository.saveAll(emotionRecordList);
     }
 }

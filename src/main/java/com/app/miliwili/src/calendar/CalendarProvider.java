@@ -5,7 +5,6 @@ import com.app.miliwili.src.calendar.dto.*;
 import com.app.miliwili.src.calendar.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -34,7 +33,6 @@ public class CalendarProvider {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public Plan retrievePlanByIdAndStatusY(Long planId) throws BaseException {
         return planRepository.findByIdAndStatus(planId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_PLAN));
@@ -48,7 +46,6 @@ public class CalendarProvider {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public PlanDiary retrievePlanDiaryById(Long diaryId) throws BaseException {
         return diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_DIARY));
@@ -62,7 +59,6 @@ public class CalendarProvider {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public PlanWork retrievePlanWorkById(Long workId) throws BaseException {
         return planWorkRepository.findById(workId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_WORK));
@@ -76,7 +72,6 @@ public class CalendarProvider {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public DDay retrieveDDayByIdAndStatusY(Long ddayId) throws BaseException {
         return ddayRepository.findByIdAndStatus(ddayId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_D_DAY));
@@ -90,7 +85,6 @@ public class CalendarProvider {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public DDayDiary retrieveDDayDiaryById(Long ddayId) throws BaseException {
         return ddayDiaryRepository.findById(ddayId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_DIARY));
@@ -104,7 +98,6 @@ public class CalendarProvider {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public DDayWork retrieveDDayWorkById(Long workId) throws BaseException {
         return ddayWorkRepository.findById(workId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_WORK));
@@ -117,7 +110,6 @@ public class CalendarProvider {
      * @return PlanVacation
      * @throws BaseException
      */
-    @Transactional
     public PlanVacation retrievePlanVacationByIdAndStatusY(Long vacationId) throws BaseException {
         return planVacationRepository.findByVacationIdAndStatus(vacationId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION_PLAN));
@@ -130,7 +122,6 @@ public class CalendarProvider {
      * @return GetPlanRes
      * @throws BaseException
      */
-    @Transactional
     public GetPlanRes getPlan(Long planId) throws BaseException {
         Plan plan = retrievePlanByIdAndStatusY(planId);
 
@@ -151,7 +142,6 @@ public class CalendarProvider {
      * @return GetDDayRes
      * @throws BaseException
      */
-    @Transactional
     public GetDDayRes getDDay(Long ddayId) throws BaseException {
         DDay dday = retrieveDDayByIdAndStatusY(ddayId);
 

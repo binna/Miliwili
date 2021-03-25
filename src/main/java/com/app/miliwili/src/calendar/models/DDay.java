@@ -31,7 +31,7 @@ public class DDay extends BaseEntity {
     @Column(name = "title", nullable = false, length = 30)
     private String title;
 
-    @Column(name = "subtitle", nullable = false, length = 60)
+    @Column(name = "subtitle", length = 60)
     private String subtitle;
 
     @Column(name = "date", nullable = false)

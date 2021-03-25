@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -21,6 +22,14 @@ public class EmotionRecordService {
     private final EmotionRecordProvider emotionRecordProvider;
     private final JwtService jwtService;
 
+    /**
+     * 감정기록 생성
+     *
+     * @param parameters
+     * @return EmotionRecordRes
+     * @throws BaseException
+     * @Auther shine
+     */
     public EmotionRecordRes createEmotionRecord(EmotionRecordReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
@@ -28,14 +37,16 @@ public class EmotionRecordService {
                 .date(LocalDate.now())
                 .content(parameters.getContent())
                 .emoticon(parameters.getEmotion())
+                .userInfo(user)
                 .build();
 
-        // 기존에 등록되어있는지 검자하는 로직 필요
+        // TODO 기존에 등록되어있는지 검자하는 로직 필요
 
         try {
             EmotionRecord savedEmotionRecord = emotionRecordRepository.save(newEmotionRecord);
             return EmotionRecordRes.builder()
                     .emotionRecordId(savedEmotionRecord.getId())
+                    .date(savedEmotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                     .content(savedEmotionRecord.getContent())
                     .emotion(savedEmotionRecord.getEmoticon())
                     .build();
@@ -44,6 +55,15 @@ public class EmotionRecordService {
         }
     }
 
+    /**
+     * 감정기록 수정
+     *
+     * @param parameters
+     * @param emotionRecordId
+     * @return EmotionRecordRes
+     * @throws BaseException
+     * @Auther shine
+     */
     public EmotionRecordRes updateEmotionRecord(EmotionRecordReq parameters, Long emotionRecordId) throws BaseException {
         EmotionRecord emotionRecord = emotionRecordProvider.retrieveEmotionRecordByIdAndStatusY(emotionRecordId);
 
@@ -58,6 +78,7 @@ public class EmotionRecordService {
             EmotionRecord savedEmotionRecord = emotionRecordRepository.save(emotionRecord);
             return EmotionRecordRes.builder()
                     .emotionRecordId(savedEmotionRecord.getId())
+                    .date(savedEmotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                     .content(savedEmotionRecord.getContent())
                     .emotion(savedEmotionRecord.getEmoticon())
                     .build();
@@ -66,6 +87,13 @@ public class EmotionRecordService {
         }
     }
 
+    /**
+     * 감정기록 삭제
+     * 
+     * @param emotionRecordId
+     * @throws BaseException
+     * @Auther shine
+     */
     public void deleteEmotionRecord(Long emotionRecordId) throws BaseException {
         EmotionRecord emotionRecord = emotionRecordProvider.retrieveEmotionRecordByIdAndStatusY(emotionRecordId);
 
