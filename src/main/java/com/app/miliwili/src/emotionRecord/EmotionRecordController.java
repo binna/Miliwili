@@ -2,12 +2,14 @@ package com.app.miliwili.src.emotionRecord;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
-import com.app.miliwili.src.emotionRecord.dto.*;
+import com.app.miliwili.src.emotionRecord.dto.EmotionRecordReq;
+import com.app.miliwili.src.emotionRecord.dto.EmotionRecordRes;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -76,7 +78,12 @@ public class EmotionRecordController {
     @PostMapping("/app/emotions-record")
     public BaseResponse<EmotionRecordRes> postEmotionRecord(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                             @RequestBody(required = false) EmotionRecordReq parameters) {
-        // TODO 유효성 검사
+        if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
+            return new BaseResponse<>(EMPTY_CONTENT);
+        }
+        if (Objects.isNull(parameters.getEmotion()) || parameters.getEmotion().length() == 0) {
+            return new BaseResponse<>(EMPTY_EMOTION);
+        }
 
         try {
             EmotionRecordRes emotionRecord = emotionRecordService.createEmotionRecord(parameters);
@@ -102,7 +109,12 @@ public class EmotionRecordController {
     public BaseResponse<EmotionRecordRes> updateEmotionRecord(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                               @RequestBody(required = false) EmotionRecordReq parameters,
                                                               @PathVariable Long emotionsRecordId) {
-        // TODO 유효성 검사
+        if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
+            return new BaseResponse<>(EMPTY_CONTENT);
+        }
+        if (Objects.isNull(parameters.getEmotion()) || parameters.getEmotion().length() == 0) {
+            return new BaseResponse<>(EMPTY_EMOTION);
+        }
 
         try {
             EmotionRecordRes emotionRecord = emotionRecordService.updateEmotionRecord(parameters, emotionsRecordId);

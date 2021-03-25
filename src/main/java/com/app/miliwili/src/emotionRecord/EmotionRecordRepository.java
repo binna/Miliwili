@@ -13,4 +13,5 @@ public interface EmotionRecordRepository extends CrudRepository<EmotionRecord, L
     Optional<EmotionRecord> findByIdAndStatus(Long emotionRecordId, String status);
     Optional<EmotionRecord> findByDateAndUserInfo_idAndStatus(LocalDate date, Long userId, String status);
     List<EmotionRecord> findByStatusAndDateBetween(String status, LocalDate start, LocalDate date);
+    boolean existsByDateAndStatus(LocalDate date, String status);
 }

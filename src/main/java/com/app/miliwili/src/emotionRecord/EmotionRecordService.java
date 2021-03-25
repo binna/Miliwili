@@ -1,7 +1,8 @@
 package com.app.miliwili.src.emotionRecord;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.emotionRecord.dto.*;
+import com.app.miliwili.src.emotionRecord.dto.EmotionRecordReq;
+import com.app.miliwili.src.emotionRecord.dto.EmotionRecordRes;
 import com.app.miliwili.src.emotionRecord.models.EmotionRecord;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.UserInfo;
@@ -40,7 +41,9 @@ public class EmotionRecordService {
                 .userInfo(user)
                 .build();
 
-        // TODO 기존에 등록되어있는지 검자하는 로직 필요
+        if (emotionRecordProvider.isEmotionRecordByDateAndStatusY(newEmotionRecord.getDate())) {
+            throw new BaseException(ALREADY_EXIST_EMOTION_RECORD);
+        }
 
         try {
             EmotionRecord savedEmotionRecord = emotionRecordRepository.save(newEmotionRecord);
@@ -67,7 +70,7 @@ public class EmotionRecordService {
     public EmotionRecordRes updateEmotionRecord(EmotionRecordReq parameters, Long emotionRecordId) throws BaseException {
         EmotionRecord emotionRecord = emotionRecordProvider.retrieveEmotionRecordByIdAndStatusY(emotionRecordId);
 
-        if(emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
+        if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
@@ -89,7 +92,7 @@ public class EmotionRecordService {
 
     /**
      * 감정기록 삭제
-     * 
+     *
      * @param emotionRecordId
      * @throws BaseException
      * @Auther shine
@@ -97,7 +100,7 @@ public class EmotionRecordService {
     public void deleteEmotionRecord(Long emotionRecordId) throws BaseException {
         EmotionRecord emotionRecord = emotionRecordProvider.retrieveEmotionRecordByIdAndStatusY(emotionRecordId);
 
-        if(emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
+        if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
