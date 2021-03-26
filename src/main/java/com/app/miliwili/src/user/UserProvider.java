@@ -8,7 +8,6 @@ import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -98,7 +97,6 @@ public class UserProvider {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public UserInfo retrieveUserByIdAndStatusY(Long userId) throws BaseException {
         return userRepository.findByIdAndStatus(userId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
@@ -112,7 +110,6 @@ public class UserProvider {
      * @return boolean
      * @Auther shine
      */
-    @Transactional
     public boolean isUserBySocialId(String socialId) {
         return userRepository.existsBySocialIdAndStatus(socialId, "Y");
     }
@@ -125,7 +122,6 @@ public class UserProvider {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public UserInfo retrieveUserBySocialIdAndStatusY(String socialId) throws BaseException {
         return userRepository.findBySocialIdAndStatus(socialId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
@@ -139,7 +135,6 @@ public class UserProvider {
      * @throws BaseException
      * @Auther shine
      */
-    @Transactional
     public Vacation retrieveVacationById(Long vacationId) throws BaseException {
         return vacationRepository.findById(vacationId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION));
@@ -178,28 +173,27 @@ public class UserProvider {
     public UserRes getUser() throws BaseException {
         try {
             UserInfo user = retrieveUserByIdAndStatusY(jwtService.getUserId());
-            if (Objects.nonNull(user.getNormalPromotionState())) {
-                return UserRes.builder()
-                        .userId(user.getId())
-                        .name(user.getName())
-                        .birthday(user.getBirthday().format(DateTimeFormatter.ISO_DATE))
-                        .profileImg(user.getProfileImg())
-                        .stateIdx(user.getStateIdx())
-                        .serveType(user.getServeType())
-                        .startDate(user.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                        .endDate(user.getEndDate().format(DateTimeFormatter.ISO_DATE))
-                        .strPrivate(user.getNormalPromotionState().getFirstDate().format(DateTimeFormatter.ISO_DATE))
-                        .strCorporal(user.getNormalPromotionState().getSecondDate().format(DateTimeFormatter.ISO_DATE))
-                        .strSergeant(user.getNormalPromotionState().getThirdDate().format(DateTimeFormatter.ISO_DATE))
-                        .hobong(user.getNormalPromotionState().getHobong())
-                        .normalPromotionStateIdx(user.getNormalPromotionState().getStateIdx())
-                        .goal(user.getGoal())
-                        .build();
-            }
+            return changeUserInfoToUserRes(user);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(FAILED_TO_GET_USER);
+        }
+    }
+
+
+    /**
+     * UserInfo -> UserRes 변경
+     *
+     * @param user
+     * @return UserRes
+     * @Auther shine
+     */
+    public UserRes changeUserInfoToUserRes(UserInfo user) {
+        if (Objects.isNull(user.getNormalPromotionState())) {
             return UserRes.builder()
                     .userId(user.getId())
                     .name(user.getName())
-                    .birthday(user.getBirthday().format(DateTimeFormatter.ISO_DATE))
+                    .birthday(Validation.isLocalDateAndChangeString(user.getBirthday()))
                     .profileImg(user.getProfileImg())
                     .stateIdx(user.getStateIdx())
                     .serveType(user.getServeType())
@@ -208,8 +202,22 @@ public class UserProvider {
                     .proDate(user.getAbnormalPromotionState().getProDate().format(DateTimeFormatter.ISO_DATE))
                     .goal(user.getGoal())
                     .build();
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_GET_USER);
         }
+        return UserRes.builder()
+                .userId(user.getId())
+                .name(user.getName())
+                .birthday(Validation.isLocalDateAndChangeString(user.getBirthday()))
+                .profileImg(user.getProfileImg())
+                .stateIdx(user.getStateIdx())
+                .serveType(user.getServeType())
+                .startDate(user.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                .endDate(user.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                .strPrivate(user.getNormalPromotionState().getFirstDate().format(DateTimeFormatter.ISO_DATE))
+                .strCorporal(user.getNormalPromotionState().getSecondDate().format(DateTimeFormatter.ISO_DATE))
+                .strSergeant(user.getNormalPromotionState().getThirdDate().format(DateTimeFormatter.ISO_DATE))
+                .hobong(user.getNormalPromotionState().getHobong())
+                .normalPromotionStateIdx(user.getNormalPromotionState().getStateIdx())
+                .goal(user.getGoal())
+                .build();
     }
 }

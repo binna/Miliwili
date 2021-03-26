@@ -1,6 +1,8 @@
 package com.app.miliwili.utils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,5 +40,11 @@ public class Validation {
         if (Objects.isNull(parameter)) return Integer.valueOf(0);
 
         return parameter;
+    }
+
+    public static String isLocalDateAndChangeString(LocalDate parameter) {
+        if(Objects.isNull(parameter)) return null;
+
+        return parameter.format(DateTimeFormatter.ISO_DATE);
     }
 }

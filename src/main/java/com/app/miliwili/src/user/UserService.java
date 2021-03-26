@@ -182,36 +182,7 @@ public class UserService {
 
         try {
             UserInfo savedUser = userRepository.save(user);
-            if (Objects.nonNull(savedUser.getNormalPromotionState())) {
-                return UserRes.builder()
-                        .userId(savedUser.getId())
-                        .name(savedUser.getName())
-                        .birthday(savedUser.getBirthday().format(DateTimeFormatter.ISO_DATE))
-                        .profileImg(savedUser.getProfileImg())
-                        .stateIdx(savedUser.getStateIdx())
-                        .serveType(savedUser.getServeType())
-                        .startDate(savedUser.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                        .endDate(savedUser.getEndDate().format(DateTimeFormatter.ISO_DATE))
-                        .strPrivate(savedUser.getNormalPromotionState().getFirstDate().format(DateTimeFormatter.ISO_DATE))
-                        .strCorporal(savedUser.getNormalPromotionState().getSecondDate().format(DateTimeFormatter.ISO_DATE))
-                        .strSergeant(savedUser.getNormalPromotionState().getThirdDate().format(DateTimeFormatter.ISO_DATE))
-                        .hobong(savedUser.getNormalPromotionState().getHobong())
-                        .normalPromotionStateIdx(savedUser.getNormalPromotionState().getStateIdx())
-                        .goal(savedUser.getGoal())
-                        .build();
-            }
-            return UserRes.builder()
-                    .userId(savedUser.getId())
-                    .name(savedUser.getName())
-                    .birthday(savedUser.getBirthday().format(DateTimeFormatter.ISO_DATE))
-                    .profileImg(savedUser.getProfileImg())
-                    .stateIdx(savedUser.getStateIdx())
-                    .serveType(savedUser.getServeType())
-                    .startDate(savedUser.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                    .endDate(savedUser.getEndDate().format(DateTimeFormatter.ISO_DATE))
-                    .proDate(savedUser.getAbnormalPromotionState().getProDate().format(DateTimeFormatter.ISO_DATE))
-                    .goal(savedUser.getGoal())
-                    .build();
+            return userProvider.changeUserInfoToUserRes(savedUser);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_PATCH_USER);
         }
