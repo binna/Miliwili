@@ -71,13 +71,13 @@ public class CalendarController {
             return new BaseResponse<>(EMPTY_CALENDAR_START_DATE);
         }
         if (!Validation.isRegexDate(parameters.getStartDate())) {
-            return new BaseResponse<>(INVALID_CALENDAR_START_DATE);
+            return new BaseResponse<>(INVALID_PLAN_START_DATE);
         }
         if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
             return new BaseResponse<>(EMPTY_CALENDAR_END_DATE);
         }
         if (!Validation.isRegexDate(parameters.getEndDate())) {
-            return new BaseResponse<>(INVALID_CALENDAR_END_DATE);
+            return new BaseResponse<>(INVALID_PLAN_END_DATE);
         }
 
         LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
@@ -90,7 +90,7 @@ public class CalendarController {
         } else if (parameters.getPlanType().equals("일정") ||
                 parameters.getPlanType().equals("휴가") || parameters.getPlanType().equals("외박")) {
             if (startDate.isAfter(endDate)) {
-                return new BaseResponse<>(FASTER_THAN_CALENDAR_START_DATE);
+                return new BaseResponse<>(FASTER_THAN_PLAN_START_DATE);
             }
         } else {
             return new BaseResponse<>(INVALID_PLAN_TYPE);
@@ -148,13 +148,13 @@ public class CalendarController {
             return new BaseResponse<>(EMPTY_CALENDAR_START_DATE);
         }
         if (!Validation.isRegexDate(parameters.getStartDate())) {
-            return new BaseResponse<>(INVALID_CALENDAR_START_DATE);
+            return new BaseResponse<>(INVALID_PLAN_START_DATE);
         }
         if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
             return new BaseResponse<>(EMPTY_CALENDAR_END_DATE);
         }
         if (!Validation.isRegexDate(parameters.getEndDate())) {
-            return new BaseResponse<>(INVALID_CALENDAR_END_DATE);
+            return new BaseResponse<>(INVALID_PLAN_END_DATE);
         }
         if (Objects.nonNull(parameters.getPush()) && parameters.getPush().equals("Y")) {
             if (Objects.isNull(parameters.getPushDeviceToken()) || parameters.getPushDeviceToken().length() == 0) {
