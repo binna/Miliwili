@@ -562,8 +562,6 @@ public class ExerciseProvider {
         }
         List<String> dateList = new ArrayList<>();
         List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
-        System.out.println(routineList.size()+"routineList");
-
 
         String startDateStr = viewYear+"-" + ((viewMonth>=10) ? viewMonth : ("0"+viewMonth))+"-01";
         int targetLocallength = LocalDate.parse(startDateStr,DateTimeFormatter.ISO_DATE).lengthOfMonth(); //월의 마지막 날짜 계산

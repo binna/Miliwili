@@ -1,6 +1,8 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.src.main.dto.GetUserCalendarMainRes;
+import com.app.miliwili.src.main.dto.UserCalendarMainData;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.src.user.models.UserInfo;
@@ -219,5 +221,21 @@ public class UserProvider {
                 .normalPromotionStateIdx(user.getNormalPromotionState().getStateIdx())
                 .goal(user.getGoal())
                 .build();
+    }
+
+    /**
+     * 메인 페이지 UserCalendarMainData 가져오기
+     */
+    public UserCalendarMainData retrieveMainDataListByUserId(Long userId) throws BaseException{
+        UserCalendarMainData mainData;
+        try{
+            mainData = userSelectRepository.findtest(userId);
+            if (mainData == null)
+                throw new BaseException(NOT_FOUND_MAIN_INFO);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new  BaseException(FAILED_TO_GET_USER_MAIN_INFO);
+        }
+        return mainData;
     }
 }

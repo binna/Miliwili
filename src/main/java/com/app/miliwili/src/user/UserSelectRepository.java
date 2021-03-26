@@ -74,7 +74,7 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
      * @param userId
      * @return
      */
-    public List<GetUserCalendarMainRes> findtest(Long userId) {
+    public UserCalendarMainData findtest(Long userId) {
         QUserInfo user = QUserInfo.userInfo;
         QNormalPromotionState normalPromotionState = QNormalPromotionState.normalPromotionState;
         QAbnormalPromotionState abnormalPromotionState = QAbnormalPromotionState.abnormalPromotionState;
@@ -82,7 +82,7 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
         QPlanVacation planVacation = QPlanVacation.planVacation;
 
         return queryFactory
-                .select((Projections.constructor(GetUserCalendarMainRes.class,
+                .select((Projections.constructor(UserCalendarMainData.class,
                         user.name.as("name"), user.profileImg.as("profileImg"), user.birthday.as("birthday"),
                         user.stateIdx.as("stateIdx"), user.serveType.as("serveType"),
                         user.startDate.as("startDate"), user.endDate.as("endDate"),
@@ -92,27 +92,34 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                         normalPromotionState.hobong.as("hobong"),
                         normalPromotionState.stateIdx.as("normalPromotionStateIdx"),
                         abnormalPromotionState.proDate.as("proDate"),
-                        user.goal.as("goal"),
-                        ExpressionUtils.as(
-                                JPAExpressions.select(vacation.totalDays)
-                                .from(vacation)
-                                .where(vacation.userInfo.id.eq(userId)),
-                                "vacationTotalDays"
-                        ),
-                        ExpressionUtils.as(
-                                JPAExpressions.select(vacation.useDays)
-                                .from(vacation)
-                                .where(vacation.userInfo.id.eq(userId)),
-                                "vacationUseDays"
-                        ),
-                        ExpressionUtils.as(
-                                JPAExpressions.select(planVacation.count)
-                                .from(planVacation)
-                                .where(planVacation.vacationId.eq(vacation.id), planVacation.status.eq("Y")),
-                                "vacationPlanUseDays"
-                        )
+                        user.goal.as("goal")
+//                        ExpressionUtils.as(
+//                                JPAExpressions.select(vacation.totalDays)
+//                                .from(vacation)
+//                                .where(vacation.userInfo.id.eq(userId)),
+//                                "vacationTotalDays"
+//                        ),
+//                        ExpressionUtils.as(
+//                                JPAExpressions.select(vacation.useDays)
+//                                .from(vacation)
+//                                .where(vacation.userInfo.id.eq(userId)),
+//                                "vacationUseDays"
+//                        ),
+//
+//                        ExpressionUtils.as(
+//                                JPAExpressions.select(planVacation.count)
+//                                .from(planVacation)
+//                                .where(planVacation.vacationId.eq(vacation.id), planVacation.status.eq("Y")),
+//                                "vacationPlanUseDays"
+//                        )
                 )))
                 .from(user)
-                .fetch();
+                .leftJoin(user.normalPromotionState, normalPromotionState)
+                .leftJoin(user.abnormalPromotionState,abnormalPromotionState)
+                .where(user.status.eq("Y"), user.id.eq(userId))
+                .fetchOne();
     }
+
+
+
 }

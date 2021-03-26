@@ -34,7 +34,7 @@ public class ExerciseRoutine extends BaseEntity {
     @Column(name = "done", nullable = false, length = 1)
     private String done = "N";
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_id", nullable = false )
     private ExerciseInfo exerciseInfo;
 

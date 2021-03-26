@@ -35,7 +35,7 @@ public class ExerciseRoutineDetail extends BaseEntity {
     @Column(name = "isSame", nullable = false)
     private String isSame;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_routine_id", nullable = false )
     private ExerciseRoutine exerciseRoutine;
 
