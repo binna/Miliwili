@@ -6,7 +6,6 @@ import com.app.miliwili.src.calendar.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -120,17 +119,7 @@ public class CalendarProvider {
         }
     }
 
-    /**
-     * date로 디데이 존재여부 체크
-     * (존재하면 true, 존재하지 않으면 false)
-     * 
-     * @param date
-     * @return boolean
-     * @Auther shine
-     */
-    public boolean isDDayDiary(LocalDate date) {
-        return ddayDiaryRepository.existsByDate(date);
-    }
+
 
 
     /**
@@ -164,6 +153,31 @@ public class CalendarProvider {
     public GetDDayRes getDDay(Long ddayId) throws BaseException {
         DDay dday = retrieveDDayByIdAndStatusY(ddayId);
 
+        return changeDDayToGetDDayRes(dday);
+    }
+
+
+
+
+    /**
+     * DDay -> GetDDayRes 변환
+     * (구분이 생일일때, date와 dataInfo, 다이어리 title, date가 다름
+     *
+     * @param dday
+     * @return GetDDayRes
+     * @Auther shine
+     */
+    public GetDDayRes changeDDayToGetDDayRes(DDay dday) {
+        if(dday.getDdayType().equals("생일")) {
+            return GetDDayRes.builder()
+                    .ddayId(dday.getId())
+                    .date(dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5))
+                    .dateInfo(dday.getDate().format(DateTimeFormatter.ofPattern("MM.dd")))
+                    .ddayType(dday.getDdayType())
+                    .work(changeListDDayWorkToListWorkRes(dday.getDdayWorks()))
+                    .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
+                    .build();
+        }
         return GetDDayRes.builder()
                 .ddayId(dday.getId())
                 .date(dday.getDate().format(DateTimeFormatter.ISO_DATE))
@@ -173,7 +187,6 @@ public class CalendarProvider {
                 .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
                 .build();
     }
-
 
     /**
      * DDayDiary -> DiaryRes 변환
@@ -211,12 +224,7 @@ public class CalendarProvider {
         if (Objects.isNull(parameters)) return null;
 
         return parameters.stream().map(dDayDiary -> {
-            return DiaryRes.builder()
-                    .diaryId(dDayDiary.getId())
-                    .date(dDayDiary.getDate().format(DateTimeFormatter.ISO_DATE))
-                    .title(dDayDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
-                    .content(dDayDiary.getContent())
-                    .build();
+            return changeDDayDiaryToDiaryRes(dDayDiary);
         }).collect(Collectors.toList());
     }
 

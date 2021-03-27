@@ -277,7 +277,7 @@ public class CalendarController {
      * @PathVariable Long ddayId
      * @Auther shine
      */
-    @ApiOperation(value = "일정 id로 상세조회", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "디데이 id로 상세조회", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @GetMapping("/calendars/ddays/{ddayId}")
     public BaseResponse<GetDDayRes> getDDay(@RequestHeader("X-ACCESS-TOKEN") String token,
