@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-public class PostPlanRes {
+public class PlanRes {
     private final Long planId;
     private final String color;
     private final String planType;

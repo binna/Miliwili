@@ -10,10 +10,7 @@ import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.SNSLogin;
-import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,8 +31,6 @@ public class UserService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final VacationRepository vacationRepository;
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     /**
@@ -98,10 +93,8 @@ public class UserService {
             if (exception.getStatus() == NOT_FOUND_USER) {
                 return new PostLoginRes(false, null);
             }
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_GET_USER);
         } catch (Exception exception) {
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
@@ -131,7 +124,6 @@ public class UserService {
         setProfileImg(newUser.getSocialType(), token, newUser);
 
         if (userProvider.isUserBySocialId(newUser.getSocialId())) {
-            logger.warn(new BaseException(DUPLICATED_USER).getStatus().toString());
             throw new BaseException(DUPLICATED_USER);
         }
 
@@ -143,10 +135,8 @@ public class UserService {
             if (exception.getStatus() == SET_PLAN_VACATION) {
                 userRepository.delete(newUser);
             }
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_SIGNUP_USER);
         } catch (Exception exception) {
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_SIGNUP_USER);
         }
     }
@@ -170,7 +160,6 @@ public class UserService {
             UserInfo savedUser = userRepository.save(user);
             return userProvider.changeUserInfoToUserRes(savedUser);
         } catch (Exception exception) {
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_PATCH_USER);
         }
     }
@@ -189,7 +178,6 @@ public class UserService {
         try {
             userRepository.save(user);
         } catch (Exception exception) {
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_DELETE_USER);
         }
     }
@@ -211,7 +199,6 @@ public class UserService {
         setUseDays(parameters.getUseDays(), count, vacation);
 
         if (vacation.getUserInfo().getId() != jwtService.getUserId()) {
-            logger.warn(new BaseException(DO_NOT_AUTH_USER).toString());
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
@@ -224,7 +211,6 @@ public class UserService {
                     .totalDays(savedVacation.getTotalDays())
                     .build();
         } catch (Exception exception) {
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_PATCH_VACATION);
         }
     }
@@ -355,7 +341,6 @@ public class UserService {
             vacation.setUseDays(vacation.getUseDays() + useDays);
 
             if ((vacation.getUseDays() + count) > vacation.getTotalDays()) {
-                logger.warn(new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS).getStatus().toString());
                 throw new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS);
             }
         }
@@ -387,7 +372,6 @@ public class UserService {
             List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3);
             vacationRepository.saveAll(leaveList);
         } catch (Exception exception) {
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(SET_PLAN_VACATION);
         }
     }

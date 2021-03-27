@@ -49,6 +49,7 @@ public class UserController {
             userProvider.retrieveUserByIdAndStatusY(userId);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -70,6 +71,7 @@ public class UserController {
             UserRes user = userProvider.getUser();
             return new BaseResponse<>(SUCCESS, user);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -121,6 +123,7 @@ public class UserController {
             PostLoginRes login = userService.loginUser(SNSLogin.getUserIdFromKakao(token));
             return new BaseResponse<>(SUCCESS, login);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -244,6 +247,7 @@ public class UserController {
             PostSignUpRes signUp = userService.createUser(parameters, token);
             return new BaseResponse<>(SUCCESS, signUp);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -364,6 +368,7 @@ public class UserController {
             UserRes user = userService.updateUser(parameters);
             return new BaseResponse<>(SUCCESS, user);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -384,6 +389,7 @@ public class UserController {
             userService.deleteUser();
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -413,6 +419,7 @@ public class UserController {
             VacationRes vacation = userService.updateVacation(parameters, vacationId);
             return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -434,6 +441,7 @@ public class UserController {
             List<VacationRes> vacation = userProvider.getVacation();
             return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }

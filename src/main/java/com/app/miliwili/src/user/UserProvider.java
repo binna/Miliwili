@@ -1,14 +1,15 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.user.dto.*;
-import com.app.miliwili.src.user.models.Vacation;
+import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
+import com.app.miliwili.src.user.dto.UserRes;
+import com.app.miliwili.src.user.dto.VacationRes;
+import com.app.miliwili.src.user.dto.VacationSelectData;
 import com.app.miliwili.src.user.models.UserInfo;
+import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -26,8 +27,6 @@ public class UserProvider {
     private final VacationRepository vacationRepository;
     private final VacationSelectRepository vacationSelectRepository;
     private final JwtService jwtService;
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     /**
@@ -145,6 +144,9 @@ public class UserProvider {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION));
     }
 
+
+
+
     /**
      * 내 휴가 전체조회
      *
@@ -155,6 +157,11 @@ public class UserProvider {
     public List<VacationRes> getVacation() throws BaseException {
         try {
             List<VacationSelectData> vacations = vacationSelectRepository.findVacationByUserIdAndStatusY(jwtService.getUserId());
+
+            if (vacations.isEmpty()) {
+                throw new BaseException(THIS_USER_NOT_FOUND_VACATION);
+            }
+
             return vacations.stream().map(vacationSelectDate -> {
                 return VacationRes.builder()
                         .vacationId(vacationSelectDate.getId())
@@ -163,8 +170,12 @@ public class UserProvider {
                         .totalDays(vacationSelectDate.getTotalDays())
                         .build();
             }).collect(Collectors.toList());
+        } catch (BaseException exception) {
+            if (exception.getStatus() == THIS_USER_NOT_FOUND_VACATION) {
+                throw new BaseException(THIS_USER_NOT_FOUND_VACATION);
+            }
+            throw new BaseException(FAILED_TO_GET_VACATION);
         } catch (Exception exception) {
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_GET_VACATION);
         }
     }
@@ -184,13 +195,13 @@ public class UserProvider {
             if (exception.getStatus() == NOT_FOUND_USER) {
                 throw new BaseException(NOT_FOUND_USER);
             }
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_GET_USER);
         } catch (Exception exception) {
-            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_GET_USER);
         }
     }
+
+
 
 
     /**

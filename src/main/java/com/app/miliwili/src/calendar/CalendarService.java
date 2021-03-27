@@ -8,6 +8,8 @@ import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,15 +33,18 @@ public class CalendarService {
     private final CalendarProvider calendarProvider;
     private final UserProvider userProvider;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
     /**
      * 일정 생성
      *
      * @param parameters
-     * @return PostPlanRes
+     * @return PlanRes
      * @throws BaseException
      * @Auther shine
      */
-    public PostPlanRes createPlan(PostPlanReq parameters) throws BaseException {
+    public PlanRes createPlan(PostPlanReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         Plan newPlan = Plan.builder()
@@ -57,7 +62,7 @@ public class CalendarService {
 
         try {
             Plan savedPlan = planRepository.save(newPlan);
-            return PostPlanRes.builder()
+            return PlanRes.builder()
                     .planId(savedPlan.getId())
                     .color(savedPlan.getColor())
                     .planType(savedPlan.getPlanType())
@@ -69,7 +74,7 @@ public class CalendarService {
                     .work(calendarProvider.changeListPlanWorkToListWorkRes(savedPlan.getPlanWorks()))
                     .build();
         } catch (Exception exception) {
-            exception.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_POST_PLAN);
         }
     }
@@ -79,11 +84,11 @@ public class CalendarService {
      *
      * @param parameters
      * @param planId
-     * @return PatchPlanRes
+     * @return PlanRes
      * @throws BaseException
      * @Auther shine
      */
-    public PatchPlanRes updatePlan(PatchPlanReq parameters, Long planId) throws BaseException {
+    public PlanRes updatePlan(PatchPlanReq parameters, Long planId) throws BaseException {
         Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
 
         if (plan.getUserInfo().getId() != jwtService.getUserId()) {
@@ -92,7 +97,6 @@ public class CalendarService {
 
         LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
-        checkPlanType(plan, startDate, endDate);
 
         plan.setColor(parameters.getColor());
         plan.setTitle(parameters.getTitle());
@@ -105,7 +109,7 @@ public class CalendarService {
 
         try {
             Plan savedPlan = planRepository.save(plan);
-            return PatchPlanRes.builder()
+            return PlanRes.builder()
                     .planId(savedPlan.getId())
                     .color(savedPlan.getColor())
                     .planType(savedPlan.getPlanType())
@@ -467,8 +471,19 @@ public class CalendarService {
         }
     }
 
-    private void setPlanVacation(List<PlanVacationReq> planVacation, Plan plan) {
+    private void setPlanVacation(List<PlanVacationReq> planVacation, Plan plan) throws BaseException {
         if (plan.getPlanType().equals("휴가")) {
+            int sum = 0;
+            for (PlanVacationReq planVacationCount : planVacation) {
+                sum += planVacationCount.getCount();
+            }
+            if(sum > ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+                throw new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS);
+            }
+            if(sum < ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+                throw new BaseException(NOT_BE_LESS_THAN_USE_DAYS);
+            }
+
             plan.getPlanVacations().clear();
             plan.getPlanVacations().addAll(calendarProvider.changeListPlanVacationReqToSetPlanVacation(planVacation, plan));
         }
@@ -526,8 +541,19 @@ public class CalendarService {
         }
     }
 
-    private void setPlanVacation(String planType, List<PlanVacationReq> planVacation, Plan plan) {
+    private void setPlanVacation(String planType, List<PlanVacationReq> planVacation, Plan plan) throws BaseException {
         if (planType.equals("휴가")) {
+            int sum = 0;
+            for (PlanVacationReq planVacationCount : planVacation) {
+                sum += planVacationCount.getCount();
+            }
+            if(sum > ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+                throw new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS);
+            }
+            if(sum < ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+                throw new BaseException(NOT_BE_LESS_THAN_USE_DAYS);
+            }
+
             plan.setPlanVacations(calendarProvider.changeListPlanVacationReqToSetPlanVacation(planVacation, plan));
         }
     }
@@ -536,24 +562,6 @@ public class CalendarService {
         if (Objects.nonNull(push) && push.equals("T")) {
             plan.setPush(push);
             plan.setPushDeviceToken(pushDeviceToken);
-        }
-    }
-
-    private void checkPlanType(Plan plan, LocalDate startDate, LocalDate endDate) throws BaseException {
-        if (plan.getPlanType().equals("면회") || plan.getPlanType().equals("외출")
-                || plan.getPlanType().equals("전투휴무") || plan.getPlanType().equals("당직")) {
-            if (startDate.isEqual(endDate)) {
-                throw new BaseException(ONLY_ON_THE_SAME_DAY);
-            }
-        }
-        else if (plan.getPlanType().equals("일정") ||
-                plan.getPlanType().equals("휴가") || plan.getPlanType().equals("외박")) {
-            if (startDate.isBefore(endDate)) {
-                throw new BaseException(FASTER_THAN_PLAN_START_DATE);
-            }
-        }
-        else {
-            throw new BaseException(INVALID_PLAN_TYPE);
         }
     }
 

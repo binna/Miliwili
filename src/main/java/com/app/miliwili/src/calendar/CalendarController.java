@@ -6,7 +6,10 @@ import com.app.miliwili.src.calendar.dto.*;
 import com.app.miliwili.utils.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,10 +19,13 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @RestController
+@EnableSwagger2
 @RequestMapping("/app")
 public class CalendarController {
     private final CalendarService calendarService;
     private final CalendarProvider calendarProvider;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     /**
@@ -43,7 +49,7 @@ public class CalendarController {
      * 일정생성 API
      * [POST] /app/calendars/plans
      *
-     * @return BaseResponse<PostPlanRes>
+     * @return BaseResponse<PlanRes>
      * @Token X-ACCESS-TOKEN
      * @RequestBody PostPlanReq parameters
      * @Auther shine
@@ -51,8 +57,8 @@ public class CalendarController {
     @ApiOperation(value = "일정생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PostMapping("/calendars/plans")
-    public BaseResponse<PostPlanRes> postPlan(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                              @RequestBody(required = false) PostPlanReq parameters) {
+    public BaseResponse<PlanRes> postPlan(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                          @RequestBody(required = false) PostPlanReq parameters) {
         if (Objects.isNull(parameters.getColor()) || parameters.getColor().length() == 0) {
             return new BaseResponse<>(EMPTY_COLOR);
         }
@@ -110,9 +116,11 @@ public class CalendarController {
         }
 
         try {
-            PostPlanRes plan = calendarService.createPlan(parameters);
+            PlanRes plan = calendarService.createPlan(parameters);
             return new BaseResponse<>(SUCCESS, plan);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -121,7 +129,7 @@ public class CalendarController {
      * 일정수정 API
      * [PATCH] /app/calendars/plans/:planId
      *
-     * @return BaseResponse<PatchPlanRes>
+     * @return BaseResponse<PlanRes>
      * @Token X-ACCESS-TOKEN
      * @RequestBody PatchPlanReq parameters
      * @PathVariable Long planId
@@ -130,7 +138,7 @@ public class CalendarController {
     @ApiOperation(value = "일정수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/calendars/plans/{planId}")
-    private BaseResponse<PatchPlanRes> updatePlan(@RequestHeader("X-ACCESS-TOKEN") String token,
+    private BaseResponse<PlanRes> updatePlan(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                   @RequestBody(required = false) PatchPlanReq parameters,
                                                   @PathVariable Long planId) {
         if (Objects.isNull(parameters.getColor()) || parameters.getColor().length() == 0) {
@@ -164,9 +172,11 @@ public class CalendarController {
         }
 
         try {
-            PatchPlanRes plan = calendarService.updatePlan(parameters, planId);
+            PlanRes plan = calendarService.updatePlan(parameters, planId);
             return new BaseResponse<>(SUCCESS, plan);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -189,6 +199,8 @@ public class CalendarController {
             calendarService.deletePlan(planId);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
