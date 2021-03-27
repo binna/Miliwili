@@ -2,6 +2,7 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.CalendarProvider;
+import com.app.miliwili.src.calendar.models.PlanVacation;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.NormalPromotionState;
@@ -219,7 +220,7 @@ public class UserService {
             return VacationRes.builder()
                     .vacationId(savedVacation.getId())
                     .title(savedVacation.getTitle())
-                    .useDays(savedVacation.getUseDays() + count)
+                    .useDays(savedVacation.getUseDays() + Validation.isInteger(count))
                     .totalDays(savedVacation.getTotalDays())
                     .build();
         } catch (Exception exception) {
@@ -351,7 +352,7 @@ public class UserService {
 
     private void setUseDays(Integer useDays, Vacation vacation) {
         if (Objects.nonNull(useDays)) {
-            vacation.setUseDays(useDays);
+            vacation.setUseDays(vacation.getUseDays() + useDays);
         }
     }
 
@@ -362,19 +363,19 @@ public class UserService {
     }
 
     private int getPlanVacationCount(Long vacationId) throws BaseException {
-        try {
-            return calendarProvider.retrievePlanVacationByIdAndStatusY(vacationId).getCount();
-        } catch (BaseException exception) {
-            if (exception.getStatus() == NOT_FOUND_VACATION_PLAN) {
-                return 0;
-            }
-            throw new BaseException(FAILED_TO_GET_VACATION_PLAN);
+        List<PlanVacation> planVacationList = calendarProvider.retrievePlanVacationByIdAndStatusY(vacationId);
+        if(planVacationList.isEmpty()) return 0;
+
+        int sum = 0;
+        for(PlanVacation planVacation : planVacationList) {
+            sum += planVacation.getCount();
         }
+        return sum;
     }
 
     private void setVacationData(UserInfo user) throws BaseException {
         Vacation vacation1 = Vacation.builder().title("정기휴가").userInfo(user).totalDays(24).build();
-        Vacation vacation2 = Vacation.builder().title("포상휴가").userInfo(user).totalDays(15).build();
+        Vacation vacation2 = Vacation.builder().title("포상휴가").userInfo(user).totalDays(0).build();
         Vacation vacation3 = Vacation.builder().title("기타휴가").userInfo(user).totalDays(0).build();
 
         try {

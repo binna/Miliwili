@@ -104,15 +104,18 @@ public class CalendarProvider {
     }
 
     /**
-     * vacationId로 일정휴가 조회
+     * vacationId로 모든 일정휴가 조회
      *
      * @param vacationId
      * @return PlanVacation
      * @throws BaseException
      */
-    public PlanVacation retrievePlanVacationByIdAndStatusY(Long vacationId) throws BaseException {
-        return planVacationRepository.findByVacationIdAndStatus(vacationId, "Y")
-                .orElseThrow(() -> new BaseException(NOT_FOUND_VACATION_PLAN));
+    public List<PlanVacation> retrievePlanVacationByIdAndStatusY(Long vacationId) throws BaseException {
+        try {
+            return planVacationRepository.findByVacationIdAndStatus(vacationId, "Y");
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_VACATION_PLAN);
+        }
     }
 
     /**
