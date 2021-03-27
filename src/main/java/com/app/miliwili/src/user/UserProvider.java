@@ -39,59 +39,12 @@ public class UserProvider {
         try {
             userList = userSelectRepository.findUsersIdByGoogleId(gSocialId);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
 
         return userList;
-    }
-
-    /**
-     * stateIdx --> 일반병사인지 아닌지 확인
-     *
-     * @Auther vivi
-     */
-    public int retrieveUserstateIdx(long id) throws BaseException {
-        int userStateIdx = 0;
-        try {
-            List<Integer> userStateList = userSelectRepository.findUserStateIdxByUserId(id);
-            if (userStateList.size() == 0)
-                throw new BaseException(FAILED_TO_GET_USER);
-
-            userStateIdx = userStateList.get(0);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BaseException(FAILED_TO_GET_USER);
-        }
-
-        return userStateIdx;
-    }
-
-    /**
-     * for 전역일 계산기 (MainProvider)
-     * [ 부사관, 준사관, 장교 ]들을 위한
-     *
-     * @return GetAbnormalUserEndDate
-     * @Auther vivi
-     */
-    public GetAbnormalUserEndDate retrieveAbnormalUserEndDate(long id) throws BaseException {
-        GetAbnormalUserEndDate abnormalUserEndDate;
-        try {
-            List<GetAbnormalUserEndDate> userList = userSelectRepository.findEndDateInfoByUserId(id);
-
-            if (userList.size() == 0)
-                throw new BaseException(FAILED_TO_GET_USER);
-
-            abnormalUserEndDate = userList.get(0);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BaseException(FAILED_TO_GET_USER);
-        }
-
-        return abnormalUserEndDate;
     }
 
     /**

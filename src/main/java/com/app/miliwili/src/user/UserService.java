@@ -54,6 +54,7 @@ public class UserService {
         try {
             userIdList = userProvider.isGoogleUser(socialId);
         } catch (Exception e) {
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
@@ -66,11 +67,7 @@ public class UserService {
         }
 
 
-        if (isMemeber == true) { //회원일 떄
-            jwtToken = jwtService.createJwt(id);
-        } else { //회원이 아닐 때
-            jwtToken = "";
-        }
+        jwtToken = (isMemeber == true) ? jwtService.createJwt(id) :"";
 
         postLoginRes = PostLoginRes.builder()
                 .isMember(isMemeber)

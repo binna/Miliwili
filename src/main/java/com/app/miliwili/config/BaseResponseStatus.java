@@ -220,6 +220,17 @@ public enum BaseResponseStatus {
 
     FAILED_TO_GET_MONTH_WEIGHT_3(false, 3570, "월별 체중 기록 조회에 실패하였습니다."),
 
+    FAILED_TO_MODIFY_WEIGHT(false, 3580, "체중기록 수정에 실패하였습니다."),
+
+
+    FAILED_TO_DELETE_ROUTINE(false, 3590, "루틴 삭제에 실패하였습니다."),
+
+    FAILED_TO_DELETE_REPORT_REPORT(false, 3581, "운동리포트 삭제 --> 운동 리포트 다시 저장에 실패하였습니다. "),
+    FAILED_TO_DELETE_REPORT_ROUTINE(false, 3581, "운동리포트 삭제 --> 운동 루틴 다시 저장에 실패하였습니다. "),
+    FAILED_TO_MODIFY_REPORT(false, 3582, "운동리포트 수정에 실패하였습니다. "),
+
+    FAILED_TO_CHANGE_ROUTINE_STATUS(false, 3590, "운동 루틴 완료 여부 초기화에 실패하였습니다."),
+
 
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");

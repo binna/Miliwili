@@ -6,7 +6,10 @@ import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
+import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,13 +28,13 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseRoutineRepository exerciseRoutineRepository;
-    private final ExerciseRoutineDetailRepository exerciseRoutineDetailRepository;
-    private final ExerciseDetailSetRepository exerciseDetailSetRepository;
     private final ExerciseReportRepository exerciseReportRepository;
     private final ExerciseWeightRepository exerciseWeightRepository;
     private final ExerciseProvider exerciseProvider;
     private final UserProvider userProvider;
     private final JwtService jwtService;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
 
     /**
@@ -52,7 +55,7 @@ public class ExerciseService {
         try{
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_POST_FIRST_WIEHGT);
         }
 
@@ -80,6 +83,7 @@ public class ExerciseService {
         try {
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_POST_DAILY_WEIGHT);
         }
 
@@ -96,8 +100,6 @@ public class ExerciseService {
             throw new BaseException(INVALID_USER);
         }
 
-       // LocalDateTime targetDate = LocalDateTime.parse(param.getDayDate()+"T00:00:00");
-      //  LocalDateTime targetNextDate = LocalDateTime.parse((param.getDayDate()+"T23:59:59"));
         LocalDate targetDate = LocalDate.parse(param.getDayDate(), DateTimeFormatter.ISO_DATE);
 
         List<ExerciseWeightRecord> targetWeightRecord;
@@ -105,12 +107,18 @@ public class ExerciseService {
             targetWeightRecord = exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate
                     (exerciseId, "Y", targetDate);
         }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_MONTH_WEIGHT_3);
         }
 
         if (targetWeightRecord.size() != 0) {
             targetWeightRecord.get(0).setWeight(param.getDayWeight());
-            exerciseWeightRepository.save(targetWeightRecord.get(0));
+            try{
+                exerciseWeightRepository.save(targetWeightRecord.get(0));
+            }catch (Exception e){
+                logger.warn(Validation.getPrintStackTrace(e));
+                throw new BaseException(FAILED_TO_MODIFY_WEIGHT);
+            }
 
         }else{
             ExerciseWeightRecord newWiehgtRecord = ExerciseWeightRecord.builder()
@@ -118,10 +126,14 @@ public class ExerciseService {
                     .exerciseInfo(exerciseInfo)
                     .exerciseDate(targetDate)
                     .build();
-            exerciseWeightRepository.save(newWiehgtRecord);
+            try {
+                exerciseWeightRepository.save(newWiehgtRecord);
+            }catch (Exception e){
+                logger.warn(Validation.getPrintStackTrace(e));
+                throw new BaseException(FAILED_TO_MODIFY_WEIGHT);
+            }
 
         }
-
 
         return param.getDayWeight()+"kg으로 수정되었습니다.";
     }
@@ -140,6 +152,7 @@ public class ExerciseService {
         try {
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_PATCH_GOAL_WEIGHT);
         }
 
@@ -228,8 +241,12 @@ public class ExerciseService {
         routine.setExerciseInfo(null);
 
         exerciseInfo.getExerciseRoutines().remove(routine);
-        exerciseRoutineRepository.delete(routine);
-
+        try {
+            exerciseRoutineRepository.delete(routine);
+        }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
+            throw new BaseException(FAILED_TO_DELETE_ROUTINE);
+        }
 
         return "\""+routine.getName()+"\""+"루틴이 삭제되었습니다";
     }
@@ -266,6 +283,7 @@ public class ExerciseService {
             exerciseReportRepository.save(newReport);
             exerciseRoutineRepository.save(routine);
         }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_POST_REPORT);
         }
         return newReport.getId();
@@ -297,8 +315,21 @@ public class ExerciseService {
         report.setStatus("N");
         report.setExerciseRoutine(null);
         routine.getReports().remove(report);
-        exerciseRoutineRepository.save(routine);
-        exerciseReportRepository.save(report);
+
+        try{
+            exerciseReportRepository.save(report);
+        }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
+            throw new BaseException(FAILED_TO_DELETE_REPORT_REPORT);
+        }
+
+        try {
+            exerciseRoutineRepository.save(routine);
+        }catch(Exception e) {
+            logger.warn(Validation.getPrintStackTrace(e));
+            throw new BaseException(FAILED_TO_DELETE_REPORT_ROUTINE);
+        }
+
 
         return "success";
 
@@ -329,8 +360,12 @@ public class ExerciseService {
             throw new BaseException(FAILED_GET_REPORT);
 
         report.setReportText(param.getReportText());
-        exerciseReportRepository.save(report);
-
+        try {
+            exerciseReportRepository.save(report);
+        }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
+            throw new BaseException(FAILED_TO_MODIFY_REPORT);
+        }
         return "success";
 
 
@@ -338,9 +373,14 @@ public class ExerciseService {
     /**
      * 운동 안한상태로 초기화
      */
-    public void resetRoutineDone(ExerciseRoutine routine){
+    public void resetRoutineDone(ExerciseRoutine routine) throws BaseException{
         routine.setDone("N");
-        exerciseRoutineRepository.save(routine);
+        try {
+            exerciseRoutineRepository.save(routine);
+        }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
+            throw new BaseException(FAILED_TO_CHANGE_ROUTINE_STATUS);
+        }
     }
 
     /**
@@ -367,7 +407,7 @@ public class ExerciseService {
             //무게 + 개수
             if (newRoutineDetail.getRoutineTypeId() == 1) {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
-                validateCountLength(newRoutineDetail, totalArr);
+                Validation.validateCountLength(newRoutineDetail, totalArr);
                 for (int j = 0; j < totalArr.length; j++) {
                     String[] weightCount = totalArr[j].split("#");
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
@@ -385,7 +425,7 @@ public class ExerciseService {
             // 개수간
             else if (newRoutineDetail.getRoutineTypeId() == 2) {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
-                validateCountLength(newRoutineDetail, totalArr);
+                Validation.validateCountLength(newRoutineDetail, totalArr);
                 for (int j = 0; j < totalArr.length; j++) {
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
                             .setIdx(j + 1)
@@ -402,7 +442,7 @@ public class ExerciseService {
             //시간
             else {
                 String[] totalArr = param.getDetailTypeContext().get(i).split("/");
-                validateCountLength(newRoutineDetail, totalArr);
+                Validation.validateCountLength(newRoutineDetail, totalArr);
                 for (int j = 0; j < totalArr.length; j++) {
                     ExerciseDetailSet newDetailSet = ExerciseDetailSet.builder()
                             .setIdx(j + 1)
@@ -426,15 +466,11 @@ public class ExerciseService {
             //이게 문제가 될까????
             exerciseRoutineRepository.save(newRoutine);
         }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_PATCH_DAILY_WEIGHT);
         }
     }
 
-    private void validateCountLength(ExerciseRoutineDetail newRoutineDetail, String[] totalArr) throws BaseException {
-        if(newRoutineDetail.getIsSame().equals("N")) {
-            if (newRoutineDetail.getSetCount() != totalArr.length)
-                throw new BaseException(INVALID_SETCOUNT);
-        }
-    }
+
 
 }

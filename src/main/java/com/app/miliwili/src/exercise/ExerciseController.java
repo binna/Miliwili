@@ -6,6 +6,8 @@ import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -19,6 +21,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class ExerciseController {
     private final ExerciseProvider exerciseProvider;
     private final ExerciseService exerciseService;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     /**
@@ -35,7 +38,7 @@ public class ExerciseController {
             Long exerciseId = exerciseService.createFistWeight(param);
             return new BaseResponse<>(SUCCESS,exerciseId);
         }catch (BaseException e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -59,7 +62,7 @@ public class ExerciseController {
             String returnStr = exerciseService.createDayilyWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,returnStr);
         }catch (BaseException e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(FAILED_POST_DAILY_WEIGHT);
         }
     }
@@ -82,6 +85,7 @@ public class ExerciseController {
             String resultStr = exerciseService.modifyDailyWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,resultStr);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -102,7 +106,8 @@ public class ExerciseController {
         try{
             String returnStr = exerciseService.modifyGoalWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,returnStr);
-        }catch (BaseException e){            e.printStackTrace();
+        }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(FAILED_PATCH_GOAL_WEIGHT);
         }
     }
@@ -120,7 +125,7 @@ public class ExerciseController {
             GetExerciseDailyWeightRes exerciseDailyWeightRes= exerciseProvider.retrieveExerciseDailyWeight(exerciseId);
             return new BaseResponse<>(SUCCESS, exerciseDailyWeightRes);
         }catch (BaseException e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -142,10 +147,9 @@ public class ExerciseController {
             return new BaseResponse<>(INVALID_VIEW_DATE);
         try{
             GetExerciseWeightRecordRes result = exerciseProvider.retrieveExerciseWeightRecord(viewMonth, viewYear,exerciseId);
-            System.out.println("outout again");
             return new BaseResponse<>(SUCCESS,result);
         }catch (BaseException e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -166,10 +170,9 @@ public class ExerciseController {
 
         try{
             Long resultLong = exerciseService.createRoutine(param,exerciseId);
-            System.out.println(resultLong);
             return new BaseResponse<>(SUCCESS,resultLong);
         }catch (BaseException e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -192,7 +195,7 @@ public class ExerciseController {
             String resultStr = exerciseService.modifyRoutine(param,exerciseId,routineId);
             return new BaseResponse<>(SUCCESS,resultStr);
         }catch (BaseException e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -210,6 +213,7 @@ public class ExerciseController {
             List<MyRoutineInfo> myAllRoutineList = exerciseProvider.retrieveAllRoutineList(exerciseId);
             return new BaseResponse<>(SUCCESS, myAllRoutineList);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -229,6 +233,7 @@ public class ExerciseController {
             String resultStr = exerciseService.deleteRoutine(exerciseId,routineId);
             return new BaseResponse<>(SUCCESS, resultStr);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -251,6 +256,7 @@ public class ExerciseController {
             List<RoutineInfo> resultList = exerciseProvider.retrieveDateRoutine(exerciseId, targetDate);
             return new BaseResponse<>(SUCCESS, resultList);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -269,6 +275,7 @@ public class ExerciseController {
             GetExerciseRoutineRes resultRoutineRes = exerciseProvider.retrieveRoutineDetailForPatchRoutine(exerciseId,routineId);
             return new BaseResponse<>(SUCCESS,resultRoutineRes);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
 
         }
@@ -288,6 +295,7 @@ public class ExerciseController {
             GetStartExerciseRes resultRoutineRes = exerciseProvider.retrieveRoutineInfoForStartExercise(exerciseId,routineId);
             return new BaseResponse<>(SUCCESS,resultRoutineRes);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
 
         }
@@ -316,6 +324,7 @@ public class ExerciseController {
             Long reportId = exerciseService.createExerciseReport(exerciseId,routineId,param);
             return new BaseResponse<>(SUCCESS, reportId);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -334,6 +343,7 @@ public class ExerciseController {
             GetExerciseReportRes reportRes = exerciseProvider.retrieveExerciseReport(exerciseId,routineId,reportDate);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
 
@@ -353,6 +363,7 @@ public class ExerciseController {
             String reportRes = exerciseService.deleteExerciseReport(exerciseId,routineId,reportDate);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -375,6 +386,7 @@ public class ExerciseController {
             String reportRes = exerciseService.modifyExerciseReport(exerciseId,routineId,param);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
@@ -394,6 +406,7 @@ public class ExerciseController {
             List<String> reportRes = exerciseProvider.retrieveCalendarReport(exerciseId,viewYear,viewMonth);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }

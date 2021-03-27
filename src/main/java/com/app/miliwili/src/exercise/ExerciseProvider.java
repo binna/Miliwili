@@ -5,8 +5,11 @@ import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.utils.JwtService;
+import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -28,6 +31,8 @@ public class ExerciseProvider {
     private final ExerciseRoutineRepository exerciseRoutineRepository;
     private final ExerciseReportRepository exerciseReportRepository;
     private final JwtService jwtService;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
 
     /**
@@ -47,14 +52,14 @@ public class ExerciseProvider {
         List<ExerciseWeightRecord> exerciseDailyWeightList = null;
 
 
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId())
             throw new BaseException(INVALID_USER);
-        }
+
 
         try{
             exerciseDailyWeightList = exerciseWeightRepository.findTop5ByExerciseInfo_IdAndStatusOrderByExerciseDateDesc(exerciseId,"Y");
         }catch (Exception e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_GET_DAILY_WEIGHT);
         }
 
@@ -79,7 +84,7 @@ public class ExerciseProvider {
         try{
             exerciseIdList = exerciseSelectRepository.getExerciseInfoByUserId(userId);
         }catch (Exception e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
@@ -87,6 +92,7 @@ public class ExerciseProvider {
             return false;
         else
             return true;
+
     }
 
     /**
@@ -99,9 +105,9 @@ public class ExerciseProvider {
         List<ExerciseWeightRecord> exerciseWeightList = new ArrayList<>();
 
 
-        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
+        if (exerciseInfo.getUser().getId() != jwtService.getUserId())
             throw new BaseException(INVALID_USER);
-        }
+
 
         //생성 날짜 오름차순 정렬
         Collections.sort(allRecordList, new Comparator<ExerciseWeightRecord>() {
@@ -369,7 +375,7 @@ public class ExerciseProvider {
         try {
             routineList = exerciseRoutineRepository.findAllByStatusAndAndDone("Y", "Y");
         }catch (Exception e){
-            e.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_FIND_GET_ROUTINE);
         }
         return routineList;
@@ -576,14 +582,13 @@ public class ExerciseProvider {
                  reports= exerciseReportRepository.findExerciseReportByExerciseRoutine_IdAndStatusAndDateCreatedBetween(routineList.get(i).getId(),
                         "Y", targetDate, targetLastDate);
             }catch (Exception e){
+                logger.warn(Validation.getPrintStackTrace(e));
                 throw new BaseException(FAILED_GET_REPORT);
             }
-            System.out.println(reports.size()+"reports");
 
 
             for(int j=0; j<reports.size();j++){
                 dateList.add(reports.get(j).getDateCreated().toLocalDate().toString());
-//                System.out.println(dateList.get(j));
             }
 
         }
@@ -704,17 +709,6 @@ public class ExerciseProvider {
 
         return changedList;
     }
-
-
-//
-//    /**
-//     * 생성 날짜로 exerciseWeightRecord찾기
-//     */
-//    public ExerciseWeightRecord getExerciseWiehgtRecord(long exerciseId, LocalDateTime targetDate, LocalDateTime targetNextDate) throws BaseException{
-//       return exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndDateCreatedBetween
-//               (exerciseId, "Y", targetDate, targetNextDate)
-//                    .orElseThrow(() -> null);
-//    }
 
 
 

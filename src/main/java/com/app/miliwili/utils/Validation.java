@@ -1,8 +1,10 @@
 package com.app.miliwili.utils;
 
+import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.exercise.dto.PostExerciseRoutineReq;
+import com.app.miliwili.src.exercise.model.ExerciseRoutineDetail;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -114,5 +116,12 @@ public class Validation {
             return INVALIED_TOTALTIME_TYPE;
 
         return VALIDATION_SUCCESS;
+    }
+
+    public static void validateCountLength(ExerciseRoutineDetail newRoutineDetail, String[] totalArr) throws BaseException {
+        if(newRoutineDetail.getIsSame().equals("N")) {
+            if (newRoutineDetail.getSetCount() != totalArr.length)
+                throw new BaseException(INVALID_SETCOUNT);
+        }
     }
 }
