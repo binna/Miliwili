@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PostDiaryReq {
-    private String date;
+public class DiaryReq {
     private String content;
 }

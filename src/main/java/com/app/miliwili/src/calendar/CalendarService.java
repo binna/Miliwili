@@ -31,15 +31,16 @@ public class CalendarService {
     private final CalendarProvider calendarProvider;
     private final UserProvider userProvider;
 
+
     /**
      * 일정 생성
      *
      * @param parameters
-     * @return PostPlanRes
+     * @return PlanRes
      * @throws BaseException
      * @Auther shine
      */
-    public PostPlanRes createPlan(PostPlanReq parameters) throws BaseException {
+    public PlanRes createPlan(PostPlanReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         Plan newPlan = Plan.builder()
@@ -57,7 +58,7 @@ public class CalendarService {
 
         try {
             Plan savedPlan = planRepository.save(newPlan);
-            return PostPlanRes.builder()
+            return PlanRes.builder()
                     .planId(savedPlan.getId())
                     .color(savedPlan.getColor())
                     .planType(savedPlan.getPlanType())
@@ -69,7 +70,6 @@ public class CalendarService {
                     .work(calendarProvider.changeListPlanWorkToListWorkRes(savedPlan.getPlanWorks()))
                     .build();
         } catch (Exception exception) {
-            exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_PLAN);
         }
     }
@@ -79,11 +79,11 @@ public class CalendarService {
      *
      * @param parameters
      * @param planId
-     * @return PatchPlanRes
+     * @return PlanRes
      * @throws BaseException
      * @Auther shine
      */
-    public PatchPlanRes updatePlan(PatchPlanReq parameters, Long planId) throws BaseException {
+    public PlanRes updatePlan(PatchPlanReq parameters, Long planId) throws BaseException {
         Plan plan = calendarProvider.retrievePlanByIdAndStatusY(planId);
 
         if (plan.getUserInfo().getId() != jwtService.getUserId()) {
@@ -92,7 +92,6 @@ public class CalendarService {
 
         LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
-        checkPlanType(plan, startDate, endDate);
 
         plan.setColor(parameters.getColor());
         plan.setTitle(parameters.getTitle());
@@ -105,7 +104,7 @@ public class CalendarService {
 
         try {
             Plan savedPlan = planRepository.save(plan);
-            return PatchPlanRes.builder()
+            return PlanRes.builder()
                     .planId(savedPlan.getId())
                     .color(savedPlan.getColor())
                     .planType(savedPlan.getPlanType())
@@ -150,11 +149,11 @@ public class CalendarService {
      *
      * @param parameters
      * @param diaryId
-     * @return PatchDiaryRes
+     * @return DiaryRes
      * @throws BaseException
      * @Auther shine
      */
-    public DiaryRes updatePlanDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
+    public DiaryRes updatePlanDiary(DiaryReq parameters, Long diaryId) throws BaseException {
         PlanDiary diary = calendarProvider.retrievePlanDiaryById(diaryId);
 
         if (diary.getPlan().getUserInfo().getId() != jwtService.getUserId()) {
@@ -214,7 +213,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    public PostDDayRes createDDay(PostDDayReq parameters) throws BaseException {
+    public DDayRes createDDay(PostDDayReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         DDay newDDay = DDay.builder()
@@ -228,9 +227,12 @@ public class CalendarService {
         setLinkOrPlaceOrWork(parameters.getDdayType(), parameters.getLink(), parameters.getPlaceLat(), parameters.getPlaceLon(), parameters.getWork(), newDDay);
         newDDay.setDdayDiaries(getDDayDiaries(newDDay));
 
+        //System.out.println("음력을 양력으로---------------------------------" + ChineseCalendarUtil.convertLunarToSolar("20210319"));
+        //System.out.println("양력을 음력으로---------------------------------" + ChineseCalendarUtil.converSolarToLunar("20210319"));
+
         try {
             DDay savedDDay = ddayRepository.save(newDDay);
-            return PostDDayRes.builder()
+            return DDayRes.builder()
                     .ddayId(savedDDay.getId())
                     .ddayType(savedDDay.getDdayType())
                     .title(savedDDay.getTitle())
@@ -252,28 +254,28 @@ public class CalendarService {
      * 
      * @param parameters
      * @param ddayId
-     * @return PatchDDayRes
+     * @return DDayRes
      * @throws BaseException
      * @Auther shine
      */
-    public PatchDDayRes updateDDay(PatchDDayReq parameters, Long ddayId) throws BaseException {
+    public DDayRes updateDDay(PatchDDayReq parameters, Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
 
         if (dday.getUserInfo().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
-        
+
+        checkValidationOfInputValuesByddayType(parameters, dday);
+
         dday.setTitle(parameters.getTitle());
-        dday.setDate(LocalDate.parse(parameters.getDate(), DateTimeFormatter.ISO_DATE));
-
         setSubTitle(parameters.getSubTitle(), dday);
+        dday.setDate(LocalDate.parse(parameters.getDate(), DateTimeFormatter.ISO_DATE));
         setChoiceCalendar(dday, dday.getDdayType(), parameters.getChoiceCalendar());
-
         setLinkOrPlaceOrWork(parameters.getLink(), parameters.getPlaceLat(), parameters.getPlaceLon(), parameters.getWork(), dday);
 
         try {
             DDay savedDDay = ddayRepository.save(dday);
-            return PatchDDayRes.builder()
+            return DDayRes.builder()
                     .ddayId(savedDDay.getId())
                     .ddayType(savedDDay.getDdayType())
                     .title(savedDDay.getTitle())
@@ -289,6 +291,8 @@ public class CalendarService {
             throw new BaseException(FAILED_TO_PATCH_D_DAY);
         }
     }
+
+
 
     /**
      * D-Day 삭제
@@ -321,29 +325,28 @@ public class CalendarService {
      * @return PostDiaryRes
      * @throws BaseException
      */
-    public DiaryRes createDDayDiary(PostDiaryReq parameters, Long ddayId) throws BaseException {
+    public DiaryRes createDDayDiary(DiaryReq parameters, Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
-
-        DDayDiary newMemo = DDayDiary.builder()
-                .date(LocalDate.parse(parameters.getDate(), DateTimeFormatter.ISO_DATE))
-                .content(parameters.getContent())
-                .dday(dday)
-                .build();
 
         if (dday.getUserInfo().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
 
-        checkDDayDiaryDay(parameters.getDate(), dday);
+        DDayDiary newDiary = DDayDiary.builder()
+                .date(LocalDate.parse(LocalDate.now().getYear() + "-" + dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5)))
+                .content(parameters.getContent())
+                .dday(dday)
+                .build();
+
+        if(!dday.getDdayType().equals("생일") && !dday.getDate().isEqual(newDiary.getDate())) {
+            throw new BaseException(OUT_OF_BOUNDS_DATE_DIARY);
+        }
+
+        checkDDayDiaryDay(newDiary.getDate().format(DateTimeFormatter.ISO_DATE), dday);
 
         try {
-            DDayDiary savedMemo = ddayDiaryRepository.save(newMemo);
-            return DiaryRes.builder()
-                    .diaryId(savedMemo.getId())
-                    .date(savedMemo.getDate().format(DateTimeFormatter.ISO_DATE))
-                    .title(savedMemo.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
-                    .content(savedMemo.getContent())
-                    .build();
+            DDayDiary savedDiary = ddayDiaryRepository.save(newDiary);
+            return calendarProvider.changeDDayDiaryToDiaryRes(savedDiary);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_DIARY);
         }
@@ -354,10 +357,10 @@ public class CalendarService {
      * 
      * @param parameters
      * @param diaryId
-     * @return PatchDiaryRes
+     * @return DiaryRes
      * @throws BaseException
      */
-    public DiaryRes updateDDayDiary(PatchDiaryReq parameters, Long diaryId) throws BaseException {
+    public DiaryRes updateDDayDiary(DiaryReq parameters, Long diaryId) throws BaseException {
         DDayDiary diary = calendarProvider.retrieveDDayDiaryById(diaryId);
 
         if (diary.getDday().getUserInfo().getId() != jwtService.getUserId()) {
@@ -368,12 +371,7 @@ public class CalendarService {
 
         try {
             DDayDiary savedDiary = ddayDiaryRepository.save(diary);
-            return DiaryRes.builder()
-                    .diaryId(savedDiary.getId())
-                    .date(savedDiary.getDate().format(DateTimeFormatter.ISO_DATE))
-                    .title(savedDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
-                    .content(savedDiary.getContent())
-                    .build();
+            return calendarProvider.changeDDayDiaryToDiaryRes(savedDiary);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_PATCH_DIARY);
         }
@@ -411,6 +409,44 @@ public class CalendarService {
 
 
 
+
+    private void checkValidationOfInputValuesByddayType(PatchDDayReq parameters, DDay dday) throws BaseException {
+        if (dday.getDdayType().equals("생일")) {
+            if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
+                throw new BaseException(EMPTY_DATE);
+            }
+            if (!Validation.isRegexBirthdayDate(parameters.getDate())) {
+                throw new BaseException(INVALID_DATE);
+            }
+            if (!(parameters.getChoiceCalendar().equals("S") || parameters.getChoiceCalendar().equals("L"))) {
+                throw new BaseException(MUST_ENTER_CHOICE_CALENDAR_S_OR_B);
+            }
+            if (Objects.nonNull(parameters.getLink())
+                    || Objects.nonNull(parameters.getPlaceLat()) || Objects.nonNull(parameters.getPlaceLon())
+                    || Objects.nonNull(parameters.getWork())) {
+                throw new BaseException(NOT_ENTER_LINK_PLACE_WORK);
+            }
+        } else if (dday.equals("기념일")) {
+            if (Objects.nonNull(parameters.getLink())
+                    || Objects.nonNull(parameters.getPlaceLat()) || Objects.nonNull(parameters.getPlaceLon())
+                    || Objects.nonNull(parameters.getWork())) {
+                throw new BaseException(NOT_ENTER_LINK_PLACE_WORK);
+            }
+            if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
+                throw new BaseException(EMPTY_DATE);
+            }
+            if (!Validation.isRegexDate(parameters.getDate())) {
+                throw new BaseException(INVALID_DATE);
+            }
+        } else if (dday.equals("자격증") || dday.equals("수능")) {
+            if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
+                throw new BaseException(EMPTY_DATE);
+            }
+            if (!Validation.isRegexDate(parameters.getDate())) {
+                throw new BaseException(INVALID_DATE);
+            }
+        }
+    }
 
     private void setDDayWorkToggleProcessingStatus(DDayWork work) {
         if (work.getProcessingStatus().equals("T")) {
@@ -467,8 +503,19 @@ public class CalendarService {
         }
     }
 
-    private void setPlanVacation(List<PlanVacationReq> planVacation, Plan plan) {
+    private void setPlanVacation(List<PlanVacationReq> planVacation, Plan plan) throws BaseException {
         if (plan.getPlanType().equals("휴가")) {
+            int sum = 0;
+            for (PlanVacationReq planVacationCount : planVacation) {
+                sum += planVacationCount.getCount();
+            }
+            if(sum > ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+                throw new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS);
+            }
+            if(sum < ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+                throw new BaseException(NOT_BE_LESS_THAN_USE_DAYS);
+            }
+
             plan.getPlanVacations().clear();
             plan.getPlanVacations().addAll(calendarProvider.changeListPlanVacationReqToSetPlanVacation(planVacation, plan));
         }
@@ -526,8 +573,19 @@ public class CalendarService {
         }
     }
 
-    private void setPlanVacation(String planType, List<PlanVacationReq> planVacation, Plan plan) {
+    private void setPlanVacation(String planType, List<PlanVacationReq> planVacation, Plan plan) throws BaseException {
         if (planType.equals("휴가")) {
+            int sum = 0;
+            for (PlanVacationReq planVacationCount : planVacation) {
+                sum += planVacationCount.getCount();
+            }
+            if(sum > ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+                throw new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS);
+            }
+            if(sum < ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+                throw new BaseException(NOT_BE_LESS_THAN_USE_DAYS);
+            }
+
             plan.setPlanVacations(calendarProvider.changeListPlanVacationReqToSetPlanVacation(planVacation, plan));
         }
     }
@@ -536,37 +594,6 @@ public class CalendarService {
         if (Objects.nonNull(push) && push.equals("T")) {
             plan.setPush(push);
             plan.setPushDeviceToken(pushDeviceToken);
-        }
-    }
-
-    private void checkPlanType(Plan plan, LocalDate startDate, LocalDate endDate) throws BaseException {
-        if (plan.getPlanType().equals("면회") || plan.getPlanType().equals("외출")
-                || plan.getPlanType().equals("전투휴무") || plan.getPlanType().equals("당직")) {
-            if (startDate.isEqual(endDate)) {
-                throw new BaseException(ONLY_ON_THE_SAME_DAY);
-            }
-        }
-        else if (plan.getPlanType().equals("일정") ||
-                plan.getPlanType().equals("휴가") || plan.getPlanType().equals("외박")) {
-            if (startDate.isBefore(endDate)) {
-                throw new BaseException(FASTER_THAN_PLAN_START_DATE);
-            }
-        }
-        else {
-            throw new BaseException(INVALID_PLAN_TYPE);
-        }
-    }
-
-    private void checkDate(Plan plan, String diaryDate) throws BaseException {
-        LocalDate date = LocalDate.parse(diaryDate, DateTimeFormatter.ISO_DATE);
-
-        if (date.isBefore(plan.getStartDate()) || date.isAfter(plan.getEndDate())) {
-            throw new BaseException(OUT_OF_BOUNDS_DATE_DIARY);
-        }
-        for (PlanDiary diary : plan.getPlanDiaries()) {
-            if (diary.getDate().isEqual(date)) {
-                throw new BaseException(ALREADY_EXIST_DIARY);
-            }
         }
     }
 }

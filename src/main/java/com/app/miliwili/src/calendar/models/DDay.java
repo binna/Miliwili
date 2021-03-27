@@ -15,7 +15,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"userInfo", "supplies", "memos"})
+@EqualsAndHashCode(callSuper = false, exclude = {"userInfo", "ddayWorks", "ddayDiaries"})
 @Data
 @Entity
 @Table(name = "dday")
@@ -37,9 +37,8 @@ public class DDay extends BaseEntity {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Builder.Default
-    @Column(name = "link", nullable = false, columnDefinition = "TEXT default 'N'")
-    private String link = "N";
+    @Column(name = "link", columnDefinition = "TEXT")
+    private String link;
 
     @Builder.Default
     @Column(name = "choiceCalendar", nullable = false, columnDefinition = "varchar(1) default 'N'")

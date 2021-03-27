@@ -6,6 +6,7 @@ import com.app.miliwili.src.calendar.models.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +25,7 @@ public class CalendarProvider {
     private final DDayWorkRepository ddayWorkRepository;
     private final DDayDiaryRepository ddayDiaryRepository;
     private final PlanVacationRepository planVacationRepository;
+
 
     /**
      * planId로 유효한 일정조회
@@ -119,6 +121,19 @@ public class CalendarProvider {
     }
 
     /**
+     * date로 디데이 존재여부 체크
+     * (존재하면 true, 존재하지 않으면 false)
+     * 
+     * @param date
+     * @return boolean
+     * @Auther shine
+     */
+    public boolean isDDayDiary(LocalDate date) {
+        return ddayDiaryRepository.existsByDate(date);
+    }
+
+
+    /**
      * planId로 일정 상세조회
      *
      * @param workId
@@ -141,6 +156,7 @@ public class CalendarProvider {
 
     /**
      * ddayId로 디데이 상세조회
+     *
      * @param ddayId
      * @return GetDDayRes
      * @throws BaseException
@@ -158,6 +174,31 @@ public class CalendarProvider {
                 .build();
     }
 
+
+    /**
+     * DDayDiary -> DiaryRes 변환
+     * (구분이 생일일때, title 연도까지)
+     *
+     * @param diary
+     * @return DiaryRes
+     * @Auther shine
+     */
+    public DiaryRes changeDDayDiaryToDiaryRes(DDayDiary diary) {
+        if (diary.getDday().getDdayType().equals("생일")) {
+            return DiaryRes.builder()
+                    .diaryId(diary.getId())
+                    .date(diary.getDate().format(DateTimeFormatter.ISO_DATE))
+                    .title(diary.getDate().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")))
+                    .content(diary.getContent())
+                    .build();
+        }
+        return DiaryRes.builder()
+                .diaryId(diary.getId())
+                .date(diary.getDate().format(DateTimeFormatter.ISO_DATE))
+                .title(diary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
+                .content(diary.getContent())
+                .build();
+    }
 
     /**
      * Set<DDayDiary> -> List<DiaryRes> 변경

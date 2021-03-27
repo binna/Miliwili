@@ -128,28 +128,28 @@ public class MiliwiliApplication implements CommandLineRunner {
 
         EmotionRecord emotionRecord1 = EmotionRecord.builder()
                 .date(LocalDate.parse("2021-03-01", DateTimeFormatter.ISO_DATE))
-                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+                .content("test1").emoticon(1).userInfo(userKaKao1).build();
         EmotionRecord emotionRecord2 = EmotionRecord.builder()
                 .date(LocalDate.parse("2021-03-10", DateTimeFormatter.ISO_DATE))
-                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+                .content("test1").emoticon(2).userInfo(userKaKao1).build();
         EmotionRecord emotionRecord3 = EmotionRecord.builder()
                 .date(LocalDate.parse("2021-03-15", DateTimeFormatter.ISO_DATE))
-                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+                .content("test1").emoticon(3).userInfo(userKaKao1).build();
         EmotionRecord emotionRecord4 = EmotionRecord.builder()
                 .date(LocalDate.parse("2021-03-20", DateTimeFormatter.ISO_DATE))
-                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+                .content("test1").emoticon(4).userInfo(userKaKao1).build();
         EmotionRecord emotionRecord5 = EmotionRecord.builder()
                 .date(LocalDate.parse("2021-03-25", DateTimeFormatter.ISO_DATE))
-                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+                .content("test1").emoticon(5).userInfo(userKaKao1).build();
         EmotionRecord emotionRecord6 = EmotionRecord.builder()
                 .date(LocalDate.parse("2021-03-31", DateTimeFormatter.ISO_DATE))
-                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+                .content("test1").emoticon(6).userInfo(userKaKao1).build();
         EmotionRecord emotionRecord7 = EmotionRecord.builder()
                 .date(LocalDate.parse("2021-04-01", DateTimeFormatter.ISO_DATE))
-                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+                .content("test1").emoticon(7).userInfo(userKaKao1).build();
         EmotionRecord emotionRecord8 = EmotionRecord.builder()
                 .date(LocalDate.parse("2021-01-01", DateTimeFormatter.ISO_DATE))
-                .content("test1").emoticon("test1").userInfo(userKaKao1).build();
+                .content("test1").emoticon(8).userInfo(userKaKao1).build();
         final List<EmotionRecord> emotionRecordList
                 = Arrays.asList(emotionRecord1, emotionRecord2, emotionRecord3, emotionRecord4,
                                 emotionRecord5, emotionRecord6, emotionRecord7, emotionRecord8);

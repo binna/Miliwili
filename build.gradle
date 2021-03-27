@@ -68,6 +68,9 @@ dependencies {
     // swagger
     compile 'io.springfox:springfox-swagger2:2.9.2'
     compile 'io.springfox:springfox-swagger-ui:2.9.2'
+
+    // 양력 -> 음력 변환
+    implementation 'com.ibm.icu:icu4j:4.8.2'
 //
 //    //Quartz scheduler
 //    implementation 'org.springframework.boot:spring-boot-starter-quartz'

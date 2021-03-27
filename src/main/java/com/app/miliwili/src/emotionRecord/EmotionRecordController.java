@@ -81,7 +81,7 @@ public class EmotionRecordController {
         if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
             return new BaseResponse<>(EMPTY_CONTENT);
         }
-        if (Objects.isNull(parameters.getEmotion()) || parameters.getEmotion().length() == 0) {
+        if (Objects.isNull(parameters.getEmotion())) {
             return new BaseResponse<>(EMPTY_EMOTION);
         }
 
@@ -112,7 +112,7 @@ public class EmotionRecordController {
         if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
             return new BaseResponse<>(EMPTY_CONTENT);
         }
-        if (Objects.isNull(parameters.getEmotion()) || parameters.getEmotion().length() == 0) {
+        if (Objects.isNull(parameters.getEmotion())) {
             return new BaseResponse<>(EMPTY_EMOTION);
         }
 

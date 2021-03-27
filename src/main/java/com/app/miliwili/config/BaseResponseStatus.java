@@ -59,13 +59,14 @@ public enum BaseResponseStatus {
     ONLY_ON_THE_SAME_DAY(false, 2150, "날짜 범위 등록 불가, 당일만 등록 가능합니다."),
 
     NOT_BE_GREATER_THAN_TOTAL_DAYS(false, 2160, "사용일은 총 휴가일수를 초과할 수 없습니다."),
+    NOT_BE_LESS_THAN_USE_DAYS(false, 2161, "사용하고자 하는 휴가일수는 사용일보다 작을 수 없습니다."),
 
     CHOOSE_BETWEEN_ABNORMAL_OR_NORMAL(false, 2170, "진급일이나 일병과 상병과 병장진급일 중 하나는 꼭 입력해주셔야 합니다."),
     CHOOSE_BETWEEN_TOTAL_OR_USE(false, 2171, "사용한 휴가일수나 총 휴가일수 중 하나는 입력해주셔야 합니다."),
 
+    MUST_ENTER_CHOICE_CALENDAR_S_OR_B(false, 2180, "반드시 양력 S, 음력 L을 입력해주셔야 합니다."),
 
-
-
+    NOT_ENTER_LINK_PLACE_WORK(false, 2190, "링크와 장소, 준비물을 기입할 수 없습니다."),
 
 
     //vivi: 2500~
@@ -118,7 +119,6 @@ public enum BaseResponseStatus {
     INVALIED_REPORT_EXERCISESTATUS(false, 2841, "완료한 운동 형식이 올바르지 않습니다."),
 
 
-
     // 3000 : Response 오류
     KAKAO_CONNECTION(false, 3000, "카카오 연결에 실패하였습니다."),
     KAKAO_CONNECTION_1(false, 3001, "카카오 Response 에러 : 플랫폼 서비스의 일시적 내부 장애가 발생했습니다."),
@@ -137,6 +137,7 @@ public enum BaseResponseStatus {
     FAILED_TO_PATCH_VACATION(false, 3022, "휴가 변경에 실패하였습니다."),
     FAILED_TO_DELETE_VACATION(false, 2023, "휴가 삭제에 실패하였습니다."),
     FAILED_TO_GET_VACATION(false, 3024, "휴가 조회에 실패하였습니다."),
+    THIS_USER_NOT_FOUND_VACATION(false, 3025, "해당 회원에 대한 휴가가 존재하지 않습니다."),
 
     NOT_FOUND_PLAN(false, 3030, "존재하지 않는 일정입니다."),
     FAILED_TO_POST_PLAN(false, 3031, "일정 등록에 실패하였습니다."),
@@ -174,11 +175,6 @@ public enum BaseResponseStatus {
 
     FAILED_TO_SET_DAILY_HOBONG_STATUSIDX(false, 3090, "스케줄러, 호봉과 상위계급 업데이트에 실패하였습니다."),
     FAILED_TO_PUSH_MESSAGE(false, 3091, "스케줄러, PUSH 메시지 발송에 실패하였습니다."),
-
-
-
-
-
 
 
     //vivi: 3500 ~

@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @Getter
 public class EmotionRecordReq {
     private String content;
-    private String emotion;
+    private Integer emotion;
 }

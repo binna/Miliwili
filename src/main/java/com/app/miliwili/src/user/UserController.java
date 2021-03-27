@@ -49,6 +49,7 @@ public class UserController {
             userProvider.retrieveUserByIdAndStatusY(userId);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -56,7 +57,7 @@ public class UserController {
 
     /**
      * 내 회원정보 조회 API
-     * [GET]
+     * [GET] /app/users
      *
      * @return BaseResponse<UserRes>
      * @RequestHeader X-ACCESS-TOKEN
@@ -70,6 +71,7 @@ public class UserController {
             UserRes user = userProvider.getUser();
             return new BaseResponse<>(SUCCESS, user);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -121,6 +123,7 @@ public class UserController {
             PostLoginRes login = userService.loginUser(SNSLogin.getUserIdFromKakao(token));
             return new BaseResponse<>(SUCCESS, login);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -161,13 +164,13 @@ public class UserController {
         if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
             return new BaseResponse<>(EMPTY_START_DATE);
         }
-        if (!Validation.isRegexDate((parameters.getStartDate()))) {
+        if (!Validation.isRegexDate(parameters.getStartDate())) {
             return new BaseResponse<>(INVALID_START_DATE);
         }
         if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
             return new BaseResponse<>(EMPTY_END_DATE);
         }
-        if (!Validation.isRegexDate((parameters.getEndDate()))) {
+        if (!Validation.isRegexDate(parameters.getEndDate())) {
             return new BaseResponse<>(INVALID_END_DATE);
         }
 
@@ -181,7 +184,7 @@ public class UserController {
             if (Objects.isNull(parameters.getStrPrivate()) || parameters.getStrPrivate().length() == 0) {
                 return new BaseResponse<>(EMPTY_FIRST_DATE);
             }
-            if (!Validation.isRegexDate((parameters.getStrPrivate()))) {
+            if (!Validation.isRegexDate(parameters.getStrPrivate())) {
                 return new BaseResponse<>(INVALID_FIRST_DATE);
             }
             LocalDate firstDate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
@@ -192,7 +195,7 @@ public class UserController {
             if (Objects.isNull(parameters.getStrCorporal()) || parameters.getStrCorporal().length() == 0) {
                 return new BaseResponse<>(EMPTY_SECOND_DATE);
             }
-            if (!Validation.isRegexDate((parameters.getStrCorporal()))) {
+            if (!Validation.isRegexDate(parameters.getStrCorporal())) {
                 return new BaseResponse<>(INVALID_SECOND_DATE);
             }
             LocalDate secondDate = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
@@ -204,7 +207,7 @@ public class UserController {
                 return new BaseResponse<>(EMPTY_THIRD_DATE);
             }
             LocalDate thirdDate = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
-            if (!Validation.isRegexDate((parameters.getStrSergeant()))) {
+            if (!Validation.isRegexDate(parameters.getStrSergeant())) {
                 return new BaseResponse<>(INVALID_THIRD_DATE);
             }
             if (secondDate.isAfter(thirdDate)) {
@@ -218,7 +221,7 @@ public class UserController {
                 if (Objects.isNull(parameters.getProDate()) || parameters.getProDate().length() == 0) {
                     return new BaseResponse<>(EMPTY_PRO_DATE);
                 }
-                if (!Validation.isRegexDate((parameters.getProDate()))) {
+                if (!Validation.isRegexDate(parameters.getProDate())) {
                     return new BaseResponse<>(INVALID_PRO_DATE);
                 }
                 LocalDate proDate = LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE);
@@ -244,6 +247,7 @@ public class UserController {
             PostSignUpRes signUp = userService.createUser(parameters, token);
             return new BaseResponse<>(SUCCESS, signUp);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -275,18 +279,20 @@ public class UserController {
                     return new BaseResponse<>(INVALID_BIRTHDAY);
                 }
             }
+            setNullByServeSetting(parameters);
+            setNullByGoal(parameters);
         } else if (Objects.nonNull(parameters.getStrPrivate()) || Objects.nonNull(parameters.getStrCorporal()) || Objects.nonNull(parameters.getStrSergeant())
                 || Objects.nonNull(parameters.getProDate())) {
             if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
                 return new BaseResponse<>(EMPTY_START_DATE);
             }
-            if (!Validation.isRegexDate((parameters.getStartDate()))) {
+            if (!Validation.isRegexDate(parameters.getStartDate())) {
                 return new BaseResponse<>(INVALID_START_DATE);
             }
             if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
                 return new BaseResponse<>(EMPTY_END_DATE);
             }
-            if (!Validation.isRegexDate((parameters.getEndDate()))) {
+            if (!Validation.isRegexDate(parameters.getEndDate())) {
                 return new BaseResponse<>(INVALID_END_DATE);
             }
 
@@ -300,7 +306,7 @@ public class UserController {
                 if (Objects.isNull(parameters.getStrPrivate()) || parameters.getStrPrivate().length() == 0) {
                     return new BaseResponse<>(EMPTY_FIRST_DATE);
                 }
-                if (!Validation.isRegexDate((parameters.getStrPrivate()))) {
+                if (!Validation.isRegexDate(parameters.getStrPrivate())) {
                     return new BaseResponse<>(INVALID_FIRST_DATE);
                 }
                 LocalDate firstDate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
@@ -311,7 +317,7 @@ public class UserController {
                 if (Objects.isNull(parameters.getStrCorporal()) || parameters.getStrCorporal().length() == 0) {
                     return new BaseResponse<>(EMPTY_SECOND_DATE);
                 }
-                if (!Validation.isRegexDate((parameters.getStrCorporal()))) {
+                if (!Validation.isRegexDate(parameters.getStrCorporal())) {
                     return new BaseResponse<>(INVALID_SECOND_DATE);
                 }
                 LocalDate secondDate = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
@@ -323,7 +329,7 @@ public class UserController {
                     return new BaseResponse<>(EMPTY_THIRD_DATE);
                 }
                 LocalDate thirdDate = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
-                if (!Validation.isRegexDate((parameters.getStrSergeant()))) {
+                if (!Validation.isRegexDate(parameters.getStrSergeant())) {
                     return new BaseResponse<>(INVALID_THIRD_DATE);
                 }
                 if (secondDate.isAfter(thirdDate)) {
@@ -346,10 +352,14 @@ public class UserController {
                     }
                 }
             }
+            setNullByNameAndBirthdayAndProfileImg(parameters);
+            setNullByGoal(parameters);
         } else if (Objects.nonNull(parameters.getGoal())) {
             if (parameters.getGoal().length() >= 25) {
                 return new BaseResponse<>(EXCEED_MAX25);
             }
+            setNullByNameAndBirthdayAndProfileImg(parameters);
+            setNullByServeSetting(parameters);
         } else {
             return new BaseResponse<>(EMPTY_ALL);
         }
@@ -358,6 +368,7 @@ public class UserController {
             UserRes user = userService.updateUser(parameters);
             return new BaseResponse<>(SUCCESS, user);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -378,6 +389,7 @@ public class UserController {
             userService.deleteUser();
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -407,6 +419,7 @@ public class UserController {
             VacationRes vacation = userService.updateVacation(parameters, vacationId);
             return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -428,6 +441,7 @@ public class UserController {
             List<VacationRes> vacation = userProvider.getVacation();
             return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
@@ -442,5 +456,28 @@ public class UserController {
     @PostMapping("/jwt/{id}")
     public String postJWT(@PathVariable Long id) {
         return jwtService.createJwt(id);
+    }
+
+
+
+
+    private void setNullByServeSetting(PatchUserReq parameters) {
+        parameters.setServeType(null);
+        parameters.setStartDate(null);
+        parameters.setEndDate(null);
+        parameters.setStrPrivate(null);
+        parameters.setStrCorporal(null);
+        parameters.setStrSergeant(null);
+        parameters.setProDate(null);
+    }
+
+    private void setNullByGoal(PatchUserReq parameters) {
+        parameters.setGoal(null);
+    }
+
+    private void setNullByNameAndBirthdayAndProfileImg(PatchUserReq parameters) {
+        parameters.setName(null);
+        parameters.setBirthday(null);
+        parameters.setProfileImg(null);
     }
 }

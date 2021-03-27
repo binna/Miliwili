@@ -28,8 +28,8 @@ public class EmotionRecord extends BaseEntity {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "emoticon", nullable = false, columnDefinition = "TEXT")
-    private String emoticon;
+    @Column(name = "emoticon", nullable = false)
+    private Integer emoticon;
 
     @OneToOne
     @JoinColumn(name = "userInfo_id", nullable = false)
