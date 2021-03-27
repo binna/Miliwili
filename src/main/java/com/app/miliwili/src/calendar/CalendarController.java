@@ -41,6 +41,8 @@ public class CalendarController {
             GetPlanRes plan = calendarProvider.getPlan(planId);
             return new BaseResponse<>(SUCCESS, plan);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -229,6 +231,8 @@ public class CalendarController {
             DiaryRes diary = calendarService.updatePlanDiary(parameters, diaryId);
             return new BaseResponse<>(SUCCESS, diary);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -252,6 +256,8 @@ public class CalendarController {
             WorkRes work = calendarService.updatePlanWork(workId);
             return new BaseResponse<>(SUCCESS, work);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -321,6 +327,8 @@ public class CalendarController {
             PostDDayRes dday = calendarService.createDDay(parameters);
             return new BaseResponse<>(SUCCESS, dday);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
