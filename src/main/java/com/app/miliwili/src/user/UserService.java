@@ -98,7 +98,7 @@ public class UserService {
             if (exception.getStatus() == NOT_FOUND_USER) {
                 return new PostLoginRes(false, null);
             }
-            logger.warn(new BaseException(FAILED_TO_GET_USER).getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_GET_USER);
         } catch (Exception exception) {
             logger.warn(Validation.getPrintStackTrace(exception));
@@ -143,7 +143,7 @@ public class UserService {
             if (exception.getStatus() == SET_PLAN_VACATION) {
                 userRepository.delete(newUser);
             }
-            logger.warn(new BaseException(FAILED_TO_SIGNUP_USER).getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_SIGNUP_USER);
         } catch (Exception exception) {
             logger.warn(Validation.getPrintStackTrace(exception));
@@ -387,6 +387,7 @@ public class UserService {
             List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3);
             vacationRepository.saveAll(leaveList);
         } catch (Exception exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(SET_PLAN_VACATION);
         }
     }

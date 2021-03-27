@@ -5,6 +5,7 @@ import com.app.miliwili.src.main.dto.GetUserCalendarMainRes;
 import com.app.miliwili.src.main.dto.UserCalendarMainData;
 import com.app.miliwili.src.main.model.GetEndDayRes;
 import com.app.miliwili.src.user.UserProvider;
+import com.app.miliwili.src.user.UserSelectRepository;
 import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.NormalPromotionState;
@@ -26,8 +27,25 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @Service
 public class MainProvider {
-    private final UserProvider userProvider;
+    public final UserSelectRepository userSelectRepository;
     private final JwtService jwtService;
+
+    /**
+     * 메인 페이지 UserCalendarMainData 가져오기
+     */
+    // TODO
+    public UserCalendarMainData retrieveMainDataListByUserId(Long userId) throws BaseException{
+        UserCalendarMainData mainData;
+        try{
+            mainData = userSelectRepository.findtest(userId);
+            if (mainData == null)
+                throw new BaseException(NOT_FOUND_MAIN_INFO);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new  BaseException(FAILED_TO_GET_USER_MAIN_INFO);
+        }
+        return mainData;
+    }
 
     /**
      * main
@@ -36,7 +54,7 @@ public class MainProvider {
         Long userId = jwtService.getUserId();
         UserCalendarMainData userMainInfo;
         try{
-            UserCalendarMainData mainResList = userProvider.retrieveMainDataListByUserId(userId);
+            UserCalendarMainData mainResList = retrieveMainDataListByUserId(userId);
             userMainInfo = mainResList;
         }catch (Exception e){
             e.printStackTrace();
