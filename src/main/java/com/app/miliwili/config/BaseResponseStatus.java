@@ -231,6 +231,9 @@ public enum BaseResponseStatus {
 
     FAILED_TO_CHANGE_ROUTINE_STATUS(false, 3590, "운동 루틴 완료 여부 초기화에 실패하였습니다."),
 
+    FAILED_TO_POST_WEIGHT_ONE_DAY(false, 3600, "오늘의 체중 기록을 이미 입력하셨습니다."),
+    FAILED_TO_GET_TODAY_WEIGHT(false, 3601, "오늘의 체중 기록을 불러오는데 실패하였습니다."),
+
 
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");

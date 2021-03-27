@@ -72,6 +72,19 @@ public class ExerciseService {
             throw new BaseException(INVALID_USER);
         }
 
+        //오늘 이미 썼다면--> 더이상 못씀
+        List<ExerciseWeightRecord> weightRecords;
+        try {
+            weightRecords= exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate(exerciseId,
+                    "Y", LocalDate.now());
+        }catch (Exception e){
+            logger.warn(Validation.getPrintStackTrace(e));
+            throw new BaseException(FAILED_TO_GET_TODAY_WEIGHT);
+        }
+        if(weightRecords.size() != 0){
+            throw new BaseException(FAILED_TO_POST_WEIGHT_ONE_DAY);
+        }
+
         ExerciseWeightRecord weightRecord = ExerciseWeightRecord.builder()
                 .weight(param.getDayWeight())
                 .exerciseInfo(exerciseInfo)
