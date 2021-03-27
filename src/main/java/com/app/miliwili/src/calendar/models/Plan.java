@@ -14,7 +14,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false, exclude = {"userInfo", "toDoLists", "planVacations", "diaries"})
+@EqualsAndHashCode(callSuper = false, exclude = {"userInfo", "planWorks", "planVacations", "planDiaries"})
 @Data
 @Entity
 @Table(name = "plan")
