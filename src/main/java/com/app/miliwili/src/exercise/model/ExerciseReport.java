@@ -27,7 +27,7 @@ public class ExerciseReport extends BaseEntity {
     @Column(name = "reportText", length = 900)
     private String reportText = "";
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_routine_id", nullable = false )
     private ExerciseRoutine exerciseRoutine;
 

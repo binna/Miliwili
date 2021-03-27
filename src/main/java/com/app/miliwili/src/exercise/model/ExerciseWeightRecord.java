@@ -25,7 +25,7 @@ public class ExerciseWeightRecord extends BaseEntity {
     @Column(name = "exerciseDate")
     private LocalDate exerciseDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_id", nullable = false )
     private ExerciseInfo exerciseInfo;
 

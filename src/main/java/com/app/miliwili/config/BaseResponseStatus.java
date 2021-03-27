@@ -172,6 +172,10 @@ public enum BaseResponseStatus {
     FAILED_TO_SIGNUP_USER(false, 3501, "회원 가입에 실패하였습니다."),
     FAILED_TO_SIGNUP_USER_NORMAL_STATE(false, 3502, "회원 가입(일반병사 table)에 실패하였습니다."),
     FAILED_TO_SIGNUP_USER_ABNORMAL_STATE(false, 3503, "회원 가입(일반병사 외 table)에 실패하였습니다."),
+    FAILED_TO_GET_USER_MAIN_INFO(false, 3504, "회원의 메인페이지 정보를 가져오는데 실패하였습니다."),
+    FAILED_TO_GET_USER_MAIN_LIST(false, 3505, "회원의 메인페이지 정보 리스트를 가져오는데 실패하였습니다."),
+    NOT_FOUND_MAIN_INFO(false, 3506, "해당 회원과 일치하는 존재하는 메인 정보가 없습니다. "),
+
 
     FAILED_TO_GET_USER_STATE_IDX(false, 3510, "회원 복무 형태 조회에 실패하였습니다."),
     FAILED_TO_GET_ABNORMAL_END(false, 3511, "부사관, 준사관, 장교 전역일 조회에 실패하였습니다."),
