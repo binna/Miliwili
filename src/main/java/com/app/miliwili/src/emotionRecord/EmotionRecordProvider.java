@@ -68,6 +68,8 @@ public class EmotionRecordProvider {
      * @throws BaseException
      */
     public List<EmotionRecord> retrieveEmotionByStatusYAndDateBetween(String month) throws BaseException {
+        month =  month.substring(0, 4) + "-" + month.substring(4, 6);
+
         LocalDate start = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
         LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
 
