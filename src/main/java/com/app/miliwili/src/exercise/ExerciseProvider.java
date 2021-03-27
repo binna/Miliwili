@@ -758,12 +758,20 @@ public class ExerciseProvider {
 
     public String secToTimeFormat(int sec){
         int hour, min;
+        String resultStr="";
         min = sec / 60;
         hour = min / 60;
         sec = sec % 60;
         min = min % 60;
-        return hour+"시간 "+min+"분 "+sec+"초 ";
 
+        if(hour != 0)
+            resultStr += hour+"시간 ";
+        if(min != 0)
+            resultStr += min+"분 ";
+        if(sec != 0)
+            resultStr += sec+"초";
+
+        return resultStr;
     }
 }
 

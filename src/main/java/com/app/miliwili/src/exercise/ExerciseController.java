@@ -5,6 +5,7 @@ import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.utils.Validation;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "목표체중, 현재체중 첫 입력", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @PostMapping("/first-weights")
     public BaseResponse<Long> postFirstWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseFirstWeightReq param){
@@ -50,6 +52,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "daily 체중 입력", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @PostMapping("/{exerciseId}/weights")
     public BaseResponse<String> postDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseWeightReq param,
@@ -73,6 +76,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "daily 체중 수정", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @PatchMapping("/{exerciseId}/weights")
     public BaseResponse<String> patchDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PatchExerciseDailyWeightReq param,
@@ -96,6 +100,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "목표체중 수정", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @PatchMapping("/{exerciseId}/goal-weights")
     public BaseResponse<String> patchGoalWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PatchExerciseGoalWeight param,
@@ -118,6 +123,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "일별 체중 기록 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @GetMapping("/{exerciseId}/daily-weights")
     public BaseResponse<GetExerciseDailyWeightRes> getDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId){
@@ -137,6 +143,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "체중 기록 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @GetMapping("/{exerciseId}/weight-records")
     public BaseResponse<GetExerciseWeightRecordRes> getWeightRecords(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
@@ -160,6 +167,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "루틴 생성", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @PostMapping("/{exerciseId}/routines")
     public BaseResponse<Long> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
@@ -183,6 +191,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "루틴 수정", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @PatchMapping("/{exerciseId}/routines/{routineId}")
     public BaseResponse<String> patchRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,@PathVariable Long routineId,
@@ -206,6 +215,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "전체 루틴 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @GetMapping("/{exerciseId}/all-routines")
     public BaseResponse<List<MyRoutineInfo>> getMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId){
@@ -225,6 +235,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "루틴 삭제", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @DeleteMapping("/{exerciseId}/routines/{routineId}")
     public BaseResponse<String> deleteMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
@@ -245,6 +256,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "특정 날짜의 루틴 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @GetMapping("/{exerciseId}/routines")
     public BaseResponse<List<RoutineInfo>> getMyDateRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
@@ -267,6 +279,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "루틴 상세정보 조회 -> 루틴 수정을 위한", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @GetMapping("/{exerciseId}/routines/{routineId}/detail-exercises")
     public BaseResponse<GetExerciseRoutineRes> getRoutineDetailForPatchRoutine(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
@@ -287,6 +300,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "루틴 상세정보 조회 -> 운동 시작을 위한", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @GetMapping("/{exerciseId}/routines/{routineId}/start-exercises")
     public BaseResponse<GetStartExerciseRes> getRoutineDetailForStartExercise(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
@@ -307,6 +321,7 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "운동 리포트 생성", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @PostMapping("/{exerciseId}/routines/{routineId}/reports")
     public BaseResponse<Long> postExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
@@ -332,6 +347,7 @@ public class ExerciseController {
     /**
      * 운동리포트 조회
      */
+    @ApiOperation(value = "운동리포트 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @GetMapping("/{exerciseId}/routines/{routineId}/reports")
     public BaseResponse<GetExerciseReportRes> getExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
@@ -352,6 +368,7 @@ public class ExerciseController {
     /**
      * 운동 리포트 삭제
      */
+    @ApiOperation(value = "운동 리포트 삭제", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @DeleteMapping("/{exerciseId}/routines/{routineId}/reports")
     public BaseResponse<String> delteRoutineExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
@@ -371,6 +388,7 @@ public class ExerciseController {
     /**
      * 운동 리포트 수정
      */
+    @ApiOperation(value = "운동 리포트 수정", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @PatchMapping("/{exerciseId}/routines/{routineId}/reports")
     public BaseResponse<String> patchExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
@@ -394,6 +412,7 @@ public class ExerciseController {
     /**
      * 운동리포트 달력 조회
      */
+    @ApiOperation(value = "운동리포트 달력 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
     @GetMapping("/{exerciseId}/reports")
     public BaseResponse<List<String>> getCalendarReports(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
