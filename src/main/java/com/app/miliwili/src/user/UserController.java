@@ -258,14 +258,13 @@ public class UserController {
             if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
                 return new BaseResponse<>(EMPTY_NAME);
             }
-            if (parameters.getServeType().length() >= 10) {
-                return new BaseResponse<>(EXCEED_MAX10);
-            }
-            if (Objects.isNull(parameters.getBirthday()) || parameters.getBirthday().length() == 0) {
-                return new BaseResponse<>(EMPTY_BIRTHDAY);
-            }
-            if (!Validation.isRegexDate(parameters.getBirthday())) {
-                return new BaseResponse<>(INVALID_BIRTHDAY);
+            if (Objects.nonNull(parameters.getBirthday())) {
+                if (parameters.getServeType().length() >= 10) {
+                    return new BaseResponse<>(EXCEED_MAX10);
+                }
+                if (!Validation.isRegexDate(parameters.getBirthday())) {
+                    return new BaseResponse<>(INVALID_BIRTHDAY);
+                }
             }
         } else if (Objects.nonNull(parameters.getStrPrivate()) || Objects.nonNull(parameters.getStrCorporal()) || Objects.nonNull(parameters.getStrSergeant())
                 || Objects.nonNull(parameters.getProDate())) {
