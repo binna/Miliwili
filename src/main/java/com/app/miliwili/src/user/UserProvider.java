@@ -180,6 +180,12 @@ public class UserProvider {
         try {
             UserInfo user = retrieveUserByIdAndStatusY(jwtService.getUserId());
             return changeUserInfoToUserRes(user);
+        } catch (BaseException exception) {
+            if (exception.getStatus() == NOT_FOUND_USER) {
+                throw new BaseException(NOT_FOUND_USER);
+            }
+            logger.warn(Validation.getPrintStackTrace(exception));
+            throw new BaseException(FAILED_TO_GET_USER);
         } catch (Exception exception) {
             logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_GET_USER);
