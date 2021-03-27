@@ -1,7 +1,6 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.main.dto.GetUserCalendarMainRes;
 import com.app.miliwili.src.main.dto.UserCalendarMainData;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.Vacation;
@@ -9,6 +8,8 @@ import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -26,6 +27,9 @@ public class UserProvider {
     private final VacationRepository vacationRepository;
     private final VacationSelectRepository vacationSelectRepository;
     private final JwtService jwtService;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     /**
      * 로그인시 존재하는 구글 아이디(socialId) 검사
@@ -161,6 +165,7 @@ public class UserProvider {
                         .build();
             }).collect(Collectors.toList());
         } catch (Exception exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_GET_VACATION);
         }
     }
@@ -177,7 +182,7 @@ public class UserProvider {
             UserInfo user = retrieveUserByIdAndStatusY(jwtService.getUserId());
             return changeUserInfoToUserRes(user);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            logger.warn(Validation.getPrintStackTrace(exception));
             throw new BaseException(FAILED_TO_GET_USER);
         }
     }
@@ -226,6 +231,7 @@ public class UserProvider {
     /**
      * 메인 페이지 UserCalendarMainData 가져오기
      */
+    // TODO
     public UserCalendarMainData retrieveMainDataListByUserId(Long userId) throws BaseException{
         UserCalendarMainData mainData;
         try{

@@ -10,6 +10,7 @@ import com.app.miliwili.src.user.UserService;
 import com.app.miliwili.src.user.models.NormalPromotionState;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.FirebaseCloudMessage;
+import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class Scheduler {
 
 
     @Scheduled(cron = "0 0 0 * * ?")
-    public void setDailyHobongAndStateIdx() {
+    private void setDailyHobongAndStateIdx() {
         logger.warn("호봉과 진급 스케줄러 실행!");
         List<UserInfo> users = userRepository.findAllByStateIdxAndStatus(1, "Y");
 
@@ -56,13 +57,14 @@ public class Scheduler {
             try {
                 userRepository.save(user);
             } catch (Exception exception) {
+                logger.warn(new BaseResponse<>(FAILED_TO_SET_DAILY_HOBONG_STATUSIDX).toString() + Validation.getPrintStackTrace(exception));
                 new BaseResponse<>(FAILED_TO_SET_DAILY_HOBONG_STATUSIDX);
             }
         }
     }
 
     @Scheduled(cron = "0 0 19 * * ?")
-    public void sendPushMessage() {
+    private void sendPushMessage() {
         logger.warn("FCM 스케줄러 실행!");
         List<Plan> schedules = planRepository.findByPushAndStatusAndStartDate("Y", "Y", LocalDate.now().plusDays(1));
 
@@ -74,13 +76,14 @@ public class Scheduler {
                             schedule.getTitle(),
                             schedule.getTitle() + " 일정 하루 전날입니다. 준비해주세요!");
             } catch (Exception exception) {
+                logger.warn(new BaseResponse<>(FAILED_TO_PUSH_MESSAGE).toString() + Validation.getPrintStackTrace(exception));
                 new BaseResponse<>(FAILED_TO_PUSH_MESSAGE);
             }
         }
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
-    public void resetExerciseRoutineState(){
+    private void resetExerciseRoutineState(){
         logger.warn("운동루틴 스케줄러 실행!");
         List<ExerciseRoutine> exerciseRoutines = new ArrayList<>();
         try {
@@ -92,8 +95,9 @@ public class Scheduler {
         for(ExerciseRoutine routine: exerciseRoutines){
             try{
                 exerciseService.resetRoutineDone(routine);
-            }catch (Exception e){
-                e.printStackTrace();
+            }catch (Exception exception){
+                //exception.printStackTrace();
+                logger.warn(new BaseResponse<>(FAILED_RESET_ROTUINE_DONE).toString() + Validation.getPrintStackTrace(exception));
                 new BaseResponse<>(FAILED_RESET_ROTUINE_DONE);
             }
         }
