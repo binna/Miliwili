@@ -159,6 +159,42 @@ public class ExerciseController {
     @PostMapping("/{exerciseId}/routines")
     public BaseResponse<Long> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
                                            @RequestBody PostExerciseRoutineReq param){
+        if(param.getDetailName().size() != param.getDetailType().size() || param.getDetailType().size() != param.getDetailType().size() ||
+                param.getDetailTypeContext().size() != param.getDetailSetEqual().size() || param.getDetailSetEqual().size() != param.getDetailSet().size()){
+            return new BaseResponse<>(INVALIED_ARRAY_LENGTH);
+        }
+        if(param.getRepeatDay().contains("8") && param.getRepeatDay().length() != 1) {
+            return new BaseResponse<>(INVALIED_DETAIL_TYPE);
+        }
+
+        for(int i=0;i<param.getDetailSet().size() ;i++){
+            //입력한 세트의 수와 세트 정보의 개수가 다른 처리
+            String[] splitArr = param.getDetailTypeContext().get(i).split("/");
+            if(param.getDetailSetEqual().get(i) == true){   //전 세트동일이면
+                if(splitArr.length != 1)
+                    return new BaseResponse<>(INVALIED_SAME_SETS);
+
+            }else{                                          //전 세트 동일이 아니면
+                if(splitArr.length != param.getDetailSet().get(i))
+                    return new BaseResponse<>(INVALIED_DETAIL_CONTEXT_ARRAY_LENGTH_AND_SETCOUNT);
+            }
+            //무게+개수 옵션이 아니면 그냥 단순 숫자배열임을 확인
+            if(param.getDetailType().get(i) == 1){
+                if(!param.getDetailTypeContext().get(i).contains("#"))
+                    return new BaseResponse<>(INVALIED_DETAILTYPE);
+                for(int j=0; j< splitArr.length ;j++) {
+                    String[] weightCountArr = splitArr[j].split("#");
+                    System.out.println(weightCountArr[0]);
+                    System.out.println(weightCountArr[1]);
+                    if (splitArr[j].split("#").length != 2)
+                        return new BaseResponse<>(INVALIED_STRING_WEIGHTPLUSCOUNT);
+                }
+            }
+            else{
+                if(param.getDetailTypeContext().get(i).contains("#"))
+                    return new BaseResponse<>(INVALIED_DETAILTYPE);
+            }
+        }
         try{
             Long resultLong = exerciseService.createRoutine(param,exerciseId);
             System.out.println(resultLong);
@@ -179,6 +215,7 @@ public class ExerciseController {
     @PatchMapping("/{exerciseId}/routines/{routineId}")
     public BaseResponse<String> patchRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,@PathVariable Long routineId,
                                            @RequestBody PostExerciseRoutineReq param){
+
         try{
             String resultStr = exerciseService.modifyRoutine(param,exerciseId,routineId);
             return new BaseResponse<>(SUCCESS,resultStr);
