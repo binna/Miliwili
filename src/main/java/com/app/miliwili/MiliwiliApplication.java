@@ -8,6 +8,7 @@ import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.NormalPromotionState;
 import com.app.miliwili.src.user.models.UserInfo;
+import com.app.miliwili.src.user.models.Vacation;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -118,6 +119,11 @@ public class MiliwiliApplication implements CommandLineRunner {
                 Arrays.asList(userKaKao1, userKaKao2, userKaKao3, userKaKao4, userKaKao5);
         userRepository.saveAll(userList);
 
+        Vacation vacation1 = Vacation.builder().title("정기휴가").userInfo(userKaKao1).totalDays(24).build();
+        Vacation vacation2 = Vacation.builder().title("포상휴가").userInfo(userKaKao1).totalDays(15).build();
+        Vacation vacation3 = Vacation.builder().title("기타휴가").userInfo(userKaKao1).totalDays(0).build();
+        final List<Vacation> vacationList = Arrays.asList(vacation1, vacation2, vacation3);
+        vacationRepository.saveAll(vacationList);
 
         EmotionRecord emotionRecord1 = EmotionRecord.builder()
                 .date(LocalDate.parse("2021-03-01", DateTimeFormatter.ISO_DATE))

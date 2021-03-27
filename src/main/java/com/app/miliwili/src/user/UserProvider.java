@@ -1,7 +1,6 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.main.dto.UserCalendarMainData;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.src.user.models.UserInfo;
@@ -22,8 +21,8 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @RequiredArgsConstructor
 @Service
 public class UserProvider {
-    private final UserSelectRepository userSelectRepository;
     private final UserRepository userRepository;
+    private final UserSelectRepository userSelectRepository;
     private final VacationRepository vacationRepository;
     private final VacationSelectRepository vacationSelectRepository;
     private final JwtService jwtService;
@@ -226,22 +225,5 @@ public class UserProvider {
                 .normalPromotionStateIdx(user.getNormalPromotionState().getStateIdx())
                 .goal(user.getGoal())
                 .build();
-    }
-
-    /**
-     * 메인 페이지 UserCalendarMainData 가져오기
-     */
-    // TODO
-    public UserCalendarMainData retrieveMainDataListByUserId(Long userId) throws BaseException{
-        UserCalendarMainData mainData;
-        try{
-            mainData = userSelectRepository.findtest(userId);
-            if (mainData == null)
-                throw new BaseException(NOT_FOUND_MAIN_INFO);
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new  BaseException(FAILED_TO_GET_USER_MAIN_INFO);
-        }
-        return mainData;
     }
 }
