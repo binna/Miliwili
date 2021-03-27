@@ -1,5 +1,7 @@
 package com.app.miliwili.utils;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -46,5 +48,13 @@ public class Validation {
         if(Objects.isNull(parameter)) return null;
 
         return parameter.format(DateTimeFormatter.ISO_DATE);
+    }
+
+    public static String getPrintStackTrace(Exception exception) {
+
+        StringWriter errors = new StringWriter();
+        exception.printStackTrace(new PrintWriter(errors));
+
+        return errors.toString();
     }
 }

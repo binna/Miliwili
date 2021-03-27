@@ -92,26 +92,26 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                         normalPromotionState.hobong.as("hobong"),
                         normalPromotionState.stateIdx.as("normalPromotionStateIdx"),
                         abnormalPromotionState.proDate.as("proDate"),
-                        user.goal.as("goal")
-//                        ExpressionUtils.as(
-//                                JPAExpressions.select(vacation.totalDays)
-//                                .from(vacation)
-//                                .where(vacation.userInfo.id.eq(userId)),
-//                                "vacationTotalDays"
-//                        ),
-//                        ExpressionUtils.as(
-//                                JPAExpressions.select(vacation.useDays)
-//                                .from(vacation)
-//                                .where(vacation.userInfo.id.eq(userId)),
-//                                "vacationUseDays"
-//                        ),
-//
-//                        ExpressionUtils.as(
-//                                JPAExpressions.select(planVacation.count)
-//                                .from(planVacation)
-//                                .where(planVacation.vacationId.eq(vacation.id), planVacation.status.eq("Y")),
-//                                "vacationPlanUseDays"
-//                        )
+                        user.goal.as("goal"),
+                        ExpressionUtils.as(
+                                JPAExpressions.select(vacation.totalDays)
+                                .from(vacation)
+                                .where(vacation.userInfo.id.eq(userId)),
+                                "vacationTotalDays"
+                        ),
+                        ExpressionUtils.as(
+                                JPAExpressions.select(vacation.useDays)
+                                .from(vacation)
+                                .where(vacation.userInfo.id.eq(userId)),
+                                "vacationUseDays"
+                        ),
+
+                        ExpressionUtils.as(
+                                JPAExpressions.select(planVacation.count)
+                                .from(planVacation)
+                                .where(planVacation.vacationId.eq(vacation.id), planVacation.status.eq("Y")),
+                                "vacationPlanUseDays"
+                        )
                 )))
                 .from(user)
                 .leftJoin(user.normalPromotionState, normalPromotionState)

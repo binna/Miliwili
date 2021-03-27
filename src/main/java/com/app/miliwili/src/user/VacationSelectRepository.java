@@ -40,7 +40,7 @@ public class VacationSelectRepository extends QuerydslRepositorySupport {
                         vacation.id.as("id"), vacation.title.as("title"),
                         vacation.useDays.as("useDays"), vacation.totalDays.as("totalDays"),
                         ExpressionUtils.as(
-                                JPAExpressions.select(planVacation.count)
+                                JPAExpressions.select(planVacation.count.sum())
                                 .from(planVacation)
                                 .where(planVacation.vacationId.eq(vacation.id), planVacation.status.eq("Y")),
                                 "count"

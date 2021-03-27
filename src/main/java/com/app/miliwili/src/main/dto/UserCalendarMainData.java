@@ -23,8 +23,8 @@ public class UserCalendarMainData {
     private final Integer normalPromotionStateIdx;
     private final LocalDate proDate;
     private final String goal;
-//    private final Integer vacationTotalDays;
-//    private final Integer vacationUseDays;
-//    private final Integer vacationPlanUseDays;
+    private final Integer vacationTotalDays;
+    private final Integer vacationUseDays;
+    private final Integer vacationPlanUseDays;
 
 }
