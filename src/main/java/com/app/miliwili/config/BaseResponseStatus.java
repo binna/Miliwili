@@ -10,6 +10,10 @@ public enum BaseResponseStatus {
     // 1000 : 요청 성공
     SUCCESS(true, 1000, "요청에 성공하였습니다."),
 
+    //vivi
+    VALIDATION_SUCCESS(true, 1100, "검증에 성공하였습니다."),
+
+
     // 2000 : Request 오류
     EMPTY_JWT(false, 2000, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2001, "유효하지 않은 JWT입니다."),
@@ -110,6 +114,8 @@ public enum BaseResponseStatus {
     INVALIED_SAME_SETS(false, 2835, "전세트 동일 설정을 하면 상세 세트 정보는 하나만 들어와야 합니다."),
     INVALIED_DETAILTYPE(false, 2836, "[무게+개수] 옵션이면 #을 포함한 배열, 그 외에는 단순 숫자 배열이 들어와야 합니다."),
 
+    INVALIED_TOTALTIME_TYPE(false, 2840, "총 운동시간 형식이 올바르지 않습니다. "),
+    INVALIED_REPORT_EXERCISESTATUS(false, 2841, "완료한 운동 형식이 올바르지 않습니다."),
 
 
 
