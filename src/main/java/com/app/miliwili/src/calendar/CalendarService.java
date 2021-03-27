@@ -218,7 +218,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    public PostDDayRes createDDay(PostDDayReq parameters) throws BaseException {
+    public DDayRes createDDay(PostDDayReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         DDay newDDay = DDay.builder()
@@ -232,9 +232,12 @@ public class CalendarService {
         setLinkOrPlaceOrWork(parameters.getDdayType(), parameters.getLink(), parameters.getPlaceLat(), parameters.getPlaceLon(), parameters.getWork(), newDDay);
         newDDay.setDdayDiaries(getDDayDiaries(newDDay));
 
+        //System.out.println("음력을 양력으로---------------------------------" + ChineseCalendarUtil.convertLunarToSolar("20210319"));
+        //System.out.println("양력을 음력으로---------------------------------" + ChineseCalendarUtil.converSolarToLunar("20210319"));
+
         try {
             DDay savedDDay = ddayRepository.save(newDDay);
-            return PostDDayRes.builder()
+            return DDayRes.builder()
                     .ddayId(savedDDay.getId())
                     .ddayType(savedDDay.getDdayType())
                     .title(savedDDay.getTitle())

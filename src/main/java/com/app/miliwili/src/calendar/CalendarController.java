@@ -141,8 +141,8 @@ public class CalendarController {
     @ResponseBody
     @PatchMapping("/calendars/plans/{planId}")
     private BaseResponse<PlanRes> updatePlan(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                  @RequestBody(required = false) PatchPlanReq parameters,
-                                                  @PathVariable Long planId) {
+                                             @RequestBody(required = false) PatchPlanReq parameters,
+                                             @PathVariable Long planId) {
         if (Objects.isNull(parameters.getColor()) || parameters.getColor().length() == 0) {
             return new BaseResponse<>(EMPTY_COLOR);
         }
@@ -297,16 +297,11 @@ public class CalendarController {
     @ApiOperation(value = "D-Day 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PostMapping("/calendars/ddays")
-    public BaseResponse<PostDDayRes> postDDay(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                              @RequestBody(required = false) PostDDayReq parameters) {
+    public BaseResponse<DDayRes> postDDay(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                          @RequestBody(required = false) PostDDayReq parameters) {
         if (Objects.isNull(parameters.getDdayType()) || parameters.getDdayType().length() == 0) {
             return new BaseResponse<>(EMPTY_D_DAY_TYPE);
         }
-        if (!(parameters.getDdayType().equals("기념일") || parameters.getDdayType().equals("생일")
-                || parameters.getDdayType().equals("자격증") || parameters.getDdayType().equals("수능"))) {
-            return new BaseResponse<>(INVALID_D_DAY_TYPE);
-        }
-
         if (Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
             return new BaseResponse<>(EMPTY_TITLE);
         }
@@ -316,15 +311,47 @@ public class CalendarController {
         if (Objects.nonNull(parameters.getSubTitle()) && parameters.getSubTitle().length() >= 20) {
             return new BaseResponse<>(EXCEED_MAX20);
         }
-        if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_DATE);
-        }
-        if (!Validation.isRegexDate(parameters.getDate())) {
-            return new BaseResponse<>(INVALID_DATE);
+
+        if (parameters.getDdayType().equals("생일")) {
+            if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
+                return new BaseResponse<>(EMPTY_DATE);
+            }
+            if (!Validation.isRegexBirthdayDate(parameters.getDate())) {
+                return new BaseResponse<>(INVALID_DATE);
+            }
+            if (!(parameters.getChoiceCalendar().equals("S") || parameters.getChoiceCalendar().equals("L"))) {
+                return new BaseResponse<>(MUST_ENTER_CHOICE_CALENDAR_S_OR_B);
+            }
+            if (Objects.nonNull(parameters.getLink())
+                    || Objects.nonNull(parameters.getPlaceLat()) || Objects.nonNull(parameters.getPlaceLon())
+                    || Objects.nonNull(parameters.getWork())) {
+                return new BaseResponse<>(NOT_ENTER_LINK_PLACE_WORK);
+            }
+        } else if (parameters.getDdayType().equals("기념일")) {
+            if (Objects.nonNull(parameters.getLink())
+                    || Objects.nonNull(parameters.getPlaceLat()) || Objects.nonNull(parameters.getPlaceLon())
+                    || Objects.nonNull(parameters.getWork())) {
+                return new BaseResponse<>(NOT_ENTER_LINK_PLACE_WORK);
+            }
+            if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
+                return new BaseResponse<>(EMPTY_DATE);
+            }
+            if (!Validation.isRegexBirthdayDate(parameters.getDate())) {
+                return new BaseResponse<>(INVALID_DATE);
+            }
+        } else if (parameters.getDdayType().equals("자격증") || parameters.getDdayType().equals("수능")) {
+            if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
+                return new BaseResponse<>(EMPTY_DATE);
+            }
+            if (!Validation.isRegexBirthdayDate(parameters.getDate())) {
+                return new BaseResponse<>(INVALID_DATE);
+            }
+        } else {
+            return new BaseResponse<>(INVALID_D_DAY_TYPE);
         }
 
         try {
-            PostDDayRes dday = calendarService.createDDay(parameters);
+            DDayRes dday = calendarService.createDDay(parameters);
             return new BaseResponse<>(SUCCESS, dday);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
@@ -369,6 +396,8 @@ public class CalendarController {
             PatchDDayRes dday = calendarService.updateDDay(parameters, ddayId);
             return new BaseResponse<>(SUCCESS, dday);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }

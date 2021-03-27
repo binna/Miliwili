@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-public class PostDDayRes {
+public class DDayRes {
     private final Long ddayId;
     private final String ddayType;
     private final String title;

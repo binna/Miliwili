@@ -17,6 +17,13 @@ public class Validation {
         return matcher.find();
     }
 
+    public static boolean isRegexBirthdayDate(String target) {
+        String regex = "0000-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(target);
+        return matcher.find();
+    }
+
     public static boolean isFullString(String target){
         boolean isEmpty=true;
 

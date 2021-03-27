@@ -60,9 +60,9 @@ public enum BaseResponseStatus {
     CHOOSE_BETWEEN_ABNORMAL_OR_NORMAL(false, 2170, "진급일이나 일병과 상병과 병장진급일 중 하나는 꼭 입력해주셔야 합니다."),
     CHOOSE_BETWEEN_TOTAL_OR_USE(false, 2171, "사용한 휴가일수나 총 휴가일수 중 하나는 입력해주셔야 합니다."),
 
+    MUST_ENTER_CHOICE_CALENDAR_S_OR_B(false, 2180, "반드시 양력 S, 음력 L을 입력해주셔야 합니다."),
 
-
-
+    NOT_ENTER_LINK_PLACE_WORK(false, 2190, "링크와 장소, 준비물을 기입할 수 없습니다."),
 
 
     //vivi: 2500~
@@ -102,7 +102,6 @@ public enum BaseResponseStatus {
     FULL_REPORT_TEXT(false, 2813, "글은 최대 300자입니다."),
 
     INVALIED_VIEW_MONTH(false, 2820, "viewMonth는 1월부터 12월까지 입력해야합니다."),
-
 
 
     // 3000 : Response 오류
@@ -161,11 +160,6 @@ public enum BaseResponseStatus {
 
     FAILED_TO_SET_DAILY_HOBONG_STATUSIDX(false, 3090, "스케줄러, 호봉과 상위계급 업데이트에 실패하였습니다."),
     FAILED_TO_PUSH_MESSAGE(false, 3091, "스케줄러, PUSH 메시지 발송에 실패하였습니다."),
-
-
-
-
-
 
 
     //vivi: 3500 ~
