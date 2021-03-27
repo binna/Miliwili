@@ -11,6 +11,9 @@ import com.app.miliwili.src.user.models.NormalPromotionState;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.FirebaseCloudMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +24,7 @@ import java.util.List;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class Scheduler {
@@ -31,9 +35,12 @@ public class Scheduler {
     private final ExerciseProvider exerciseProvider;
     private final ExerciseService exerciseService;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Scheduled(cron = "0 0 0 * * *")
+
+    @Scheduled(cron = "0 0 0 * * ?")
     public void setDailyHobongAndStateIdx() {
+        logger.warn("호봉과 진급 스케줄러 실행!");
         List<UserInfo> users = userRepository.findAllByStateIdxAndStatus(1, "Y");
 
         for (UserInfo user : users) {
@@ -54,8 +61,9 @@ public class Scheduler {
         }
     }
 
-    @Scheduled(cron = "0 0 19 * * *")
+    @Scheduled(cron = "0 0 19 * * ?")
     public void sendPushMessage() {
+        logger.warn("FCM 스케줄러 실행!");
         List<Plan> schedules = planRepository.findByPushAndStatusAndStartDate("Y", "Y", LocalDate.now().plusDays(1));
 
         for (Plan schedule : schedules) {
@@ -71,8 +79,9 @@ public class Scheduler {
         }
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void resetExerciseRoutineState(){
+        logger.warn("운동루틴 스케줄러 실행!");
         List<ExerciseRoutine> exerciseRoutines = new ArrayList<>();
         try {
             exerciseRoutines = exerciseProvider.getCompleteRoutine();
@@ -89,6 +98,4 @@ public class Scheduler {
             }
         }
     }
-
-
 }
