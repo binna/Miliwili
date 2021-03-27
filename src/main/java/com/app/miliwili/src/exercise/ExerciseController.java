@@ -2,6 +2,7 @@ package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
+import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
@@ -159,6 +160,10 @@ public class ExerciseController {
     @PostMapping("/{exerciseId}/routines")
     public BaseResponse<Long> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
                                            @RequestBody PostExerciseRoutineReq param){
+
+        if(Validation.validateForPostExerciseRoutineReq(param) != VALIDATION_SUCCESS)
+            return new BaseResponse<>(Validation.validateForPostExerciseRoutineReq(param));
+
         try{
             Long resultLong = exerciseService.createRoutine(param,exerciseId);
             System.out.println(resultLong);
@@ -179,6 +184,10 @@ public class ExerciseController {
     @PatchMapping("/{exerciseId}/routines/{routineId}")
     public BaseResponse<String> patchRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,@PathVariable Long routineId,
                                            @RequestBody PostExerciseRoutineReq param){
+
+        if(Validation.validateForPostExerciseRoutineReq(param) != VALIDATION_SUCCESS)
+            return new BaseResponse<>(Validation.validateForPostExerciseRoutineReq(param));
+
         try{
             String resultStr = exerciseService.modifyRoutine(param,exerciseId,routineId);
             return new BaseResponse<>(SUCCESS,resultStr);
@@ -294,11 +303,14 @@ public class ExerciseController {
     @PostMapping("/{exerciseId}/routines/{routineId}/reports")
     public BaseResponse<Long> postExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
                                                                   @RequestBody PostExerciseReportReq param){
-        //TODO : 검증더해야함
         if(param.getExerciseStatus().length() == 0 || param.getExerciseStatus() == null)
             return new BaseResponse<>(EMPTY_EXERCISESTATUS);
         if(param.getTotalTime().length() == 0 || param.getTotalTime() == null)
             return new BaseResponse<>(EMPTY_TOTALTIME);
+
+       if(Validation.validateReportTotalTime(param.getTotalTime()) != VALIDATION_SUCCESS)
+           return new BaseResponse<>(Validation.validateReportTotalTime(param.getTotalTime()));
+
 
         try{
             Long reportId = exerciseService.createExerciseReport(exerciseId,routineId,param);
@@ -352,6 +364,7 @@ public class ExerciseController {
     @PatchMapping("/{exerciseId}/routines/{routineId}/reports")
     public BaseResponse<String> patchExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
                                                            @RequestBody PatchExerciseReportReq param){
+
         if(!Validation.isRegexDate(param.getReportDate()))
             return new BaseResponse<>(INVALID_DATE);
 
@@ -384,5 +397,8 @@ public class ExerciseController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+
+
 
 }

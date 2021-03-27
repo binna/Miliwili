@@ -10,6 +10,10 @@ public enum BaseResponseStatus {
     // 1000 : 요청 성공
     SUCCESS(true, 1000, "요청에 성공하였습니다."),
 
+    //vivi
+    VALIDATION_SUCCESS(true, 1100, "검증에 성공하였습니다."),
+
+
     // 2000 : Request 오류
     EMPTY_JWT(false, 2000, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2001, "유효하지 않은 JWT입니다."),
@@ -101,6 +105,17 @@ public enum BaseResponseStatus {
     FULL_REPORT_TEXT(false, 2813, "글은 최대 300자입니다."),
 
     INVALIED_VIEW_MONTH(false, 2820, "viewMonth는 1월부터 12월까지 입력해야합니다."),
+
+    INVALIED_ARRAY_LENGTH(false, 2830, "배열들의 길이가 일치하지 않습니다."),
+    INVALIED_DETAIL_SET_ARRAY_LENGTH(false, 2831, "운동 각 세트의 정보 배열의 형식이 틀렸습니다."),
+    INVALIED_DETAIL_TYPE(false, 2832, "매일을 선택하게 되면 다른 날짜와 함께 선택할 수 없습니다."),
+    INVALIED_DETAIL_CONTEXT_ARRAY_LENGTH_AND_SETCOUNT(false, 2833, "detailSetEqual에서의 /로 나누어진 개수와 세트의 수가 일치하지 않습니다."),
+    INVALIED_STRING_WEIGHTPLUSCOUNT(false, 2834, "무게+운동의 # 처리가 틀렸습니다."),
+    INVALIED_SAME_SETS(false, 2835, "전세트 동일 설정을 하면 상세 세트 정보는 하나만 들어와야 합니다."),
+    INVALIED_DETAILTYPE(false, 2836, "[무게+개수] 옵션이면 #을 포함한 배열, 그 외에는 단순 숫자 배열이 들어와야 합니다."),
+
+    INVALIED_TOTALTIME_TYPE(false, 2840, "총 운동시간 형식이 올바르지 않습니다. "),
+    INVALIED_REPORT_EXERCISESTATUS(false, 2841, "완료한 운동 형식이 올바르지 않습니다."),
 
 
 
