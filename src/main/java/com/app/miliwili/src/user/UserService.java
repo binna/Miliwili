@@ -98,7 +98,7 @@ public class UserService {
             if (exception.getStatus() == NOT_FOUND_USER) {
                 return new PostLoginRes(false, null);
             }
-            logger.warn(exception.getStatus().toString());
+            logger.warn(new BaseException(FAILED_TO_GET_USER).getStatus().toString());
             throw new BaseException(FAILED_TO_GET_USER);
         } catch (Exception exception) {
             logger.warn(Validation.getPrintStackTrace(exception));
@@ -131,7 +131,7 @@ public class UserService {
         setProfileImg(newUser.getSocialType(), token, newUser);
 
         if (userProvider.isUserBySocialId(newUser.getSocialId())) {
-            logger.warn(new BaseException(DUPLICATED_USER).toString());
+            logger.warn(new BaseException(DUPLICATED_USER).getStatus().toString());
             throw new BaseException(DUPLICATED_USER);
         }
 
@@ -140,10 +140,10 @@ public class UserService {
             setVacationData(newUser);
             return new PostSignUpRes(newUser.getId(), jwtService.createJwt(newUser.getId()));
         } catch (BaseException exception) {
-            if (exception.getStatus() == SET_VACATION_PLAN) {
+            if (exception.getStatus() == SET_PLAN_VACATION) {
                 userRepository.delete(newUser);
             }
-            logger.warn(exception.getStatus().toString());
+            logger.warn(new BaseException(FAILED_TO_SIGNUP_USER).getStatus().toString());
             throw new BaseException(FAILED_TO_SIGNUP_USER);
         } catch (Exception exception) {
             logger.warn(Validation.getPrintStackTrace(exception));
@@ -208,7 +208,7 @@ public class UserService {
         int count = getPlanVacationCount(vacationId);
 
         setTotalDays(parameters.getTotalDays(), vacation);
-        setUseDays(parameters.getUseDays(), vacation);
+        setUseDays(parameters.getUseDays(), count, vacation);
 
         if (vacation.getUserInfo().getId() != jwtService.getUserId()) {
             logger.warn(new BaseException(DO_NOT_AUTH_USER).toString());
@@ -220,7 +220,7 @@ public class UserService {
             return VacationRes.builder()
                     .vacationId(savedVacation.getId())
                     .title(savedVacation.getTitle())
-                    .useDays(savedVacation.getUseDays() + Validation.isInteger(count))
+                    .useDays(savedVacation.getUseDays() + count)
                     .totalDays(savedVacation.getTotalDays())
                     .build();
         } catch (Exception exception) {
@@ -350,9 +350,14 @@ public class UserService {
         }
     }
 
-    private void setUseDays(Integer useDays, Vacation vacation) {
+    private void setUseDays(Integer useDays, int count, Vacation vacation) throws BaseException {
         if (Objects.nonNull(useDays)) {
             vacation.setUseDays(vacation.getUseDays() + useDays);
+
+            if ((vacation.getUseDays() + count) > vacation.getTotalDays()) {
+                logger.warn(new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS).getStatus().toString());
+                throw new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS);
+            }
         }
     }
 
@@ -382,7 +387,7 @@ public class UserService {
             List<Vacation> leaveList = Arrays.asList(vacation1, vacation2, vacation3);
             vacationRepository.saveAll(leaveList);
         } catch (Exception exception) {
-            throw new BaseException(SET_VACATION_PLAN);
+            throw new BaseException(SET_PLAN_VACATION);
         }
     }
 

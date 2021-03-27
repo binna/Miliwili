@@ -114,7 +114,7 @@ public class CalendarProvider {
         try {
             return planVacationRepository.findByVacationIdAndStatus(vacationId, "Y");
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_GET_VACATION_PLAN);
+            throw new BaseException(FAILED_TO_GET_PLAN_VACATION);
         }
     }
 
