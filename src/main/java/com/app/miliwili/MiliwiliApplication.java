@@ -45,6 +45,7 @@ public class MiliwiliApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
         /**
          * 회원 데이터
          */
