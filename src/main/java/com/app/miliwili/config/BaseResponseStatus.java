@@ -151,11 +151,11 @@ public enum BaseResponseStatus {
     FAILED_TO_PATCH_EMOTION_RECORD(false, 3072, "감정기록 수정에 실패하였습니다."),
     FAILED_TO_DELETE_EMOTION_RECORD(false, 3073, "감정기록 삭제에 실패하였습니다."),
     FAILED_TO_GET_EMOTION_RECORD(false, 3074, "감정기록 조회에 실패하였습니다."),
+    ALREADY_EXIST_EMOTION_RECORD(false, 3075, "이미 해당 날짜에는 감정일기가 존재합니다."),
 
-    NOT_FOUND_VACATION_PLAN(false, 3080, "일정에 등록된 휴가가 없습니다."),
-    FAILED_TO_GET_VACATION_PLAN(false, 3081, "일정에 등록된 휴가 조회에 실패했습니다."),
-    SET_VACATION_PLAN(false, 3082, "기본 휴가 세팅에 실패하였습니다."),
-    ALREADY_EXIST_EMOTION_RECORD(false, 3083, "이미 해당 날짜에는 감정일기가 존재합니다."),
+    NOT_FOUND_PLAN_VACATION(false, 3080, "일정에 등록된 휴가가 없습니다."),
+    FAILED_TO_GET_PLAN_VACATION(false, 3081, "일정에 등록된 휴가 조회에 실패했습니다."),
+    SET_PLAN_VACATION(false, 3082, "기본 휴가 세팅에 실패하였습니다."),
 
     FAILED_TO_SET_DAILY_HOBONG_STATUSIDX(false, 3090, "스케줄러, 호봉과 상위계급 업데이트에 실패하였습니다."),
     FAILED_TO_PUSH_MESSAGE(false, 3091, "스케줄러, PUSH 메시지 발송에 실패하였습니다."),

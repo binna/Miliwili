@@ -8,6 +8,8 @@ import com.app.miliwili.utils.SNSLogin;
 import com.app.miliwili.utils.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
@@ -28,6 +30,9 @@ public class UserController {
     private final UserService userService;
     private final UserProvider userProvider;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
     /**
      * JWT 검증 API
      * [GET] /app/users/jwt
@@ -44,6 +49,7 @@ public class UserController {
             userProvider.retrieveUserByIdAndStatusY(userId);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -64,6 +70,7 @@ public class UserController {
             UserRes user = userProvider.getUser();
             return new BaseResponse<>(SUCCESS, user);
         } catch (BaseException exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -113,8 +120,9 @@ public class UserController {
         try {
             PostLoginRes login = userService.loginUser(SNSLogin.getUserIdFromKakao(token));
             return new BaseResponse<>(SUCCESS, login);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
+        } catch (BaseException exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 
@@ -235,8 +243,9 @@ public class UserController {
         try {
             PostSignUpRes signUp = userService.createUser(parameters, token);
             return new BaseResponse<>(SUCCESS, signUp);
-        } catch (BaseException e) {
-            return new BaseResponse<>(e.getStatus());
+        } catch (BaseException exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 
@@ -349,6 +358,7 @@ public class UserController {
             UserRes user = userService.updateUser(parameters);
             return new BaseResponse<>(SUCCESS, user);
         } catch (BaseException exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -368,6 +378,7 @@ public class UserController {
             userService.deleteUser();
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -396,6 +407,7 @@ public class UserController {
             VacationRes vacation = userService.updateVacation(parameters, vacationId);
             return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -416,6 +428,7 @@ public class UserController {
             List<VacationRes> vacation = userProvider.getVacation();
             return new BaseResponse<>(SUCCESS, vacation);
         } catch (BaseException exception) {
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
