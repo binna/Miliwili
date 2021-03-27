@@ -31,6 +31,11 @@ public class CalendarController {
     /**
      * 일정조회 API
      * [GET] /app/calendars/plans/:planId
+     *
+     * @return BaseResponse<GetPlanRes>
+     * @Token X-ACCESS-TOKEN
+     * @PathVariable Long planId
+     * @Auther shine
      */
     @ApiOperation(value = "일정 id로 상세조회", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
@@ -211,9 +216,9 @@ public class CalendarController {
      * 일정 다이어리 수정 API
      * [PATCH] /app/calendars/plans/plans-diary/:diaryId
      *
-     * @return BaseResponse<PatchDiaryRes>
+     * @return BaseResponse<DiaryRes>
      * @Token X-ACCESS-TOKEN
-     * @RequestBody PatchDiaryReq parameters
+     * @RequestBody DiaryReq parameters
      * @PathVariable Long diaryId
      * @Auther shine
      */
@@ -221,7 +226,7 @@ public class CalendarController {
     @ResponseBody
     @PatchMapping("/calendars/plans/plans-diary/{diaryId}")
     public BaseResponse<DiaryRes> updatePlanDiary(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                  @RequestBody(required = false) PatchDiaryReq parameters,
+                                                  @RequestBody(required = false) DiaryReq parameters,
                                                   @PathVariable Long diaryId) {
         if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
             return new BaseResponse<>(EMPTY_CONTENT);
@@ -289,7 +294,7 @@ public class CalendarController {
      * D-Day 생성 API
      * [POST] /app/calendars/ddays
      *
-     * @return BaseResponse<PostDDayRes>
+     * @return BaseResponse<DDayRes>
      * @Token X-ACCESS-TOKEN
      * @RequestBody PostDDayReq parameters
      * @Auther shine
@@ -336,14 +341,14 @@ public class CalendarController {
             if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
                 return new BaseResponse<>(EMPTY_DATE);
             }
-            if (!Validation.isRegexBirthdayDate(parameters.getDate())) {
+            if (!Validation.isRegexDate(parameters.getDate())) {
                 return new BaseResponse<>(INVALID_DATE);
             }
         } else if (parameters.getDdayType().equals("자격증") || parameters.getDdayType().equals("수능")) {
             if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
                 return new BaseResponse<>(EMPTY_DATE);
             }
-            if (!Validation.isRegexBirthdayDate(parameters.getDate())) {
+            if (!Validation.isRegexDate(parameters.getDate())) {
                 return new BaseResponse<>(INVALID_DATE);
             }
         } else {
@@ -354,6 +359,7 @@ public class CalendarController {
             DDayRes dday = calendarService.createDDay(parameters);
             return new BaseResponse<>(SUCCESS, dday);
         } catch (BaseException exception) {
+            exception.printStackTrace();
             logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
@@ -373,27 +379,21 @@ public class CalendarController {
     @ApiOperation(value = "D-Day 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/calendars/ddays/{ddayId}")
-    public BaseResponse<PatchDDayRes> updateDDay(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                 @RequestBody(required = false) PatchDDayReq parameters,
-                                                 @PathVariable Long ddayId) {
+    public BaseResponse<DDayRes> updateDDay(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                            @RequestBody(required = false) PatchDDayReq parameters,
+                                            @PathVariable Long ddayId) {
         if (Objects.isNull(parameters.getTitle()) || parameters.getTitle().length() == 0) {
             return new BaseResponse<>(EMPTY_TITLE);
         }
         if (parameters.getTitle().length() >= 10) {
             return new BaseResponse<>(EXCEED_MAX10);
         }
-        if (parameters.getSubTitle().length() >= 20) {
+        if (Objects.nonNull(parameters.getSubTitle()) && parameters.getSubTitle().length() >= 20) {
             return new BaseResponse<>(EXCEED_MAX20);
-        }
-        if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_DATE);
-        }
-        if (!Validation.isRegexDate(parameters.getDate())) {
-            return new BaseResponse<>(INVALID_DATE);
         }
 
         try {
-            PatchDDayRes dday = calendarService.updateDDay(parameters, ddayId);
+            DDayRes dday = calendarService.updateDDay(parameters, ddayId);
             return new BaseResponse<>(SUCCESS, dday);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
@@ -420,6 +420,8 @@ public class CalendarController {
             calendarService.deleteDDay(ddayId);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -431,7 +433,7 @@ public class CalendarController {
      *
      * @return BaseResponse<PostDiaryRes>
      * @Token X-ACCESS-TOKEN
-     * @RequestBody PostDiaryReq parameters
+     * @RequestBody DiaryReq parameters
      * @PathVariable Long ddayId
      * @Auther shine
      */
@@ -439,14 +441,8 @@ public class CalendarController {
     @ResponseBody
     @PostMapping("/calendars/ddays/{ddayId}/ddays-diary")
     public BaseResponse<DiaryRes> postDDayDiary(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                @RequestBody(required = false) PostDiaryReq parameters,
+                                                @RequestBody(required = false) DiaryReq parameters,
                                                 @PathVariable Long ddayId) {
-        if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_DATE);
-        }
-        if (!Validation.isRegexDate(parameters.getDate())) {
-            return new BaseResponse<>(INVALID_DATE);
-        }
         if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
             return new BaseResponse<>(EMPTY_CONTENT);
         }
@@ -463,9 +459,9 @@ public class CalendarController {
      * D-Day 다이어리 수정 API
      * [PATCH] /app/calendars/ddays/ddays-diary/:diaryId
      *
-     * @return BaseResponse<PatchDiaryRes>
+     * @return BaseResponse<DiaryRes>
      * @Token X-ACCESS-TOKEN
-     * @RequestBody PatchDiaryReq parameters
+     * @RequestBody DiaryReq parameters
      * @PathVariable Long diaryId
      * @Auther shine
      */
@@ -473,7 +469,7 @@ public class CalendarController {
     @ResponseBody
     @PatchMapping("/calendars/ddays/ddays-diary/{diaryId}")
     public BaseResponse<DiaryRes> updateDDayDiary(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                  @RequestBody(required = false) PatchDiaryReq parameters,
+                                                  @RequestBody(required = false) DiaryReq parameters,
                                                   @PathVariable Long diaryId) {
         if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
             return new BaseResponse<>(EMPTY_CONTENT);
@@ -483,6 +479,8 @@ public class CalendarController {
             DiaryRes diary = calendarService.updateDDayDiary(parameters, diaryId);
             return new BaseResponse<>(SUCCESS, diary);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -506,6 +504,8 @@ public class CalendarController {
             WorkRes todolist = calendarService.updateDDayWork(workId);
             return new BaseResponse<>(SUCCESS, todolist);
         } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse<>(exception.getStatus());
         }
     }
