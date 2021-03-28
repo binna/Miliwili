@@ -13,14 +13,14 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.app.miliwili.config.BaseResponseStatus.FAILED_TO_GET_EMOTION_RECORD;
-import static com.app.miliwili.config.BaseResponseStatus.NOT_FOUND_EMOTION_RECORD;
+import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
 public class EmotionRecordProvider {
     private final EmotionRecordRepository emotionRecordRepository;
     private final JwtService jwtService;
+
 
     /**
      * emotionRecordId로 유효한 감정일기 조회
@@ -66,9 +66,10 @@ public class EmotionRecordProvider {
      * @param month
      * @return List<EmotionRecord>
      * @throws BaseException
+     * @Auther shine
      */
     public List<EmotionRecord> retrieveEmotionByStatusYAndDateBetween(String month) throws BaseException {
-        month =  month.substring(0, 4) + "-" + month.substring(4, 6);
+        month = month.substring(0, 4) + "-" + month.substring(4, 6);
 
         LocalDate start = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
         LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
@@ -79,6 +80,9 @@ public class EmotionRecordProvider {
             throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
         }
     }
+
+
+
 
     /**
      * 감정기록 월별 조회
@@ -91,12 +95,23 @@ public class EmotionRecordProvider {
     public List<EmotionRecordRes> getEmotionRecordFromMonth(String month) throws BaseException {
         List<EmotionRecord> emotionRecords = retrieveEmotionByStatusYAndDateBetween(month);
 
+        if (emotionRecords.isEmpty()) {
+            throw new BaseException(NOT_FOUND_EMOTION_RECORD);
+        }
+
+        for (EmotionRecord emotionRecord : emotionRecords) {
+            if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
+                throw new BaseException(DO_NOT_AUTH_USER);
+            }
+        }
+
         return emotionRecords.stream().map(emotionRecord -> {
             return EmotionRecordRes.builder()
                     .emotionRecordId(emotionRecord.getId())
                     .date(emotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                     .emotion(emotionRecord.getEmoticon())
                     .content(emotionRecord.getContent())
+                    .emotionText(changeEmotionToEmotionText(emotionRecord.getEmoticon()))
                     .build();
         }).collect(Collectors.toList());
 
@@ -113,11 +128,31 @@ public class EmotionRecordProvider {
     public EmotionRecordRes getEmotionRecordFromDate(String date) throws BaseException {
         EmotionRecord emotionRecord = retrieveEmotionByDateAndUserIdAndStatusY(date);
 
+        if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
         return EmotionRecordRes.builder()
                 .emotionRecordId(emotionRecord.getId())
                 .date(emotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                 .emotion(emotionRecord.getEmoticon())
                 .content(emotionRecord.getContent())
+                .emotionText(changeEmotionToEmotionText(emotionRecord.getEmoticon()))
                 .build();
+    }
+
+
+
+
+    /**
+     * emotion을 넣으면 알맞은 emotionText으로 변환
+     *
+     * @param emotion
+     * @return String
+     */
+    public String changeEmotionToEmotionText(Integer emotion) {
+        String[] emotionText = {"행복해", "슬퍼", "화가나!", "힘들어..", "gunchim", "흠..", "???", "룰루~", "좋-아"};
+
+        return emotionText[emotion + 1];
     }
 }

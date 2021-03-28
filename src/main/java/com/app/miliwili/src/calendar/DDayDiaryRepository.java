@@ -4,9 +4,5 @@ import com.app.miliwili.src.calendar.models.DDayDiary;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-
 @Repository
-public interface DDayDiaryRepository extends CrudRepository<DDayDiary, Long> {
-    boolean existsByDate(LocalDate date);
-}
+public interface DDayDiaryRepository extends CrudRepository<DDayDiary, Long> {;}

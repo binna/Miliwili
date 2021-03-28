@@ -23,6 +23,7 @@ public class EmotionRecordService {
     private final EmotionRecordProvider emotionRecordProvider;
     private final JwtService jwtService;
 
+
     /**
      * 감정기록 생성
      *
@@ -52,6 +53,7 @@ public class EmotionRecordService {
                     .date(savedEmotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                     .content(savedEmotionRecord.getContent())
                     .emotion(savedEmotionRecord.getEmoticon())
+                    .emotionText(emotionRecordProvider.changeEmotionToEmotionText(savedEmotionRecord.getEmoticon()))
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_EMOTION_RECORD);
@@ -84,6 +86,7 @@ public class EmotionRecordService {
                     .date(savedEmotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                     .content(savedEmotionRecord.getContent())
                     .emotion(savedEmotionRecord.getEmoticon())
+                    .emotionText(emotionRecordProvider.changeEmotionToEmotionText(savedEmotionRecord.getEmoticon()))
                     .build();
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_PATCH_EMOTION_RECORD);

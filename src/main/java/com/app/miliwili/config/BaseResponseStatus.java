@@ -33,7 +33,7 @@ public enum BaseResponseStatus {
     EMPTY_DATE(false, 2014, "날짜을 입력해주세요."),
     EMPTY_CONTENT(false, 2015, "내용을 입력해주세요."),
     EMPTY_D_DAY_TYPE(false, 2016, "디데이 구분을 입력해주세요."),
-    EMPTY_EMOTION(false, 2017, "감정 이모티콘 URL 입력해주세요."),
+    EMPTY_EMOTION(false, 2017, "감정 이모티콘 아이디를 입력해주세요."),
 
     INVALID_BIRTHDAY(false, 2050, "생일 형식을 확인해주세요."),
     INVALID_PLAN_START_DATE(false, 2051, "일정의 시작날짜 형식을 확인해주세요."),
@@ -42,6 +42,7 @@ public enum BaseResponseStatus {
     INVALID_DATE(false, 2054, "날짜 형식을 확인해주세요."),
     INVALID_SOCIAL_TYPE(false, 2055, "가입 요청하는 소셜타입의 형식을 확인해주세요."),
     INVALID_D_DAY_TYPE(false, 2056, "유효하지 않은 디데이 타입입니다."),
+    INVALID_EMOTION(false, 2057, "감정 이모티콘 아이디는 1부터 9까지 입력 가능합니다."),
 
     EXCEED_MAX10(false, 2100, "입력할 수 있는 최대 10글자의 수를 초과하였습니다."),
     EXCEED_MAX20(false, 2101, "입력할 수 있는 최대 20글자의 수를 초과하였습니다."),
