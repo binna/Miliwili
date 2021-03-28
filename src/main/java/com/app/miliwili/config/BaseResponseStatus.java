@@ -118,6 +118,7 @@ public enum BaseResponseStatus {
 
     INVALIED_TOTALTIME_TYPE(false, 2840, "총 운동시간 형식이 올바르지 않습니다. "),
     INVALIED_REPORT_EXERCISESTATUS(false, 2841, "완료한 운동 형식이 올바르지 않습니다."),
+    INVALIED_REPEATDAY(false, 2850, "반복 요일은 1-8 사이의 숫자로 입력해야 합니다."),
 
 
     // 3000 : Response 오류

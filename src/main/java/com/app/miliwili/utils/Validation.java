@@ -82,6 +82,12 @@ public class Validation {
         if(param.getRepeatDay().contains("8") && param.getRepeatDay().length() != 1) {
             return INVALIED_DETAIL_TYPE;
         }
+        String[] repeatDayList = param.getRepeatDay().split("#");
+        for(String day: repeatDayList){
+            int dayInt = Integer.parseInt(day);
+            if(dayInt>8 ||dayInt<1 )
+                return INVALIED_REPEATDAY;
+        }
 
         for(int i=0;i<param.getDetailSet().size() ;i++){
             //입력한 세트의 수와 세트 정보의 개수가 다른 처리
@@ -100,7 +106,7 @@ public class Validation {
                     return INVALIED_DETAILTYPE;
                 for(int j=0; j< splitArr.length ;j++) {
                     String[] weightCountArr = splitArr[j].split("#");
-                    if (splitArr[j].split("#").length != 2)
+                    if (weightCountArr.length != 2)
                         return INVALIED_STRING_WEIGHTPLUSCOUNT;
                 }
             }
