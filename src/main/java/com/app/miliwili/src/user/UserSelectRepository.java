@@ -38,35 +38,6 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                 .fetch();
     }
 
-    /**
-     * stateIdx 조회
-     */
-    public List<Integer> findUserStateIdxByUserId(long userId){
-        QUserInfo user = QUserInfo.userInfo;
-        return queryFactory.select((Projections.constructor(Integer.class,
-                user.stateIdx)))
-                .from(user)
-                .where(user.status.eq("Y"), user.id.eq(userId))
-                .fetch();
-    }
-
-    /**
-     * 전역일 계산을 하기 위해
-     * --> mainProvider
-     */
-    public List<GetAbnormalUserEndDate> findEndDateInfoByUserId(long userId){
-        QUserInfo user = QUserInfo.userInfo;
-        QAbnormalPromotionState abnormal = QAbnormalPromotionState.abnormalPromotionState;
-
-        return queryFactory.select((Projections.constructor(GetAbnormalUserEndDate.class,
-                user.id, user.profileImg, user.name, user.endDate,
-                user.startDate,abnormal.proDate,user.goal)))
-                .from(user)
-                .where(user.status.eq("Y"), user.id.eq(userId))
-                .join(abnormal)
-                .on(abnormal.userInfo.id.eq(user.id))   //???왜래키라면???
-                .fetch();
-    }
 
 
     /**

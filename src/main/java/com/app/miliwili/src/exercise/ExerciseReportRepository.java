@@ -12,5 +12,6 @@ import java.util.Optional;
 public interface ExerciseReportRepository extends CrudRepository<ExerciseReport, Long> {
 
     List<ExerciseReport> findExerciseReportByExerciseRoutine_IdAndStatusAndDateCreatedBetween(Long routineId,String status, LocalDateTime dateCreated, LocalDateTime dateCreatedNext);
+   // List<ExerciseReport> findExerciseReportByExerciseRoutine_IdAndStatusAnd(Long routineId,String status, LocalDateTime dateCreated, LocalDateTime dateCreatedNext);
 
 }
