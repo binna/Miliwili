@@ -433,7 +433,6 @@ public class CalendarController {
      *
      * @return BaseResponse<PostDiaryRes>
      * @Token X-ACCESS-TOKEN
-     * @RequestBody DiaryReq parameters
      * @PathVariable Long ddayId
      * @Auther shine
      */
@@ -441,14 +440,9 @@ public class CalendarController {
     @ResponseBody
     @PostMapping("/calendars/ddays/{ddayId}/ddays-diary")
     public BaseResponse<DiaryRes> postDDayDiary(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                @RequestBody(required = false) DiaryReq parameters,
                                                 @PathVariable Long ddayId) {
-        if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
-            return new BaseResponse<>(EMPTY_CONTENT);
-        }
-
         try {
-            DiaryRes diary = calendarService.createDDayDiary(parameters, ddayId);
+            DiaryRes diary = calendarService.createDDayDiary(ddayId);
             return new BaseResponse<>(SUCCESS, diary);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());

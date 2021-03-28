@@ -3,9 +3,12 @@ package com.app.miliwili.src.calendar;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.dto.*;
 import com.app.miliwili.src.calendar.models.*;
+import com.app.miliwili.utils.ChineseCalendarUtil;
+import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +27,7 @@ public class CalendarProvider {
     private final DDayWorkRepository ddayWorkRepository;
     private final DDayDiaryRepository ddayDiaryRepository;
     private final PlanVacationRepository planVacationRepository;
+    private final JwtService jwtService;
 
 
     /**
@@ -120,8 +124,6 @@ public class CalendarProvider {
     }
 
 
-
-
     /**
      * planId로 일정 상세조회
      *
@@ -131,6 +133,10 @@ public class CalendarProvider {
      */
     public GetPlanRes getPlan(Long planId) throws BaseException {
         Plan plan = retrievePlanByIdAndStatusY(planId);
+
+        if (plan.getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
 
         return GetPlanRes.builder()
                 .planId(plan.getId())
@@ -153,6 +159,10 @@ public class CalendarProvider {
     public GetDDayRes getDDay(Long ddayId) throws BaseException {
         DDay dday = retrieveDDayByIdAndStatusY(ddayId);
 
+        if (dday.getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
         return changeDDayToGetDDayRes(dday);
     }
 
@@ -168,12 +178,14 @@ public class CalendarProvider {
      * @Auther shine
      */
     public GetDDayRes changeDDayToGetDDayRes(DDay dday) {
-        if(dday.getDdayType().equals("생일")) {
+        if (dday.getDdayType().equals("생일")) {
             return GetDDayRes.builder()
                     .ddayId(dday.getId())
                     .date(dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5))
                     .dateInfo(dday.getDate().format(DateTimeFormatter.ofPattern("MM.dd")))
                     .ddayType(dday.getDdayType())
+                    .choiceCalendarText(getCalendarText(dday.getChoiceCalendar()))
+                    .convertLunarToSolar(convertLunarToSolar(dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5), dday.getChoiceCalendar()))
                     .work(changeListDDayWorkToListWorkRes(dday.getDdayWorks()))
                     .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
                     .build();
@@ -183,6 +195,8 @@ public class CalendarProvider {
                 .date(dday.getDate().format(DateTimeFormatter.ISO_DATE))
                 .dateInfo(dday.getDate().format(DateTimeFormatter.ofPattern("yy.MM.dd")))
                 .ddayType(dday.getDdayType())
+                .choiceCalendarText(null)
+                .convertLunarToSolar(null)
                 .work(changeListDDayWorkToListWorkRes(dday.getDdayWorks()))
                 .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
                 .build();
@@ -363,6 +377,27 @@ public class CalendarProvider {
         }).collect(Collectors.toList());
     }
 
+
+
+
+    private String getCalendarText(String choiceCalendar) {
+        if (choiceCalendar.equals("S")) {
+            return "양력";
+        }
+        return "음력";
+    }
+
+    private String convertLunarToSolar(String date, String choiceCalendar) {
+        if (choiceCalendar.equals("S")) return null;
+
+        LocalDate targetDate = LocalDate.parse(ChineseCalendarUtil.convertLunarToSolar(LocalDate.now().getYear() + date.replaceAll("-", "")));
+        if (LocalDate.now().isAfter(targetDate)) {
+            return targetDate.format(DateTimeFormatter.ISO_DATE);
+        }
+
+        targetDate = LocalDate.parse(ChineseCalendarUtil.convertLunarToSolar(LocalDate.now().plusYears(1).getYear() + date.replaceAll("-", "")));
+        return targetDate.format(DateTimeFormatter.ISO_DATE);
+    }
 
     private String getDateInfo(Plan plan) {
         if (plan.getStartDate().isEqual(plan.getEndDate())) {
