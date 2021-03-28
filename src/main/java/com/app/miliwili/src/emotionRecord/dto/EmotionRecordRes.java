@@ -12,4 +12,5 @@ public class EmotionRecordRes {
     private final String date;
     private final String content;
     private final Integer emotion;
+    private final String emotionText;
 }
