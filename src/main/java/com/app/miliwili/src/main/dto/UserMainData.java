@@ -2,13 +2,12 @@ package com.app.miliwili.src.main.dto;
 
 import lombok.*;
 
-import javax.annotation.Nonnull;
 import java.time.LocalDate;
 
 @AllArgsConstructor
 @Builder
 @Data
-public class UserCalendarMainData {
+public class UserMainData {
     private String name;
     private final String profileImg;
     private final LocalDate birthday;
@@ -26,5 +25,4 @@ public class UserCalendarMainData {
     private final Integer vacationTotalDays;
     private final Integer vacationUseDays;
     private final Integer vacationPlanUseDays;
-
 }

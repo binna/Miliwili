@@ -1,11 +1,9 @@
 package com.app.miliwili.src.main.dto;
 
 import com.app.miliwili.src.calendar.dto.GetDDayRes;
-import com.app.miliwili.src.calendar.dto.GetPlanRes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
@@ -34,5 +32,5 @@ public class GetUserCalendarMainRes {
     // 디데이
     private List<GetDDayRes> dday;
     // 일정
-    private List<GetPlanRes> plan;
+    private List<PlanData> plan;
 }

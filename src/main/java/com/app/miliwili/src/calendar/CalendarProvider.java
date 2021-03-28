@@ -123,6 +123,24 @@ public class CalendarProvider {
         }
     }
 
+    /**
+     * 오늘 해당하는 일정 모두 조회
+     * 
+     * @return List<Plan>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<Plan> retrievePlanListByToday() throws BaseException{
+        try {
+            List<Plan> planList = planRepository.findByStartDateEqualsOrStartDateAfterAndEndDateEqualsOrEndDateBeforeAndStatusOrderById(LocalDate.now(), LocalDate.now(), LocalDate.now(), LocalDate.now(), "Y");
+            return planList;
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_PLAN);
+        }
+    }
+
+
+
 
     /**
      * planId로 일정 상세조회
@@ -140,6 +158,7 @@ public class CalendarProvider {
 
         return GetPlanRes.builder()
                 .planId(plan.getId())
+                .title(plan.getTitle())
                 .startDate(plan.getStartDate().format(DateTimeFormatter.ISO_DATE))
                 .endDate(plan.getEndDate().format(DateTimeFormatter.ISO_DATE))
                 .dateInfo(getDateInfo(plan))
@@ -181,6 +200,7 @@ public class CalendarProvider {
         if (dday.getDdayType().equals("생일")) {
             return GetDDayRes.builder()
                     .ddayId(dday.getId())
+                    .title(dday.getTitle())
                     .date(dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5))
                     .dateInfo(dday.getDate().format(DateTimeFormatter.ofPattern("MM.dd")))
                     .ddayType(dday.getDdayType())
@@ -192,6 +212,7 @@ public class CalendarProvider {
         }
         return GetDDayRes.builder()
                 .ddayId(dday.getId())
+                .title(dday.getTitle())
                 .date(dday.getDate().format(DateTimeFormatter.ISO_DATE))
                 .dateInfo(dday.getDate().format(DateTimeFormatter.ofPattern("yy.MM.dd")))
                 .ddayType(dday.getDdayType())
