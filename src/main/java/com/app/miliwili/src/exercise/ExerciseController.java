@@ -65,6 +65,7 @@ public class ExerciseController {
             String returnStr = exerciseService.createDayilyWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,returnStr);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(FAILED_POST_DAILY_WEIGHT);
         }
@@ -89,6 +90,7 @@ public class ExerciseController {
             String resultStr = exerciseService.modifyDailyWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,resultStr);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -112,6 +114,7 @@ public class ExerciseController {
             String returnStr = exerciseService.modifyGoalWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,returnStr);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(FAILED_PATCH_GOAL_WEIGHT);
         }
@@ -131,6 +134,7 @@ public class ExerciseController {
             GetExerciseDailyWeightRes exerciseDailyWeightRes= exerciseProvider.retrieveExerciseDailyWeight(exerciseId);
             return new BaseResponse<>(SUCCESS, exerciseDailyWeightRes);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -156,6 +160,7 @@ public class ExerciseController {
             GetExerciseWeightRecordRes result = exerciseProvider.retrieveExerciseWeightRecord(viewMonth, viewYear,exerciseId);
             return new BaseResponse<>(SUCCESS,result);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -180,6 +185,7 @@ public class ExerciseController {
             Long resultLong = exerciseService.createRoutine(param,exerciseId);
             return new BaseResponse<>(SUCCESS,resultLong);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -204,6 +210,7 @@ public class ExerciseController {
             String resultStr = exerciseService.modifyRoutine(param,exerciseId,routineId);
             return new BaseResponse<>(SUCCESS,resultStr);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -223,6 +230,7 @@ public class ExerciseController {
             List<MyRoutineInfo> myAllRoutineList = exerciseProvider.retrieveAllRoutineList(exerciseId);
             return new BaseResponse<>(SUCCESS, myAllRoutineList);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -244,6 +252,7 @@ public class ExerciseController {
             String resultStr = exerciseService.deleteRoutine(exerciseId,routineId);
             return new BaseResponse<>(SUCCESS, resultStr);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -268,6 +277,7 @@ public class ExerciseController {
             List<RoutineInfo> resultList = exerciseProvider.retrieveDateRoutine(exerciseId, targetDate);
             return new BaseResponse<>(SUCCESS, resultList);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -288,6 +298,7 @@ public class ExerciseController {
             GetExerciseRoutineRes resultRoutineRes = exerciseProvider.retrieveRoutineDetailForPatchRoutine(exerciseId,routineId);
             return new BaseResponse<>(SUCCESS,resultRoutineRes);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
 
@@ -309,6 +320,7 @@ public class ExerciseController {
             GetStartExerciseRes resultRoutineRes = exerciseProvider.retrieveRoutineInfoForStartExercise(exerciseId,routineId);
             return new BaseResponse<>(SUCCESS,resultRoutineRes);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
 
@@ -339,6 +351,7 @@ public class ExerciseController {
             Long reportId = exerciseService.createExerciseReport(exerciseId,routineId,param);
             return new BaseResponse<>(SUCCESS, reportId);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -359,6 +372,7 @@ public class ExerciseController {
             GetExerciseReportRes reportRes = exerciseProvider.retrieveExerciseReport(exerciseId,routineId,reportDate);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -380,6 +394,7 @@ public class ExerciseController {
             String reportRes = exerciseService.deleteExerciseReport(exerciseId,routineId,reportDate);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -404,6 +419,7 @@ public class ExerciseController {
             String reportRes = exerciseService.modifyExerciseReport(exerciseId,routineId,param);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -425,6 +441,7 @@ public class ExerciseController {
             List<String> reportRes = exerciseProvider.retrieveCalendarReport(exerciseId,viewYear,viewMonth);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }

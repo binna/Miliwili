@@ -8,7 +8,6 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
@@ -90,6 +89,7 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                 .where(user.status.eq("Y"), user.id.eq(userId))
                 .fetchOne();
     }
+
 
 
 

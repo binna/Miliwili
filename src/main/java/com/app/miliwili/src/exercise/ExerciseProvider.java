@@ -8,8 +8,6 @@ import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -31,7 +29,6 @@ public class ExerciseProvider {
     private final ExerciseRoutineRepository exerciseRoutineRepository;
     private final ExerciseReportRepository exerciseReportRepository;
     private final JwtService jwtService;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
 
@@ -59,7 +56,6 @@ public class ExerciseProvider {
         try{
             exerciseDailyWeightList = exerciseWeightRepository.findTop5ByExerciseInfo_IdAndStatusOrderByExerciseDateDesc(exerciseId,"Y");
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_GET_DAILY_WEIGHT);
         }
 
@@ -84,7 +80,6 @@ public class ExerciseProvider {
         try{
             exerciseIdList = exerciseSelectRepository.getExerciseInfoByUserId(userId);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
@@ -375,7 +370,6 @@ public class ExerciseProvider {
         try {
             routineList = exerciseRoutineRepository.findAllByStatusAndAndDone("Y", "Y");
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_FIND_GET_ROUTINE);
         }
         return routineList;
@@ -510,7 +504,10 @@ public class ExerciseProvider {
             }
         }
         if(report == null)
-            throw new BaseException(FAILED_GET_REPORT);
+            throw new BaseException(NOT_FOUNT_REPORT);
+        if(report.getStatus().equals("N"))
+            throw new BaseException(NOT_FOUNT_REPORT);
+
 
         String[] doneSplit = report.getExerciseStatus().split("#");
 
@@ -582,7 +579,6 @@ public class ExerciseProvider {
                  reports= exerciseReportRepository.findExerciseReportByExerciseRoutine_IdAndStatusAndDateCreatedBetween(routineList.get(i).getId(),
                         "Y", targetDate, targetLastDate);
             }catch (Exception e){
-                logger.warn(Validation.getPrintStackTrace(e));
                 throw new BaseException(FAILED_GET_REPORT);
             }
 

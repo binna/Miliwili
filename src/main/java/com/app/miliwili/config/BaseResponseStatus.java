@@ -225,6 +225,7 @@ public enum BaseResponseStatus {
     FAILED_TO_DELETE_REPORT_REPORT(false, 3581, "운동리포트 삭제 --> 운동 리포트 다시 저장에 실패하였습니다. "),
     FAILED_TO_DELETE_REPORT_ROUTINE(false, 3581, "운동리포트 삭제 --> 운동 루틴 다시 저장에 실패하였습니다. "),
     FAILED_TO_MODIFY_REPORT(false, 3582, "운동리포트 수정에 실패하였습니다. "),
+    NOT_FOUNT_REPORT(false, 3583, "해당 날짜에 운동 리포트가 없습니다. "),
 
     FAILED_TO_CHANGE_ROUTINE_STATUS(false, 3590, "운동 루틴 완료 여부 초기화에 실패하였습니다."),
 

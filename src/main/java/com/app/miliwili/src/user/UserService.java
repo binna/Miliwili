@@ -49,7 +49,6 @@ public class UserService {
         try {
             userIdList = userProvider.isGoogleUser(socialId);
         } catch (Exception e) {
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 

@@ -1,10 +1,7 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
-import com.app.miliwili.src.user.dto.UserRes;
-import com.app.miliwili.src.user.dto.VacationRes;
-import com.app.miliwili.src.user.dto.VacationSelectData;
+import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.utils.JwtService;
@@ -38,7 +35,6 @@ public class UserProvider {
         try {
             userList = userSelectRepository.findUsersIdByGoogleId(gSocialId);
         } catch (Exception e) {
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
