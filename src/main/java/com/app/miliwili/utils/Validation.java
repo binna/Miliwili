@@ -25,7 +25,7 @@ public class Validation {
     }
 
     public static boolean isRegexBirthdayDate(String target) {
-        String regex = "0000-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$";
+        String regex = "9999-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(target);
         return matcher.find();
