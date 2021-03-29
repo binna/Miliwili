@@ -33,7 +33,7 @@ public class MainController {
      */
     @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @GetMapping("/main")
+    @GetMapping("/main/users-calendars")
     public BaseResponse<GetUserCalendarMainRes> getUserMain(@RequestHeader("X-ACCESS-TOKEN") String token){
         try{
             GetUserCalendarMainRes userMain = mainProvider.getUserCalendarMainById();

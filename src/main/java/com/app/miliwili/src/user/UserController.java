@@ -214,7 +214,7 @@ public class UserController {
                 return new BaseResponse<>(FASTER_THAN_THIRD_DATE);
             }
             if (thirdDate.isAfter(endDate)) {
-                return new BaseResponse<>(FASTER_THAN_END_DATE);
+                return new BaseResponse<>(FASTER_THAN_END_DATE_NOR);
             }
         } else {
             if (Objects.isNull(parameters.getStrPrivate()) || Objects.isNull(parameters.getStrCorporal()) || Objects.isNull(parameters.getStrSergeant())) {
@@ -267,30 +267,28 @@ public class UserController {
     @PatchMapping("/users")
     public BaseResponse<UserRes> updateUser(@RequestHeader("X-ACCESS-TOKEN") String token,
                                             @RequestBody(required = false) PatchUserReq parameters) {
-        if (Objects.nonNull(parameters.getName()) || Objects.nonNull(parameters.getBirthday())) {
-            if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
-                return new BaseResponse<>(EMPTY_NAME);
+        if (Objects.nonNull(parameters.getName())) {
+            if (parameters.getName().length() >= 20) {
+                return new BaseResponse<>(EXCEED_MAX20);
             }
             if (Objects.nonNull(parameters.getBirthday())) {
-                if (parameters.getServeType().length() >= 10) {
-                    return new BaseResponse<>(EXCEED_MAX10);
-                }
                 if (!Validation.isRegexDate(parameters.getBirthday())) {
                     return new BaseResponse<>(INVALID_BIRTHDAY);
                 }
             }
+            if (Objects.nonNull(parameters.getProfileImg())) {
+                if (parameters.getProfileImg().isEmpty()) {
+                    return new BaseResponse<>(EMPTY_PROFILE_IMG);
+                }
+            }
             setNullByServeSetting(parameters);
             setNullByGoal(parameters);
-        } else if (Objects.nonNull(parameters.getStrPrivate()) || Objects.nonNull(parameters.getStrCorporal()) || Objects.nonNull(parameters.getStrSergeant())
-                || Objects.nonNull(parameters.getProDate())) {
-            if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
-                return new BaseResponse<>(EMPTY_START_DATE);
+        } else if (Objects.nonNull(parameters.getServeType()) && Objects.nonNull(parameters.getStartDate()) && Objects.nonNull(parameters.getEndDate())) {
+            if (parameters.getServeType().length() >= 10) {
+                return new BaseResponse<>(EXCEED_MAX10);
             }
             if (!Validation.isRegexDate(parameters.getStartDate())) {
                 return new BaseResponse<>(INVALID_START_DATE);
-            }
-            if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
-                return new BaseResponse<>(EMPTY_END_DATE);
             }
             if (!Validation.isRegexDate(parameters.getEndDate())) {
                 return new BaseResponse<>(INVALID_END_DATE);
@@ -300,57 +298,6 @@ public class UserController {
             LocalDate endDate = LocalDate.parse(parameters.getEndDate(), DateTimeFormatter.ISO_DATE);
             if (startDate.isAfter(endDate)) {
                 return new BaseResponse<>(FASTER_THAN_START_DATE);
-            }
-
-            if (Objects.isNull(parameters.getProDate())) {
-                if (Objects.isNull(parameters.getStrPrivate()) || parameters.getStrPrivate().length() == 0) {
-                    return new BaseResponse<>(EMPTY_FIRST_DATE);
-                }
-                if (!Validation.isRegexDate(parameters.getStrPrivate())) {
-                    return new BaseResponse<>(INVALID_FIRST_DATE);
-                }
-                LocalDate firstDate = LocalDate.parse(parameters.getStrPrivate(), DateTimeFormatter.ISO_DATE);
-                if (startDate.isAfter(firstDate)) {
-                    return new BaseResponse<>(FASTER_THAN_FIRST_DATE);
-                }
-
-                if (Objects.isNull(parameters.getStrCorporal()) || parameters.getStrCorporal().length() == 0) {
-                    return new BaseResponse<>(EMPTY_SECOND_DATE);
-                }
-                if (!Validation.isRegexDate(parameters.getStrCorporal())) {
-                    return new BaseResponse<>(INVALID_SECOND_DATE);
-                }
-                LocalDate secondDate = LocalDate.parse(parameters.getStrCorporal(), DateTimeFormatter.ISO_DATE);
-                if (firstDate.isAfter(secondDate)) {
-                    return new BaseResponse<>(FASTER_THAN_SECOND_DATE);
-                }
-
-                if (Objects.isNull(parameters.getStrSergeant()) || parameters.getStrSergeant().length() == 0) {
-                    return new BaseResponse<>(EMPTY_THIRD_DATE);
-                }
-                LocalDate thirdDate = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
-                if (!Validation.isRegexDate(parameters.getStrSergeant())) {
-                    return new BaseResponse<>(INVALID_THIRD_DATE);
-                }
-                if (secondDate.isAfter(thirdDate)) {
-                    return new BaseResponse<>(FASTER_THAN_THIRD_DATE);
-                }
-                if (thirdDate.isAfter(endDate)) {
-                    return new BaseResponse<>(FASTER_THAN_END_DATE);
-                }
-            } else {
-                if (Objects.isNull(parameters.getStrPrivate()) || Objects.isNull(parameters.getStrCorporal()) || Objects.isNull(parameters.getStrSergeant())) {
-                    if (Objects.isNull(parameters.getProDate()) || parameters.getProDate().length() == 0) {
-                        return new BaseResponse<>(EMPTY_PRO_DATE);
-                    }
-                    if (!Validation.isRegexDate((parameters.getProDate()))) {
-                        return new BaseResponse<>(INVALID_PRO_DATE);
-                    }
-                    LocalDate proDate = LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE);
-                    if (startDate.isAfter(proDate)) {
-                        return new BaseResponse<>(FASTER_THAN_PRO_DATE);
-                    }
-                }
             }
             setNullByNameAndBirthdayAndProfileImg(parameters);
             setNullByGoal(parameters);
