@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Builder
 @Data
 public class UserMainData {
-    private String name;
+    private final String name;
     private final String profileImg;
     private final LocalDate birthday;
     private final Integer stateIdx;

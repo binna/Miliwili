@@ -7,7 +7,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 @Data
-public class PlanData {
-    private final Long planId;
+public class DDayMainDataRes {
+    private final Long ddayId;
+    private final String date;
     private final String title;
 }

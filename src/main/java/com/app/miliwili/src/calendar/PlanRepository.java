@@ -12,6 +12,4 @@ import java.util.Optional;
 public interface PlanRepository extends CrudRepository<Plan, Long> {
     List<Plan> findByPushAndStatusAndStartDate(String push, String status, LocalDate startDate);
     Optional<Plan> findByIdAndStatus(Long planId, String status);
-    List<Plan> findByStartDateEqualsOrStartDateAfterAndEndDateEqualsOrEndDateBeforeAndStatusOrderById(
-            LocalDate startDateEquals, LocalDate startDateAfter, LocalDate endDateEquals, LocalDate endDateAfter, String status);
 }

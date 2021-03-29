@@ -3,6 +3,8 @@ package com.app.miliwili.src.calendar;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.dto.*;
 import com.app.miliwili.src.calendar.models.*;
+import com.app.miliwili.src.main.dto.DDayMainData;
+import com.app.miliwili.src.main.dto.PlanMainData;
 import com.app.miliwili.utils.ChineseCalendarUtil;
 import com.app.miliwili.utils.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +23,11 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 @Service
 public class CalendarProvider {
     private final PlanRepository planRepository;
+    private final PlanSelectRepository planSelectRepository;
     private final PlanWorkRepository planWorkRepository;
     private final PlanDiaryRepository diaryRepository;
     private final DDayRepository ddayRepository;
+    private final DDaySelectRepository ddaySelectRepository;
     private final DDayWorkRepository ddayWorkRepository;
     private final DDayDiaryRepository ddayDiaryRepository;
     private final PlanVacationRepository planVacationRepository;
@@ -114,6 +118,7 @@ public class CalendarProvider {
      * @param vacationId
      * @return PlanVacation
      * @throws BaseException
+     * @Auther shine
      */
     public List<PlanVacation> retrievePlanVacationByIdAndStatusY(Long vacationId) throws BaseException {
         try {
@@ -124,18 +129,35 @@ public class CalendarProvider {
     }
 
     /**
-     * 오늘 해당하는 일정 모두 조회
-     * 
-     * @return List<Plan>
+     * 금일 유효한 내 일정 전체조회(메인조회용)
+     *
+     * @return List<PlanData>
      * @throws BaseException
      * @Auther shine
      */
-    public List<Plan> retrievePlanListByToday() throws BaseException{
+    public List<PlanMainData> retrievePlanMainDataByTodayAndStatusY() throws BaseException {
         try {
-            List<Plan> planList = planRepository.findByStartDateEqualsOrStartDateAfterAndEndDateEqualsOrEndDateBeforeAndStatusOrderById(LocalDate.now(), LocalDate.now(), LocalDate.now(), LocalDate.now(), "Y");
-            return planList;
+            List<PlanMainData> planData = planSelectRepository.findPlanByToday(jwtService.getUserId(), LocalDate.now());
+            return planData;
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
+        }
+    }
+
+    /**
+     * 유효한 모든 일정조회(메인조회용)
+     *
+     * @return List<DDayMainData>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<DDayMainData> retrieveDDayMainDataByTodayAndStatusY() throws BaseException {
+        try {
+            List<DDayMainData> ddayMainData = ddaySelectRepository.findDDayByToday(jwtService.getUserId());
+            return ddayMainData;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(FAILED_TO_GET_D_DAY);
         }
     }
 
@@ -205,7 +227,7 @@ public class CalendarProvider {
                     .dateInfo(dday.getDate().format(DateTimeFormatter.ofPattern("MM.dd")))
                     .ddayType(dday.getDdayType())
                     .choiceCalendarText(getCalendarText(dday.getChoiceCalendar()))
-                    .convertLunarToSolar(convertLunarToSolar(dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5), dday.getChoiceCalendar()))
+                    .solarCalendarDate(ChineseCalendarUtil.convertSolar(dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5), dday.getChoiceCalendar()))
                     .work(changeListDDayWorkToListWorkRes(dday.getDdayWorks()))
                     .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
                     .build();
@@ -217,7 +239,7 @@ public class CalendarProvider {
                 .dateInfo(dday.getDate().format(DateTimeFormatter.ofPattern("yy.MM.dd")))
                 .ddayType(dday.getDdayType())
                 .choiceCalendarText(null)
-                .convertLunarToSolar(null)
+                .solarCalendarDate(null)
                 .work(changeListDDayWorkToListWorkRes(dday.getDdayWorks()))
                 .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
                 .build();
@@ -406,18 +428,6 @@ public class CalendarProvider {
             return "양력";
         }
         return "음력";
-    }
-
-    private String convertLunarToSolar(String date, String choiceCalendar) {
-        if (choiceCalendar.equals("S")) return null;
-
-        LocalDate targetDate = LocalDate.parse(ChineseCalendarUtil.convertLunarToSolar(LocalDate.now().getYear() + date.replaceAll("-", "")));
-        if (LocalDate.now().isAfter(targetDate)) {
-            return targetDate.format(DateTimeFormatter.ISO_DATE);
-        }
-
-        targetDate = LocalDate.parse(ChineseCalendarUtil.convertLunarToSolar(LocalDate.now().plusYears(1).getYear() + date.replaceAll("-", "")));
-        return targetDate.format(DateTimeFormatter.ISO_DATE);
     }
 
     private String getDateInfo(Plan plan) {

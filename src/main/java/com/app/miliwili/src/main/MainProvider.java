@@ -2,112 +2,151 @@ package com.app.miliwili.src.main;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.CalendarProvider;
-import com.app.miliwili.src.calendar.models.Plan;
-import com.app.miliwili.src.main.dto.GetUserCalendarMainRes;
-import com.app.miliwili.src.main.dto.PlanData;
-import com.app.miliwili.src.main.dto.UserMainData;
-import com.app.miliwili.src.user.UserSelectRepository;
-import com.app.miliwili.utils.JwtService;
+import com.app.miliwili.src.main.dto.*;
+import com.app.miliwili.src.user.UserProvider;
+import com.app.miliwili.utils.ChineseCalendarUtil;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-import static com.app.miliwili.config.BaseResponseStatus.*;
+import static com.app.miliwili.config.BaseResponseStatus.FAILED_TO_GET_USER_MAIN_INFO;
 
 
 @RequiredArgsConstructor
 @Service
 public class MainProvider {
-    private final UserSelectRepository userSelectRepository;
+    private final UserProvider userProvider;
     private final CalendarProvider calendarProvider;
-    private final JwtService jwtService;
 
-
-
-    public UserMainData retrieveUserMainDataById() throws BaseException{
-        try{
-            UserMainData userMainData = userSelectRepository.findUserMainDataByUserId(jwtService.getUserId());
-
-            if (Objects.isNull(userMainData)) {
-                throw new BaseException(NOT_FOUND_MAIN_INFO);
-            }
-            return userMainData;
-        } catch (BaseException exception) {
-            if(exception.getStatus() == NOT_FOUND_MAIN_INFO) {
-                throw new BaseException(NOT_FOUND_MAIN_INFO);
-            }
-            throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
-        }
-    }
-
-
-    public GetUserCalendarMainRes getUserMainById() throws BaseException {
-        UserMainData userMainData = retrieveUserMainDataById();
-        List<Plan> plans = calendarProvider.retrievePlanListByToday();
-
-        try {
-            return changeMainDataToRes(userMainData, plans);
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
-        }
-    }
 
     /**
-     * Converter
-     * UserCalendarMainData -> GetUserCalendarMainRes
+     * 메인화면 조회
+     * 
+     * @return GetUserCalendarMainRes
+     * @throws BaseException
+     * @Auther shine
      */
-    public GetUserCalendarMainRes changeMainDataToRes(UserMainData mainData, List<Plan> plans){
-        if(mainData.getStateIdx() == 1) {
+    public GetUserCalendarMainRes getUserCalendarMainById() throws BaseException {
+        UserMainData userMainData = userProvider.retrieveUserMainDataById();
+        List<PlanMainData> planMainData = calendarProvider.retrievePlanMainDataByTodayAndStatusY();
+        List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResByTodaySortDateAsc();
+
+        try {
+            return changeGetUserCalendarMainRes(userMainData, planMainData, ddayMainDate);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
+        }
+    }
+
+
+
+
+    /**
+     * 생일구분 날짜 계산(양력 -> 양력, 음력 -> 양력) 및 디데이 최신순으로 정렬
+     *
+     * @return List<DDayMainDataRes>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<DDayMainDataRes> retrieveDDayMainDataResByTodaySortDateAsc() throws BaseException {
+        List<DDayMainDataRes> ddayMainData = new ArrayList<>();
+
+        for (DDayMainData dday : calendarProvider.retrieveDDayMainDataByTodayAndStatusY()) {
+            if (dday.getDdayType().equals("생일")) {
+                ddayMainData.add(DDayMainDataRes.builder()
+                        .ddayId(dday.getId())
+                        .date(ChineseCalendarUtil.convertSolar(dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5), dday.getChoiceCalendar()))
+                        .title(dday.getTitle())
+                        .build());
+                continue;
+            }
+            ddayMainData.add(DDayMainDataRes.builder()
+                    .ddayId(dday.getId())
+                    .date(dday.getDate().format(DateTimeFormatter.ISO_DATE))
+                    .title(dday.getTitle())
+                    .build());
+        }
+
+        Collections.sort(ddayMainData, new dateSortAsc());
+
+        return ddayMainData;
+    }
+
+
+
+
+    /**
+     * GetUserCalendarMainRes 변환
+     *
+     * @param userMainData
+     * @param planMainData
+     * @param ddayMainDate
+     * @return GetUserCalendarMainRes
+     * @Auther shine
+     */
+    public GetUserCalendarMainRes changeGetUserCalendarMainRes(UserMainData userMainData, List<PlanMainData> planMainData, List<DDayMainDataRes> ddayMainDate) {
+        if (userMainData.getStateIdx() == 1) {
             return GetUserCalendarMainRes.builder()
-                    .name(mainData.getName())
-                    .profileImg(mainData.getProfileImg())
-                    .birthday(Validation.isLocalDateAndChangeString(mainData.getBirthday()))
-                    .stateIdx(mainData.getStateIdx())
-                    .serveType(mainData.getServeType())
-                    .startDate(mainData.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                    .endDate(mainData.getEndDate().format(DateTimeFormatter.ISO_DATE))
-                    .strPrivate(mainData.getStrPrivate().format(DateTimeFormatter.ISO_DATE))
-                    .strCorporal(mainData.getStrCorporal().format(DateTimeFormatter.ISO_DATE))
-                    .strSergeant(mainData.getStrSergeant().format(DateTimeFormatter.ISO_DATE))
-                    .hobong(mainData.getHobong())
-                    .normalPromotionStateIdx(mainData.getNormalPromotionStateIdx())
-                    .goal(mainData.getGoal())
-                    .vacationTotalDays(Validation.isInteger(mainData.getVacationTotalDays()))
-                    .vacationUseDays(Validation.isInteger(mainData.getVacationUseDays()) + Validation.isInteger(mainData.getVacationPlanUseDays()))
-                    .plan(plans.stream().map(plan -> {
-                        return PlanData.builder()
-                                .planId(plan.getId())
-                                .title(plan.getTitle())
-                                .build();
-                    }).collect(Collectors.toList()))
+                    .name(userMainData.getName())
+                    .profileImg(userMainData.getProfileImg())
+                    .birthday(Validation.isLocalDateAndChangeString(userMainData.getBirthday()))
+                    .stateIdx(userMainData.getStateIdx())
+                    .serveType(userMainData.getServeType())
+                    .startDate(userMainData.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(userMainData.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .strPrivate(userMainData.getStrPrivate().format(DateTimeFormatter.ISO_DATE))
+                    .strCorporal(userMainData.getStrCorporal().format(DateTimeFormatter.ISO_DATE))
+                    .strSergeant(userMainData.getStrSergeant().format(DateTimeFormatter.ISO_DATE))
+                    .hobong(userMainData.getHobong())
+                    .normalPromotionStateIdx(userMainData.getNormalPromotionStateIdx())
+                    .goal(userMainData.getGoal())
+                    .vacationTotalDays(Validation.isInteger(userMainData.getVacationTotalDays()))
+                    .vacationUseDays(Validation.isInteger(userMainData.getVacationUseDays()) + Validation.isInteger(userMainData.getVacationPlanUseDays()))
+                    .dday(ddayMainDate)
+                    .plan(planMainData)
                     .build();
         }
         return GetUserCalendarMainRes.builder()
-                .name(mainData.getName())
-                .profileImg(mainData.getProfileImg())
-                .birthday(Validation.isLocalDateAndChangeString(mainData.getBirthday()))
-                .stateIdx(mainData.getStateIdx())
-                .serveType(mainData.getServeType())
-                .startDate(mainData.getStartDate().format(DateTimeFormatter.ISO_DATE))
-                .endDate(mainData.getEndDate().format(DateTimeFormatter.ISO_DATE))
-                .proDate(mainData.getProDate().toString())
-                .goal(mainData.getGoal())
-                .vacationTotalDays(Validation.isInteger(mainData.getVacationTotalDays()))
-                .vacationUseDays(Validation.isInteger(mainData.getVacationUseDays()) + Validation.isInteger(mainData.getVacationPlanUseDays()))
-                .plan(plans.stream().map(plan -> {
-                    return PlanData.builder()
-                            .planId(plan.getId())
-                            .title(plan.getTitle())
-                            .build();
-                }).collect(Collectors.toList()))
+                .name(userMainData.getName())
+                .profileImg(userMainData.getProfileImg())
+                .birthday(Validation.isLocalDateAndChangeString(userMainData.getBirthday()))
+                .stateIdx(userMainData.getStateIdx())
+                .serveType(userMainData.getServeType())
+                .startDate(userMainData.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                .endDate(userMainData.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                .proDate(userMainData.getProDate().toString())
+                .goal(userMainData.getGoal())
+                .vacationTotalDays(Validation.isInteger(userMainData.getVacationTotalDays()))
+                .vacationUseDays(Validation.isInteger(userMainData.getVacationUseDays()) + Validation.isInteger(userMainData.getVacationPlanUseDays()))
+                .dday(ddayMainDate)
+                .plan(planMainData)
                 .build();
+    }
+}
+
+
+
+
+class dateSortAsc implements Comparator<DDayMainDataRes> {
+
+    @Override
+    public int compare(DDayMainDataRes o1, DDayMainDataRes o2) {
+        LocalDate date1 = LocalDate.parse(o1.getDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate date2 = LocalDate.parse(o2.getDate(), DateTimeFormatter.ISO_DATE);
+
+        if (date1.isBefore(date2)) {
+            return 1;
+        } else if (date1.isAfter(date2)) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 }
