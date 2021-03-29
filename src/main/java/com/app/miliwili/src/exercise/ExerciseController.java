@@ -36,6 +36,14 @@ public class ExerciseController {
     @ResponseBody
     @PostMapping("/first-weights")
     public BaseResponse<Long> postFirstWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseFirstWeightReq param){
+        //몸무게 정보가 잘 들어왔는지 검증
+        try{
+            if(param.getFirstWeight() < -1.0 || param.getGoalWeight() < -1.0)
+                return new BaseResponse<>(INVALID_WEIGHT_BOUNDARY);
+        }catch (Exception e){
+            return new BaseResponse<>(INVALID_WEIGHT);
+        }
+
         try{
             Long exerciseId = exerciseService.createFistWeight(param);
             return new BaseResponse<>(SUCCESS,exerciseId);
@@ -61,6 +69,14 @@ public class ExerciseController {
         if(param.getDayWeight() == null)
             return new BaseResponse<>(EMPTY_WEIGHT);
 
+        //몸무게 정보가 잘 들어왔는지 검증
+        try{
+            if(param.getDayWeight() < 0.0)
+                return new BaseResponse<>(INVALID_WEIGHT_BOUNDARY);
+        }catch (Exception e){
+            return new BaseResponse<>(INVALID_WEIGHT);
+        }
+
         try{
             String returnStr = exerciseService.createDayilyWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,returnStr);
@@ -84,6 +100,13 @@ public class ExerciseController {
                                                  @PathVariable Long exerciseId){
         if(!Validation.isRegexDate(param.getDayDate())){
             return new BaseResponse<>(INVALID_MODIFY_DATE);
+        }
+        //몸무게 정보가 잘 들어왔는지 검증
+        try{
+            if(param.getDayWeight() < 0.0)
+                return new BaseResponse<>(INVALID_WEIGHT_BOUNDARY);
+        }catch (Exception e){
+            return new BaseResponse<>(INVALID_WEIGHT);
         }
 
         try{
@@ -109,6 +132,13 @@ public class ExerciseController {
                                                 @PathVariable Long exerciseId){
         if(param.getGoalWeight() == null)
             return new BaseResponse<>(EMPTY_WEIGHT);
+        //몸무게 정보가 잘 들어왔는지 검증
+        try{
+            if(param.getGoalWeight() < 0.0)
+                return new BaseResponse<>(INVALID_WEIGHT_BOUNDARY);
+        }catch (Exception e){
+            return new BaseResponse<>(INVALID_WEIGHT);
+        }
 
         try{
             String returnStr = exerciseService.modifyGoalWeight(param,exerciseId);

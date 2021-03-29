@@ -31,7 +31,7 @@ public class ExerciseService {
     private final ExerciseProvider exerciseProvider;
     private final UserProvider userProvider;
     private final JwtService jwtService;
-
+    private PostExerciseFirstWeightReq pa;
 
 
     /**
@@ -45,16 +45,38 @@ public class ExerciseService {
         if(exerciseProvider.isExerciseInfoUser(user.getId()) == true)
             throw new BaseException(FAILED_CHECK_FIRST_WIEHGT);
 
+        Double goalWeight = (param.getGoalWeight() == -1.0) ? null : param.getGoalWeight();
+        Double firstWeight = (param.getFirstWeight() == -1.0) ? null : param.getFirstWeight();
+
+
         ExerciseInfo exerciseInfo = ExerciseInfo.builder()
                 .user(user)
-                .firstWeight(param.getFirstWeight())
-                .goalWeight(param.getGoalWeight())
+                .firstWeight(firstWeight)
+                .goalWeight(goalWeight)
+                .weightRecords(new ArrayList<>())
                 .build();
+
         try{
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
             throw new BaseException(FAILED_POST_FIRST_WIEHGT);
         }
+
+        //첫 몸무게 체중 기록에 기록하기
+        if(firstWeight != null) {
+            ExerciseWeightRecord firstRecord = ExerciseWeightRecord.builder()
+                    .weight(firstWeight)
+                    .exerciseDate(LocalDate.now())
+                    .exerciseInfo(exerciseInfo)
+                    .build();
+
+            try {
+                exerciseWeightRepository.save(firstRecord);
+            } catch (Exception e) {
+                throw new BaseException(FAILED_TO_POST_FIRST_WEIGHT);
+            }
+        }
+
 
         return exerciseInfo.getId();
     }
@@ -473,6 +495,25 @@ public class ExerciseService {
         }
     }
 
+    /**
+     * exerciseInfo 삭제 --> 회원이 삭제된다면 줄줄이 다 status 바꾸도록
+     * --> UserService 에
+     */
+    public void deleteExerciseInfo(Long userId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(userId);
+        List<ExerciseRoutine> routine = exerciseInfo.getExerciseRoutines();
 
+        exerciseInfo.setStatus("N");
+        for(ExerciseRoutine r : routine){
+            deleteRoutine(exerciseInfo.getId(), r.getId());
+        }
+
+        try{
+            exerciseRepository.save(exerciseInfo);
+        }catch (Exception e){
+            throw new BaseException(FAILED_TO_DELTE_EXERCISE_INFO);
+        }
+
+    }
 
 }

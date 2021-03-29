@@ -43,7 +43,6 @@ public class ExerciseProvider {
     /**
      * 일별 체중 조회
      */
-    @Transactional
     public GetExerciseDailyWeightRes retrieveExerciseDailyWeight(long exerciseId) throws BaseException{
         ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
         List<ExerciseWeightRecord> exerciseDailyWeightList = null;
@@ -60,7 +59,7 @@ public class ExerciseProvider {
         }
 
         GetExerciseDailyWeightRes dailyWeightRes = GetExerciseDailyWeightRes.builder()
-                .goalWeight(exerciseInfo.getGoalWeight())
+                .goalWeight((exerciseInfo.getGoalWeight() == null) ? (-1.0) : exerciseInfo.getGoalWeight())
                 .dailyWeightList(getDailyWeightTodailyWeightList(exerciseDailyWeightList))
                 .weightDayList(getDailyWeightTodailyDaytList(exerciseDailyWeightList))
                 .build();
@@ -176,7 +175,7 @@ public class ExerciseProvider {
         }
 
         GetExerciseWeightRecordRes getExerciseWeightRecordRes = GetExerciseWeightRecordRes.builder()
-                .goalWeight(exerciseInfo.getGoalWeight())
+                .goalWeight((exerciseInfo.getGoalWeight() == null) ? (-1.0): exerciseInfo.getGoalWeight())
                 .monthWeight(monthWeight)
                 .monthWeightMonth(monthWeightMonth)
                 .dayWeightDay(dayWeightDayList(viewYear,viewMonth))
@@ -270,8 +269,9 @@ public class ExerciseProvider {
         return changedList;
     }
     //차이 변환
-    public List<Double> dayWeightListDif(double goalWeight, List<Double> weightList, int year, int month){
+    public List<Double> dayWeightListDif(Double goalWeight, List<Double> weightList, int year, int month){
         List<Double> changedList = new ArrayList<>();
+
         if(weightList.size()==0){
             LocalDate inputDate = LocalDate.parse((year+"-"+month+"-1"),DateTimeFormatter.ISO_DATE);
             int lastDate = inputDate.lengthOfMonth();
@@ -280,6 +280,12 @@ public class ExerciseProvider {
             }
             return changedList;
 
+        }
+        if(goalWeight == null){
+            for(int i=0;i<weightList.size() ; i++){
+                changedList.add(0.0);
+            }
+            return changedList;
         }
             for (int i = 0; i < weightList.size(); i++) {
                 if (weightList.get(i) == 0.0) {
@@ -345,7 +351,8 @@ public class ExerciseProvider {
             //그 날짜에 루틴의 운동 기록이 있다면 true처리 
             List<ExerciseReport> reports = routine.getReports();
             for(ExerciseReport r : reports){
-                if(r.getDateCreated().isAfter(targetReportDate) && r.getDateCreated().isBefore(targetReportLastDate))
+                if(r.getDateCreated().isAfter(targetReportDate) && r.getDateCreated().isBefore(targetReportLastDate)
+                && r.getStatus().equals("Y"))
                     isDone = true;
             }
 
