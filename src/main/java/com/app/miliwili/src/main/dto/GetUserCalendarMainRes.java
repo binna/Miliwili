@@ -26,6 +26,6 @@ public class GetUserCalendarMainRes {
     private final String goal;
     private final Integer vacationTotalDays;
     private final Integer vacationUseDays;
-    private List<DDayMainDataRes> dday;
-    private List<PlanMainData> plan;
+    private final List<DDayMainDataRes> dday;
+    private final List<PlanMainData> plan;
 }

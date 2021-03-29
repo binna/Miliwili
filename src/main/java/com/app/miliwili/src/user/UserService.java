@@ -149,7 +149,9 @@ public class UserService {
     public UserRes updateUser(PatchUserReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
-        checkValidationOfInputValuesByServeData(user.getStateIdx(), parameters);
+        if (Objects.nonNull(parameters.getServeType()) && Objects.nonNull(parameters.getStartDate()) && Objects.nonNull(parameters.getEndDate())) {
+            checkValidationOfInputValuesByServeData(user.getStateIdx(), parameters);
+        }
 
         setNameOrBirthdayOrProfileImg(parameters, user);
         setNormalOrAbnormal(parameters, user);

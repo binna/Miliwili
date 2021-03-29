@@ -27,7 +27,7 @@ public class MainProvider {
 
 
     /**
-     * 메인화면 조회
+     * 메인 유저, 캘린더 조회
      * 
      * @return GetUserCalendarMainRes
      * @throws BaseException
@@ -44,6 +44,12 @@ public class MainProvider {
             throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
         }
     }
+
+    /**
+     * 메인 캘린더 조회
+     *
+     */
+    public void getCalendarMain() {}
 
 
 

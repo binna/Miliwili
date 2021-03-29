@@ -34,7 +34,7 @@ public class MainController {
     @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @GetMapping("/main/users-calendars")
-    public BaseResponse<GetUserCalendarMainRes> getUserMain(@RequestHeader("X-ACCESS-TOKEN") String token){
+    public BaseResponse<GetUserCalendarMainRes> getUserCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token){
         try{
             GetUserCalendarMainRes userMain = mainProvider.getUserCalendarMainById();
             return new BaseResponse(SUCCESS,userMain);
@@ -54,17 +54,17 @@ public class MainController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther
      */
-//    @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
-//    @ResponseBody
-//    @GetMapping("/main/calendar")
-//    public BaseResponse<Void> getUserMain(@RequestHeader("X-ACCESS-TOKEN") String token){
-//        try{
-//            GetUserCalendarMainRes userMain = mainProvider.getUserCalendarMainById();
-//            return new BaseResponse(SUCCESS,userMain);
-//        } catch (BaseException exception) {
-//            logger.warn(exception.getStatus().toString());
-//            logger.warn(Validation.getPrintStackTrace(exception));
-//            return new BaseResponse(exception.getStatus());
-//        }
-//    }
+    @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ResponseBody
+    @GetMapping("/main/calendar")
+    public BaseResponse<Void> getCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token){
+        try{
+            GetUserCalendarMainRes userMain = mainProvider.getUserCalendarMainById();
+            return new BaseResponse(SUCCESS,userMain);
+        } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
+            return new BaseResponse(exception.getStatus());
+        }
+    }
 }
