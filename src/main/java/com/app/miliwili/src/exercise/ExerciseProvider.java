@@ -339,8 +339,9 @@ public class ExerciseProvider {
 
         for(int i=0;i<routineList.size();i++){
             ExerciseRoutine routine = routineList.get(i);
-            Boolean isDone = (routine.getDone().equals("Y")) ? true : false;
-
+        //오늘 운동을 한 기록이 있으면 True처리 -->빼기/ 저번주에 같은 요일에도 들어감
+           // Boolean isDone = (routine.getDone().equals("Y")) ? true : false;
+            Boolean isDone = false;
             //그 날짜에 루틴의 운동 기록이 있다면 true처리 
             List<ExerciseReport> reports = routine.getReports();
             for(ExerciseReport r : reports){

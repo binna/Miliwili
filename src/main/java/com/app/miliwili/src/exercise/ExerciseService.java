@@ -38,6 +38,7 @@ public class ExerciseService {
      * 운동탭 처음 입장시 --> 목표 몸무게, 현재 몸무게 입력 ui
      *
      */
+
     public Long createFistWeight(PostExerciseFirstWeightReq param) throws BaseException{
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
@@ -312,6 +313,9 @@ public class ExerciseService {
         }
         if(report == null)
             throw new BaseException(FAILED_GET_REPORT);
+
+        if(routine.getDone().equals("Y"))
+            routine.setDone("N");
 
         report.setStatus("N");
         report.setExerciseRoutine(null);

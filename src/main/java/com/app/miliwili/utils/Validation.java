@@ -108,11 +108,23 @@ public class Validation {
                     String[] weightCountArr = splitArr[j].split("#");
                     if (weightCountArr.length != 2)
                         return INVALIED_STRING_WEIGHTPLUSCOUNT;
+                    try{
+                        Double parsing = Double.parseDouble(weightCountArr[0]);
+                    }catch (Exception e){
+                        return INVALIED_DETAILTYPE_WEIGHTCOUNT;
+                    }
                 }
             }
             else{
                 if(param.getDetailTypeContext().get(i).contains("#"))
                     return INVALIED_DETAILTYPE;
+                for(int j=0;j<splitArr.length;j++){
+                    try{
+                        Integer parsing = Integer.parseInt(splitArr[j]);
+                    }catch (Exception e){
+                        return INVALIED_DETAILTYPE_COUNT_TIME;
+                    }
+                }
             }
         }
         return VALIDATION_SUCCESS;
