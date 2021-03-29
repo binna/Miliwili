@@ -1,7 +1,11 @@
 package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.user.dto.*;
+import com.app.miliwili.src.main.dto.UserMainData;
+import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
+import com.app.miliwili.src.user.dto.UserRes;
+import com.app.miliwili.src.user.dto.VacationRes;
+import com.app.miliwili.src.user.dto.VacationSelectData;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.src.user.models.Vacation;
 import com.app.miliwili.utils.JwtService;
@@ -35,6 +39,7 @@ public class UserProvider {
         try {
             userList = userSelectRepository.findUsersIdByGoogleId(gSocialId);
         } catch (Exception e) {
+            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
@@ -147,6 +152,30 @@ public class UserProvider {
             throw new BaseException(FAILED_TO_GET_USER);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_USER);
+        }
+    }
+
+    /**
+     * 메인에 노출할 내 회원정보 조회
+     *
+     * @return UserMainData
+     * @throws BaseException
+     */
+    public UserMainData retrieveUserMainDataById() throws BaseException{
+        try{
+            UserMainData userMainData = userSelectRepository.findUserMainDataByUserId(jwtService.getUserId());
+
+            if (Objects.isNull(userMainData)) {
+                throw new BaseException(NOT_FOUND_MAIN_INFO);
+            }
+            return userMainData;
+        } catch (BaseException exception) {
+            if(exception.getStatus() == NOT_FOUND_MAIN_INFO) {
+                throw new BaseException(NOT_FOUND_MAIN_INFO);
+            }
+            throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
         }
     }
 

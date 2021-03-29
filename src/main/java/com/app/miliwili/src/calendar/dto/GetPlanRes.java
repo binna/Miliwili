@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 public class GetPlanRes {
     private final Long planId;
+    private final String title;
     private final String startDate;
     private final String endDate;
     private final String dateInfo;

@@ -34,6 +34,7 @@ public enum BaseResponseStatus {
     EMPTY_CONTENT(false, 2015, "내용을 입력해주세요."),
     EMPTY_D_DAY_TYPE(false, 2016, "디데이 구분을 입력해주세요."),
     EMPTY_EMOTION(false, 2017, "감정 이모티콘 아이디를 입력해주세요."),
+    EMPTY_PROFILE_IMG(false, 2018, "프로필 사진의 입력 값은 빈 값을 받을 수 없습니다. 값을 입력하거나 null 값으로 입력해주세요."),
 
     INVALID_BIRTHDAY(false, 2050, "생일 형식을 확인해주세요."),
     INVALID_PLAN_START_DATE(false, 2051, "일정의 시작날짜 형식을 확인해주세요."),
@@ -44,18 +45,19 @@ public enum BaseResponseStatus {
     INVALID_D_DAY_TYPE(false, 2056, "유효하지 않은 디데이 타입입니다."),
     INVALID_EMOTION(false, 2057, "감정 이모티콘 아이디는 1부터 9까지 입력 가능합니다."),
 
-    EXCEED_MAX10(false, 2100, "입력할 수 있는 최대 10글자의 수를 초과하였습니다."),
-    EXCEED_MAX20(false, 2101, "입력할 수 있는 최대 20글자의 수를 초과하였습니다."),
-    EXCEED_MAX25(false, 2102, "입력할 수 있는 최대 25글자의 수를 초과하였습니다."),
+    EXCEED_MAX10(false, 2100, "입력할 수 있는 최대 10글자 미만의 수를 초과하였습니다."),
+    EXCEED_MAX20(false, 2101, "입력할 수 있는 최대 20글자 미만의 수를 초과하였습니다."),
+    EXCEED_MAX25(false, 2102, "입력할 수 있는 최대 25글자 미만의 수를 초과하였습니다."),
 
     FASTER_THAN_START_DATE(false, 2110, "전역일은 입대일보다 빠를 수 없습니다."),
     FASTER_THAN_FIRST_DATE(false, 2111, "입대일은 상병진급일보다 빠를 수 없습니다."),
     FASTER_THAN_SECOND_DATE(false, 2112, "상병진급일은 병장진급일보다 빠를 수 없습니다."),
     FASTER_THAN_THIRD_DATE(false, 2113, "병장진급일은 상병진급일보다 빠를 수 없습니다."),
-    FASTER_THAN_END_DATE(false, 2114, "상병진급일은 전역일보다 빠를 수 없습니다."),
+    FASTER_THAN_END_DATE_NOR(false, 2114, "상병진급일은 전역일보다 빠를 수 없습니다."),
     FASTER_THAN_PRO_DATE(false, 2115, "진급심사일은 입대일보다 빠를 수 없습니다."),
     FASTER_THAN_VACATION_START_DATE(false, 2116, "휴가종료일은 휴가시작일보다 빠를 수 없습니다."),
     FASTER_THAN_PLAN_START_DATE(false, 2117, "종료일은 시작일보다 빠를 수 없습니다."),
+    FASTER_THAN_END_DATE_ABN(false, 2118, "전역일은 진급심사일보다 빠를 수 없습니다."),
 
     ONLY_ON_THE_SAME_DAY(false, 2150, "날짜 범위 등록 불가, 당일만 등록 가능합니다."),
 
@@ -184,9 +186,9 @@ public enum BaseResponseStatus {
     FAILED_TO_SIGNUP_USER(false, 3501, "회원 가입에 실패하였습니다."),
     FAILED_TO_SIGNUP_USER_NORMAL_STATE(false, 3502, "회원 가입(일반병사 table)에 실패하였습니다."),
     FAILED_TO_SIGNUP_USER_ABNORMAL_STATE(false, 3503, "회원 가입(일반병사 외 table)에 실패하였습니다."),
-    FAILED_TO_GET_USER_MAIN_INFO(false, 3504, "회원의 메인페이지 정보를 가져오는데 실패하였습니다."),
+    FAILED_TO_GET_USER_MAIN_INFO(false, 3504, "메인 정보를 조회하는데 실패하였습니다."),
     FAILED_TO_GET_USER_MAIN_LIST(false, 3505, "회원의 메인페이지 정보 리스트를 가져오는데 실패하였습니다."),
-    NOT_FOUND_MAIN_INFO(false, 3506, "해당 회원과 일치하는 존재하는 메인 정보가 없습니다. "),
+    NOT_FOUND_MAIN_INFO(false, 3506, "해당 회원과 일치하는 메인 정보가 없습니다."),
 
 
     FAILED_TO_GET_USER_STATE_IDX(false, 3510, "회원 복무 형태 조회에 실패하였습니다."),

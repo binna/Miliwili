@@ -3,23 +3,51 @@ package com.app.miliwili.utils;
 import com.ibm.icu.util.ChineseCalendar;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
 public class ChineseCalendarUtil {
+    
+    /**
+     * 디데이 구분 생일, 양력계산기
+     * 양력 -> 양력(지난 X, 다가올 날짜)
+     * 음력 -> 양력(지난 X, 다가올 날짜)
+     * 
+     * @param date yyyyMMdd
+     * @param choiceCalendar
+     * @return String
+     */
+    public static String convertSolar(String date, String choiceCalendar) {
+        if (choiceCalendar.equals("S")) {
+            LocalDate targetDate = LocalDate.parse(LocalDate.now().getYear() + "-"+ date);
 
-    public static String getDateByString(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        return sdf.format(date);
+            if (targetDate.isAfter(LocalDate.now())) {
+                return targetDate.format(DateTimeFormatter.ISO_DATE);
+            }
+
+            return LocalDate.now().plusYears(1).getYear() + "-" + date;
+        }
+
+        LocalDate targetDate = LocalDate.parse(convertLunarToSolar(LocalDate.now().getYear() + date.replaceAll("-", "")));
+        if (targetDate.isAfter(LocalDate.now())) {
+            return targetDate.format(DateTimeFormatter.ISO_DATE);
+        }
+
+        targetDate = LocalDate.parse(convertLunarToSolar(LocalDate.now().plusYears(1).getYear() + date.replaceAll("-", "")));
+        return targetDate.format(DateTimeFormatter.ISO_DATE);
     }
 
-    /**
-     * 음력 -> 양력 변환
-     *
-     * @param yyyyMMdd String
-     * @return yyyy-MM-dd String
-     */
-    public static String convertLunarToSolar(String date) {
+
+
+
+    private static String getDateByString(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(date);
+    }
+
+    private static String convertLunarToSolar(String date) {
         ChineseCalendar chineseCalendar = new ChineseCalendar();
         Calendar calendar = Calendar.getInstance();
 
@@ -29,33 +57,5 @@ public class ChineseCalendarUtil {
 
         calendar.setTimeInMillis(chineseCalendar.getTimeInMillis());
         return getDateByString(calendar.getTime());
-    }
-
-    /**
-     * 양력 -> 음력
-     *
-     * @param yyyyMMdd String
-     * @return yyyy-MM-dd String
-     */
-    public static String converSolarToLunar(String date) {
-        ChineseCalendar chineseCalendar = new ChineseCalendar();
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, Integer.parseInt(date.substring(0, 4)));
-        calendar.set(Calendar.MONTH, Integer.parseInt(date.substring(4, 6)) - 1);
-        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date.substring(6)));
-
-        chineseCalendar.setTimeInMillis(calendar.getTimeInMillis());
-
-        int y = chineseCalendar.get(ChineseCalendar.EXTENDED_YEAR) - 2637;
-        int m = chineseCalendar.get(ChineseCalendar.MONTH) + 1;
-        int d = chineseCalendar.get(ChineseCalendar.DAY_OF_MONTH);
-
-        StringBuffer ret = new StringBuffer();
-        ret.append(String.format("%04d", y)).append("-");
-        ret.append(String.format("%02d", m)).append("-");
-        ret.append(String.format("%02d", d));
-
-        return ret.toString();
     }
 }
