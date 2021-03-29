@@ -473,6 +473,25 @@ public class ExerciseService {
         }
     }
 
+    /**
+     * exerciseInfo 삭제 --> 회원이 삭제된다면 줄줄이 다 status 바꾸도록
+     * --> UserService 에
+     */
+    public void deleteExerciseInfo(Long userId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(userId);
+        List<ExerciseRoutine> routine = exerciseInfo.getExerciseRoutines();
 
+        exerciseInfo.setStatus("N");
+        for(ExerciseRoutine r : routine){
+            deleteRoutine(exerciseInfo.getId(), r.getId());
+        }
+
+        try{
+            exerciseRepository.save(exerciseInfo);
+        }catch (Exception e){
+            throw new BaseException(FAILED_TO_DELTE_EXERCISE_INFO);
+        }
+
+    }
 
 }

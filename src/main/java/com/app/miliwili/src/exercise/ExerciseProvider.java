@@ -345,7 +345,8 @@ public class ExerciseProvider {
             //그 날짜에 루틴의 운동 기록이 있다면 true처리 
             List<ExerciseReport> reports = routine.getReports();
             for(ExerciseReport r : reports){
-                if(r.getDateCreated().isAfter(targetReportDate) && r.getDateCreated().isBefore(targetReportLastDate))
+                if(r.getDateCreated().isAfter(targetReportDate) && r.getDateCreated().isBefore(targetReportLastDate)
+                && r.getStatus().equals("Y"))
                     isDone = true;
             }
 

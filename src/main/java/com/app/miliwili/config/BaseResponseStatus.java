@@ -237,6 +237,8 @@ public enum BaseResponseStatus {
     FAILED_TO_POST_WEIGHT_ONE_DAY(false, 3600, "오늘의 체중 기록을 이미 입력하셨습니다."),
     FAILED_TO_GET_TODAY_WEIGHT(false, 3601, "오늘의 체중 기록을 불러오는데 실패하였습니다."),
 
+    FAILED_TO_DELTE_EXERCISE_INFO(false, 3650, "ExerciseInfo를 삭제하는데 실패하였습니다."),
+
 
     // 4000 : Database 오류
     DATABASE_ERROR(false, 4000, "데이터베이스 오류입니다.");

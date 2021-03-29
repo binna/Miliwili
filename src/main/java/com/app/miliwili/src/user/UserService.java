@@ -3,6 +3,9 @@ package com.app.miliwili.src.user;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.CalendarProvider;
 import com.app.miliwili.src.calendar.models.PlanVacation;
+import com.app.miliwili.src.exercise.ExerciseProvider;
+import com.app.miliwili.src.exercise.ExerciseService;
+import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.NormalPromotionState;
@@ -32,6 +35,7 @@ public class UserService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final VacationRepository vacationRepository;
+    private final ExerciseService exerciseService;
 
 
     /**
@@ -175,6 +179,8 @@ public class UserService {
     public void deleteUser() throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
         user.setStatus("N");
+
+        exerciseService.deleteExerciseInfo(user.getId());
 
         try {
             userRepository.save(user);
