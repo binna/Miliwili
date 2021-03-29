@@ -117,6 +117,8 @@ public enum BaseResponseStatus {
     INVALIED_STRING_WEIGHTPLUSCOUNT(false, 2834, "무게+운동의 # 처리가 틀렸습니다."),
     INVALIED_SAME_SETS(false, 2835, "전세트 동일 설정을 하면 상세 세트 정보는 하나만 들어와야 합니다."),
     INVALIED_DETAILTYPE(false, 2836, "[무게+개수] 옵션이면 #을 포함한 배열, 그 외에는 단순 숫자 배열이 들어와야 합니다."),
+    INVALIED_DETAILTYPE_WEIGHTCOUNT(false, 2837, "[무게+개수] 옵션이면 Double, Integer형태의 숫자들이 들어와야 합니다."),
+    INVALIED_DETAILTYPE_COUNT_TIME(false, 2838, "[무게],[시간]옵션이면 Integer 형태의 숫자가 들어와야 합니다. "),
 
     INVALIED_TOTALTIME_TYPE(false, 2840, "총 운동시간 형식이 올바르지 않습니다. "),
     INVALIED_REPORT_EXERCISESTATUS(false, 2841, "완료한 운동 형식이 올바르지 않습니다."),
