@@ -4,6 +4,7 @@ import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.dto.*;
 import com.app.miliwili.src.calendar.models.*;
 import com.app.miliwili.src.main.dto.DDayMainData;
+import com.app.miliwili.src.main.dto.PlanCalendarData;
 import com.app.miliwili.src.main.dto.PlanMainData;
 import com.app.miliwili.utils.ChineseCalendarUtil;
 import com.app.miliwili.utils.JwtService;
@@ -129,15 +130,15 @@ public class CalendarProvider {
     }
 
     /**
-     * 금일 유효한 내 일정 전체조회(메인조회용)
+     * 날짜별 유효한 내 일정 전체조회(메인조회용)
      *
      * @return List<PlanData>
      * @throws BaseException
      * @Auther shine
      */
-    public List<PlanMainData> retrievePlanMainDataByTodayAndStatusY() throws BaseException {
+    public List<PlanMainData> retrievePlanMainDataByDateAndStatusY(LocalDate date) throws BaseException {
         try {
-            List<PlanMainData> planData = planSelectRepository.findPlanByToday(jwtService.getUserId(), LocalDate.now());
+            List<PlanMainData> planData = planSelectRepository.findPlanByDate(jwtService.getUserId(), date);
             return planData;
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
@@ -145,7 +146,25 @@ public class CalendarProvider {
     }
 
     /**
-     * 유효한 모든 일정조회(메인조회용)
+     *
+     * 월별 유효한 내 일정 전체조회(메인조회용)
+     *
+     * @param startDate
+     * @param endDate
+     * @return List<PlanCalendarData>
+     * @throws BaseException
+     */
+    public List<PlanCalendarData> retrievePlanCalendarDataByMonthAndStatusY(LocalDate startDate, LocalDate endDate) throws BaseException {
+        try {
+            List<PlanCalendarData> planCalendarData = planSelectRepository.findPlanByMonth(jwtService.getUserId(), startDate, endDate);
+            return planCalendarData;
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_PLAN);
+        }
+    }
+
+    /**
+     * 유효한 디데이 전체조회(메인조회용)
      *
      * @return List<DDayMainData>
      * @throws BaseException
