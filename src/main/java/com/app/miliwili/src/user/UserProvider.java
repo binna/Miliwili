@@ -39,7 +39,6 @@ public class UserProvider {
         try {
             userList = userSelectRepository.findUsersIdByGoogleId(gSocialId);
         } catch (Exception e) {
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 

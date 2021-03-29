@@ -117,9 +117,12 @@ public enum BaseResponseStatus {
     INVALIED_STRING_WEIGHTPLUSCOUNT(false, 2834, "무게+운동의 # 처리가 틀렸습니다."),
     INVALIED_SAME_SETS(false, 2835, "전세트 동일 설정을 하면 상세 세트 정보는 하나만 들어와야 합니다."),
     INVALIED_DETAILTYPE(false, 2836, "[무게+개수] 옵션이면 #을 포함한 배열, 그 외에는 단순 숫자 배열이 들어와야 합니다."),
+    INVALIED_DETAILTYPE_WEIGHTCOUNT(false, 2837, "[무게+개수] 옵션이면 Double, Integer형태의 숫자들이 들어와야 합니다."),
+    INVALIED_DETAILTYPE_COUNT_TIME(false, 2838, "[무게],[시간]옵션이면 Integer 형태의 숫자가 들어와야 합니다. "),
 
     INVALIED_TOTALTIME_TYPE(false, 2840, "총 운동시간 형식이 올바르지 않습니다. "),
     INVALIED_REPORT_EXERCISESTATUS(false, 2841, "완료한 운동 형식이 올바르지 않습니다."),
+    INVALIED_REPEATDAY(false, 2850, "반복 요일은 1-8 사이의 숫자로 입력해야 합니다."),
 
 
     // 3000 : Response 오류
@@ -227,6 +230,7 @@ public enum BaseResponseStatus {
     FAILED_TO_DELETE_REPORT_REPORT(false, 3581, "운동리포트 삭제 --> 운동 리포트 다시 저장에 실패하였습니다. "),
     FAILED_TO_DELETE_REPORT_ROUTINE(false, 3581, "운동리포트 삭제 --> 운동 루틴 다시 저장에 실패하였습니다. "),
     FAILED_TO_MODIFY_REPORT(false, 3582, "운동리포트 수정에 실패하였습니다. "),
+    NOT_FOUNT_REPORT(false, 3583, "해당 날짜에 운동 리포트가 없습니다. "),
 
     FAILED_TO_CHANGE_ROUTINE_STATUS(false, 3590, "운동 루틴 완료 여부 초기화에 실패하였습니다."),
 

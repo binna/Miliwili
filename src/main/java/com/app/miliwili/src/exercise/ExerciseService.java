@@ -8,8 +8,6 @@ import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -33,7 +31,6 @@ public class ExerciseService {
     private final ExerciseProvider exerciseProvider;
     private final UserProvider userProvider;
     private final JwtService jwtService;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
 
@@ -41,6 +38,7 @@ public class ExerciseService {
      * 운동탭 처음 입장시 --> 목표 몸무게, 현재 몸무게 입력 ui
      *
      */
+
     public Long createFistWeight(PostExerciseFirstWeightReq param) throws BaseException{
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
@@ -55,7 +53,6 @@ public class ExerciseService {
         try{
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_POST_FIRST_WIEHGT);
         }
 
@@ -78,7 +75,6 @@ public class ExerciseService {
             weightRecords= exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate(exerciseId,
                     "Y", LocalDate.now());
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_TODAY_WEIGHT);
         }
         if(weightRecords.size() != 0){
@@ -96,7 +92,6 @@ public class ExerciseService {
         try {
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_POST_DAILY_WEIGHT);
         }
 
@@ -120,7 +115,6 @@ public class ExerciseService {
             targetWeightRecord = exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate
                     (exerciseId, "Y", targetDate);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_MONTH_WEIGHT_3);
         }
 
@@ -129,7 +123,6 @@ public class ExerciseService {
             try{
                 exerciseWeightRepository.save(targetWeightRecord.get(0));
             }catch (Exception e){
-                logger.warn(Validation.getPrintStackTrace(e));
                 throw new BaseException(FAILED_TO_MODIFY_WEIGHT);
             }
 
@@ -142,7 +135,6 @@ public class ExerciseService {
             try {
                 exerciseWeightRepository.save(newWiehgtRecord);
             }catch (Exception e){
-                logger.warn(Validation.getPrintStackTrace(e));
                 throw new BaseException(FAILED_TO_MODIFY_WEIGHT);
             }
 
@@ -165,7 +157,6 @@ public class ExerciseService {
         try {
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_PATCH_GOAL_WEIGHT);
         }
 
@@ -257,7 +248,6 @@ public class ExerciseService {
         try {
             exerciseRoutineRepository.delete(routine);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_DELETE_ROUTINE);
         }
 
@@ -296,7 +286,6 @@ public class ExerciseService {
             exerciseReportRepository.save(newReport);
             exerciseRoutineRepository.save(routine);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_POST_REPORT);
         }
         return newReport.getId();
@@ -325,6 +314,9 @@ public class ExerciseService {
         if(report == null)
             throw new BaseException(FAILED_GET_REPORT);
 
+        if(routine.getDone().equals("Y"))
+            routine.setDone("N");
+
         report.setStatus("N");
         report.setExerciseRoutine(null);
         routine.getReports().remove(report);
@@ -332,14 +324,12 @@ public class ExerciseService {
         try{
             exerciseReportRepository.save(report);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_DELETE_REPORT_REPORT);
         }
 
         try {
             exerciseRoutineRepository.save(routine);
         }catch(Exception e) {
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_DELETE_REPORT_ROUTINE);
         }
 
@@ -370,13 +360,14 @@ public class ExerciseService {
             }
         }
         if(report == null)
-            throw new BaseException(FAILED_GET_REPORT);
+            throw new BaseException(NOT_FOUNT_REPORT);
+        if(report.getStatus().equals("N"))
+            throw new BaseException(NOT_FOUNT_REPORT);
 
         report.setReportText(param.getReportText());
         try {
             exerciseReportRepository.save(report);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_MODIFY_REPORT);
         }
         return "success";
@@ -384,14 +375,13 @@ public class ExerciseService {
 
     }
     /**
-     * 운동 안한상태로 초기화
+     * 루틴 안한상태로 초기화
      */
     public void resetRoutineDone(ExerciseRoutine routine) throws BaseException{
         routine.setDone("N");
         try {
             exerciseRoutineRepository.save(routine);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_CHANGE_ROUTINE_STATUS);
         }
     }
@@ -479,7 +469,6 @@ public class ExerciseService {
             //이게 문제가 될까????
             exerciseRoutineRepository.save(newRoutine);
         }catch (Exception e){
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_PATCH_DAILY_WEIGHT);
         }
     }

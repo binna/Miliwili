@@ -50,7 +50,6 @@ public class UserService {
         try {
             userIdList = userProvider.isGoogleUser(socialId);
         } catch (Exception e) {
-            logger.warn(Validation.getPrintStackTrace(e));
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
@@ -453,7 +452,7 @@ public class UserService {
                 return;
             }
         }
-        user.setProfileImg("https://miliwili-storage.s3.ap-northeast-2.amazonaws.com/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2021-03-10+%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE+7.21.24.png");
+        user.setProfileImg("https://firebasestorage.googleapis.com/v0/b/milliewillie-dev.appspot.com/o/profiles%2Fgraphic_profile_big.png?alt=media&token=00a849ac-39d6-4926-98b3-7f0c2b53a801");
     }
 
     private void setUserPromotionState(String strPrivate, String strCorporal, String strSergeant,
