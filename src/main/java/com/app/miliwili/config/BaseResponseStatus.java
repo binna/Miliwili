@@ -89,6 +89,7 @@ public enum BaseResponseStatus {
 
     INVALID_WEIGHT(false, 2520, "몸무게는 Double형으로 설정해주세요."),
     INVALID_SETCOUNT(false, 2521, "운동정보에 입력하신 세트의 개수와 실제 세트들의 개수가 일치하지 않습니다."),
+    INVALID_WEIGHT_BOUNDARY(false, 2522, "몸무게는 0.0이상으로 입력해야합니다."),
 
     EMPTY_START_DATE(false, 2700, "입대일을 입력해주세요."),
     EMPTY_END_DATE(false, 2701, "전역일을 입력해주세요."),
@@ -123,6 +124,7 @@ public enum BaseResponseStatus {
     INVALIED_TOTALTIME_TYPE(false, 2840, "총 운동시간 형식이 올바르지 않습니다. "),
     INVALIED_REPORT_EXERCISESTATUS(false, 2841, "완료한 운동 형식이 올바르지 않습니다."),
     INVALIED_REPEATDAY(false, 2850, "반복 요일은 1-8 사이의 숫자로 입력해야 합니다."),
+
 
 
     // 3000 : Response 오류
@@ -238,6 +240,8 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_TODAY_WEIGHT(false, 3601, "오늘의 체중 기록을 불러오는데 실패하였습니다."),
 
     FAILED_TO_DELTE_EXERCISE_INFO(false, 3650, "ExerciseInfo를 삭제하는데 실패하였습니다."),
+
+    FAILED_TO_POST_FIRST_WEIGHT(false, 3660, "첫 몸무게 체중 기록에 실패하였습니다."),
 
 
     // 4000 : Database 오류
