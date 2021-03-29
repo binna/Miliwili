@@ -8,7 +8,6 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
@@ -40,12 +39,16 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
 
 
 
+
+
     /**
-     *
+     * UserMain Date 조회
+     * 
      * @param userId
-     * @return
+     * @return UserMainData
+     * @Auther shine
      */
-    public UserCalendarMainData findtest(Long userId) {
+    public UserMainData findUserMainDataByUserId(Long userId) {
         QUserInfo user = QUserInfo.userInfo;
         QNormalPromotionState normalPromotionState = QNormalPromotionState.normalPromotionState;
         QAbnormalPromotionState abnormalPromotionState = QAbnormalPromotionState.abnormalPromotionState;
@@ -53,7 +56,7 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
         QPlanVacation planVacation = QPlanVacation.planVacation;
 
         return queryFactory
-                .select((Projections.constructor(UserCalendarMainData.class,
+                .select((Projections.constructor(UserMainData.class,
                         user.name.as("name"), user.profileImg.as("profileImg"), user.birthday.as("birthday"),
                         user.stateIdx.as("stateIdx"), user.serveType.as("serveType"),
                         user.startDate.as("startDate"), user.endDate.as("endDate"),
@@ -65,32 +68,28 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                         abnormalPromotionState.proDate.as("proDate"),
                         user.goal.as("goal"),
                         ExpressionUtils.as(
-                                JPAExpressions.select(vacation.totalDays)
+                                JPAExpressions.select(vacation.totalDays.sum())
                                 .from(vacation)
                                 .where(vacation.userInfo.id.eq(userId)),
                                 "vacationTotalDays"
                         ),
                         ExpressionUtils.as(
-                                JPAExpressions.select(vacation.useDays)
+                                JPAExpressions.select(vacation.useDays.sum())
                                 .from(vacation)
                                 .where(vacation.userInfo.id.eq(userId)),
                                 "vacationUseDays"
                         ),
-
                         ExpressionUtils.as(
-                                JPAExpressions.select(planVacation.count)
+                                JPAExpressions.select(planVacation.count.sum())
                                 .from(planVacation)
-                                .where(planVacation.vacationId.eq(vacation.id), planVacation.status.eq("Y")),
+                                .where(planVacation.plan.userInfo.id.eq(userId), planVacation.status.eq("Y")),
                                 "vacationPlanUseDays"
                         )
                 )))
                 .from(user)
                 .leftJoin(user.normalPromotionState, normalPromotionState)
-                .leftJoin(user.abnormalPromotionState,abnormalPromotionState)
+                .leftJoin(user.abnormalPromotionState, abnormalPromotionState)
                 .where(user.status.eq("Y"), user.id.eq(userId))
                 .fetchOne();
     }
-
-
-
 }
