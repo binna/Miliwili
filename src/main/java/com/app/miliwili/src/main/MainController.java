@@ -2,6 +2,7 @@ package com.app.miliwili.src.main;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
+import com.app.miliwili.src.main.dto.GetCalendarMainRes;
 import com.app.miliwili.src.main.dto.GetUserCalendarMainRes;
 import com.app.miliwili.utils.Validation;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +35,7 @@ public class MainController {
     @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @GetMapping("/main/users-calendars")
-    public BaseResponse<GetUserCalendarMainRes> getUserCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token){
+    public BaseResponse<GetUserCalendarMainRes> getUserCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try{
             GetUserCalendarMainRes userMain = mainProvider.getUserCalendarMainById();
             return new BaseResponse(SUCCESS,userMain);
@@ -44,7 +45,6 @@ public class MainController {
             return new BaseResponse(exception.getStatus());
         }
     }
-
 
     /**
      * 메인 캘린더 조회
@@ -57,10 +57,14 @@ public class MainController {
     @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @GetMapping("/main/calendar")
-    public BaseResponse<Void> getCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token){
+    public BaseResponse<GetCalendarMainRes> getCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                            @RequestParam(value = "month", required = false) String month,
+                                                            @RequestParam(value = "date", required = false) String date) {
+        // TODO 유효성 검사
+
         try{
-            GetUserCalendarMainRes userMain = mainProvider.getUserCalendarMainById();
-            return new BaseResponse(SUCCESS,userMain);
+            GetCalendarMainRes calendarMain = mainProvider.getCalendarMain(month, date);
+            return new BaseResponse(SUCCESS,calendarMain);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));

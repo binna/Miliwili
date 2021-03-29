@@ -23,15 +23,15 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
     }
 
     /**
-     * 금일 유효한 내 일정 전체조회(메인조회용)
-     * (일정 시작일 순으로 오름차순)
+     * 날짜별 유효한 내 일정 전체조회(메인조회용)
+     * (일정 시작일로 오름차순)
      *
      * @param userId
-     * @param today
+     * @param date
      * @return List<PlanData>
      * @Auther shine
      */
-    public List<PlanMainData> findPlanByToday(Long userId, LocalDate today) {
+    public List<PlanMainData> findPlanByDate(Long userId, LocalDate date) {
         QPlan plan = QPlan.plan;
 
         return queryFactory
@@ -40,8 +40,34 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
                 ))
                 .from(plan)
                 .where(plan.userInfo.id.eq(userId), plan.status.eq("Y"),
-                        plan.startDate.eq(today).or(plan.startDate.before(today)),
-                        plan.endDate.eq(today).or(plan.endDate.after(today))
+                        plan.startDate.eq(date).or(plan.startDate.before(date)),
+                        plan.endDate.eq(date).or(plan.endDate.after(date))
+                )
+                .orderBy(plan.startDate.asc())
+                .fetch();
+    }
+
+    /**
+     * 월별 유효한 내 일정 전체조회(메인조회용)
+     * (일정 시작일로 오름차순)
+     *
+     * @param userId
+     * @param startDate
+     * @param endDate
+     * @return List<PlanCalendarData>
+     * @Auther shine
+     */
+    public List<PlanCalendarData> findPlanByMonth(Long userId, LocalDate startDate, LocalDate endDate) {
+        QPlan plan = QPlan.plan;
+
+        return queryFactory
+                .select(Projections.constructor(PlanCalendarData.class,
+                        plan.color.as("color"), plan.startDate.as("startDate"), plan.endDate.as("endDate")
+                ))
+                .from(plan)
+                .where(plan.userInfo.id.eq(userId), plan.status.eq("Y"),
+                        plan.startDate.eq(startDate).or(plan.startDate.before(startDate)),
+                        plan.endDate.eq(endDate).or(plan.endDate.after(endDate))
                 )
                 .orderBy(plan.startDate.asc())
                 .fetch();
