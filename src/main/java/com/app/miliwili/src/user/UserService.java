@@ -182,15 +182,29 @@ public class UserService {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
         user.setStatus("N");
 
-        exerciseService.deleteExerciseInfo(user.getId());
-        calendarService.deletePlanByUser(user.getId());
-        calendarService.deleteDDayByUser(user.getId());
-        emotionRecordService.deleteEmotionRecordByUser(user.getId());
-
         try {
             userRepository.save(user);
+            exerciseService.deleteExerciseInfo(user.getId());
+            calendarService.deletePlanByUser(user.getId());
+            calendarService.deleteDDayByUser(user.getId());
+            emotionRecordService.deleteEmotionRecordByUser(user.getId());
+        } catch (BaseException exception) {
+            if (exception.getStatus() == FAILED_TO_DELTE_EXERCISE_INFO) {
+                throw new BaseException(FAILED_TO_DELTE_EXERCISE_INFO);
+            }
+            if (exception.getStatus() == FAILED_TO_DELETE_PLAN) {
+                calendarService.deleteRollbackPlanByUser(user.getId());
+                throw new BaseException(FAILED_TO_DELETE_PLAN);
+            }
+            if (exception.getStatus() == FAILED_TO_DELETE_D_DAY) {
+                calendarService.deleteRollbackDDayByUser(user.getId());
+                throw new BaseException(FAILED_TO_DELETE_D_DAY);
+            }
+            if (exception.getStatus() == FAILED_TO_DELETE_EMOTION_RECORD) {
+                emotionRecordService.deleteRollbackEmotionRecord(user.getId());
+            }
+            throw new BaseException(FAILED_TO_DELETE_USER);
         } catch (Exception exception) {
-            // TODO 롤백 부분
             throw new BaseException(FAILED_TO_DELETE_USER);
         }
     }

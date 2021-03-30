@@ -127,10 +127,6 @@ public class EmotionRecordService {
         List<EmotionRecord> emotionRecords = emotionRecordProvider.retrieveEmotionByUser(userId);
 
         for (EmotionRecord emotionRecord : emotionRecords) {
-            if (emotionRecord.getUserInfo().getId() != userId) {
-                throw new BaseException(DO_NOT_AUTH_USER);
-            }
-
             emotionRecord.setStatus("N");
         }
 
