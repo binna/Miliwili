@@ -90,7 +90,7 @@ public class MainProvider {
                     .build());
         }
 
-        Collections.sort(ddayMainData, new dateSortAsc());
+        Collections.sort(ddayMainData, new dateSortDesc());
 
         return ddayMainData;
     }
@@ -101,10 +101,13 @@ public class MainProvider {
         for (DDayMainDataRes ddayMain : ddayMainDate) {
             LocalDate targetDate = LocalDate.parse(ddayMain.getDate(), DateTimeFormatter.ISO_DATE);
 
-            if ((targetDate.isEqual(startDate) || targetDate.isAfter(startDate)) && (endDate.isEqual(targetDate) || endDate.isBefore(targetDate))) {
+            System.out.println(targetDate.isEqual(endDate) || targetDate.isBefore(endDate));
+            System.out.println(endDate.isEqual(targetDate) || endDate.isBefore(targetDate));
+            if ((targetDate.isEqual(startDate) || targetDate.isAfter(startDate)) && (targetDate.isEqual(endDate) || targetDate.isBefore(endDate))) {
                 ddayCalendar.add(targetDate.format(DateTimeFormatter.ISO_DATE));
             }
         }
+
         return ddayCalendar;
     }
 
@@ -160,7 +163,7 @@ public class MainProvider {
 
 
 
-class dateSortAsc implements Comparator<DDayMainDataRes> {
+class dateSortDesc implements Comparator<DDayMainDataRes> {
 
     @Override
     public int compare(DDayMainDataRes o1, DDayMainDataRes o2) {
