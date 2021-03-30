@@ -2,6 +2,7 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.CalendarProvider;
+import com.app.miliwili.src.calendar.CalendarService;
 import com.app.miliwili.src.calendar.models.PlanVacation;
 import com.app.miliwili.src.emotionRecord.EmotionRecordService;
 import com.app.miliwili.src.exercise.ExerciseService;
@@ -30,6 +31,7 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class UserService {
     private final UserProvider userProvider;
     private final CalendarProvider calendarProvider;
+    private final CalendarService calendarService;
     private final EmotionRecordService emotionRecordService;
     private final SNSLogin snsLogin;
     private final JwtService jwtService;
@@ -181,9 +183,9 @@ public class UserService {
         user.setStatus("N");
 
         exerciseService.deleteExerciseInfo(user.getId());
-        // TODO 일정, 디데이
+        calendarService.deletePlanByUser(user.getId());
+        calendarService.deleteDDayByUser(user.getId());
         emotionRecordService.deleteEmotionRecordByUser(user.getId());
-
 
         try {
             userRepository.save(user);

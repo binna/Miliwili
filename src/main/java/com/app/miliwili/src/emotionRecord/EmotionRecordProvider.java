@@ -88,9 +88,9 @@ public class EmotionRecordProvider {
      * @throws BaseException
      * @Auther shine
      */
-    public List<EmotionRecord> retrieveEmotionByUser() throws BaseException {
+    public List<EmotionRecord> retrieveEmotionByUser(Long userid) throws BaseException {
         try {
-            return emotionRecordRepository.findByUserInfo_Id(jwtService.getUserId());
+            return emotionRecordRepository.findByUserInfo_Id(userid);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
         }
@@ -103,9 +103,9 @@ public class EmotionRecordProvider {
      * @throws BaseException
      * @Auther shine
      */
-    public List<EmotionRecord> retrieveEmotionByUserAndStatusN() throws BaseException {
+    public List<EmotionRecord> retrieveEmotionByUserAndStatusN(Long userId) throws BaseException {
         try {
-            return emotionRecordRepository.findByUserInfo_IdAndStatus(jwtService.getUserId(), "N");
+            return emotionRecordRepository.findByUserInfo_IdAndStatus(userId, "N");
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
         }

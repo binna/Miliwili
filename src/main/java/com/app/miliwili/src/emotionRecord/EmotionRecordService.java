@@ -124,10 +124,10 @@ public class EmotionRecordService {
      * @Auther shine
      */
     public void deleteEmotionRecordByUser(Long userId) throws BaseException {
-        List<EmotionRecord> emotionRecords = emotionRecordProvider.retrieveEmotionByUser();
+        List<EmotionRecord> emotionRecords = emotionRecordProvider.retrieveEmotionByUser(userId);
 
         for (EmotionRecord emotionRecord : emotionRecords) {
-            if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
+            if (emotionRecord.getUserInfo().getId() != userId) {
                 throw new BaseException(DO_NOT_AUTH_USER);
             }
 
@@ -147,14 +147,10 @@ public class EmotionRecordService {
      * @throws BaseException
      * @Auther shine
      */
-    public void deleteRollbackEmotionRecord() throws BaseException {
-        List<EmotionRecord> emotionRecords = emotionRecordProvider.retrieveEmotionByUserAndStatusN();
+    public void deleteRollbackEmotionRecord(Long userId) throws BaseException {
+        List<EmotionRecord> emotionRecords = emotionRecordProvider.retrieveEmotionByUserAndStatusN(userId);
 
         for (EmotionRecord emotionRecord : emotionRecords) {
-            if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
-                throw new BaseException(DO_NOT_AUTH_USER);
-            }
-
             emotionRecord.setStatus("Y");
         }
 

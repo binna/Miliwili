@@ -152,6 +152,7 @@ public enum BaseResponseStatus {
     FAILED_TO_PATCH_PLAN(false, 3032, "일정 수정에 실패하였습니다."),
     FAILED_TO_DELETE_PLAN(false, 3033, "일정 삭제에 실패하였습니다."),
     FAILED_TO_GET_PLAN(false, 3034, "일정 조회에 실패하였습니다."),
+    FAILED_TO_DELETE_ROLLBACK_PLAN(false, 3035, "일정 삭제 롤백에 실패하였습니다."),
 
     NOT_FOUND_DIARY(false, 3040, "존재하지 않는 다이어리입니다."),
     FAILED_TO_POST_DIARY(false, 3041, "다이어리 생성에 실패하였습니다."),
@@ -166,6 +167,7 @@ public enum BaseResponseStatus {
     FAILED_TO_PATCH_D_DAY(false, 3052, "D-Day 수정에 실패하였습니다."),
     FAILED_TO_DELETE_D_DAY(false, 3053, "D-Day 삭제에 실패하였습니다."),
     FAILED_TO_GET_D_DAY(false, 3054, "D-Day 조회에 실패하였습니다."),
+    FAILED_TO_DELETE_ROLLBACK_D_DAY(false, 3055, "D-Day 삭제 롤백에 실패하였습니다."),
 
     NOT_FOUND_WORK(false, 3060, "존재하지 않는 할일/준비물 입니다."),
     FAILED_TO_PATCH_WORK(false, 3061, "할일/준비물 수정에 실패하였습니다."),
@@ -176,7 +178,7 @@ public enum BaseResponseStatus {
     FAILED_TO_DELETE_EMOTION_RECORD(false, 3073, "감정기록 삭제에 실패하였습니다."),
     FAILED_TO_GET_EMOTION_RECORD(false, 3074, "감정기록 조회에 실패하였습니다."),
     ALREADY_EXIST_EMOTION_RECORD(false, 3075, "이미 해당 날짜에는 감정일기가 존재합니다."),
-    FAILED_TO_DELETE_ROLLBACK_EMOTION_RECORD(false, 3076, "감정기록 삭제에 실패하였습니다."),
+    FAILED_TO_DELETE_ROLLBACK_EMOTION_RECORD(false, 3076, "감정기록 삭제 롤백에 실패하였습니다."),
 
     NOT_FOUND_PLAN_VACATION(false, 3080, "일정에 등록된 휴가가 없습니다."),
     FAILED_TO_GET_PLAN_VACATION(false, 3081, "일정에 등록된 휴가 조회에 실패했습니다."),
