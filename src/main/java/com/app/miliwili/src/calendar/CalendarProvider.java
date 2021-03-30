@@ -138,15 +138,13 @@ public class CalendarProvider {
      */
     public List<PlanMainData> retrievePlanMainDataByDateAndStatusY(LocalDate date) throws BaseException {
         try {
-            List<PlanMainData> planData = planSelectRepository.findPlanByDate(jwtService.getUserId(), date);
-            return planData;
+            return planSelectRepository.findPlanByDate(jwtService.getUserId(), date);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
         }
     }
 
     /**
-     *
      * 월별 유효한 내 일정 전체조회(메인조회용)
      *
      * @param startDate
@@ -156,8 +154,7 @@ public class CalendarProvider {
      */
     public List<PlanCalendarData> retrievePlanCalendarDataByMonthAndStatusY(LocalDate startDate, LocalDate endDate) throws BaseException {
         try {
-            List<PlanCalendarData> planCalendarData = planSelectRepository.findPlanByMonth(jwtService.getUserId(), startDate, endDate);
-            return planCalendarData;
+            return planSelectRepository.findPlanByMonth(jwtService.getUserId(), startDate, endDate);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
         }
@@ -172,10 +169,72 @@ public class CalendarProvider {
      */
     public List<DDayMainData> retrieveDDayMainDataByTodayAndStatusY() throws BaseException {
         try {
-            List<DDayMainData> ddayMainData = ddaySelectRepository.findDDayByToday(jwtService.getUserId());
-            return ddayMainData;
+            return ddaySelectRepository.findDDayByToday(jwtService.getUserId());
         } catch (Exception exception) {
-            exception.printStackTrace();
+            throw new BaseException(FAILED_TO_GET_D_DAY);
+        }
+    }
+
+    /**
+     * 회원별 모든 일정조회
+     * 
+     * @param userId
+     * @return List<Plan>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<Plan> retrievePlanByUser(Long userId) throws BaseException {
+        try {
+            return planRepository.findByUserInfo_Id(userId);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_PLAN);
+        }
+    }
+
+    /**
+     * 회원별 상태 "N"의 모든 일정조회
+     *
+     * @param userId
+     * @return List<Plan>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<Plan> retrievePlanByUserAndStatusN(Long userId) throws BaseException {
+        try {
+            return planRepository.findByUserInfo_IdAndStatus(userId, "N");
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_PLAN);
+        }
+    }
+
+    /**
+     * 회원별 모든 디데이 조회
+     *
+     * @param userId
+     * @return List<DDay>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<DDay> retrieveDDayByUser(Long userId) throws BaseException {
+        try {
+            return ddayRepository.findByUserInfo_Id(userId);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_D_DAY);
+        }
+    }
+
+    /**
+     * 회원별 상태 "N"의 모든 디데이 조회
+     *
+     * @param userId
+     * @return List<DDay>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<DDay> retrieveDDayByUserAndStatusN(Long userId) throws BaseException {
+        try {
+            return ddayRepository.findByUserInfo_IdAndStatus(userId, "N");
+        } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_D_DAY);
         }
     }

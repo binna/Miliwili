@@ -141,8 +141,8 @@ public class UserController {
     @ApiOperation(value = "회원가입", notes = "X-ACCESS-TOKEN 구글 혹은 카카오 토큰 필요")
     @ResponseBody
     @PostMapping("/users")
-    public BaseResponse<PostSignUpRes> postSignUpKakao(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                       @RequestBody(required = false) PostSignUpReq parameters) {
+    public BaseResponse<PostSignUpRes> postSignUp(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                  @RequestBody(required = false) PostSignUpReq parameters) {
         if (Objects.isNull(parameters.getName()) || parameters.getName().length() == 0) {
             return new BaseResponse<>(EMPTY_NAME);
         }
@@ -206,29 +206,35 @@ public class UserController {
             if (Objects.isNull(parameters.getStrSergeant()) || parameters.getStrSergeant().length() == 0) {
                 return new BaseResponse<>(EMPTY_THIRD_DATE);
             }
-            LocalDate thirdDate = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
             if (!Validation.isRegexDate(parameters.getStrSergeant())) {
                 return new BaseResponse<>(INVALID_THIRD_DATE);
             }
+            LocalDate thirdDate = LocalDate.parse(parameters.getStrSergeant(), DateTimeFormatter.ISO_DATE);
             if (secondDate.isAfter(thirdDate)) {
                 return new BaseResponse<>(FASTER_THAN_THIRD_DATE);
             }
+
             if (thirdDate.isAfter(endDate)) {
                 return new BaseResponse<>(FASTER_THAN_END_DATE_NOR);
             }
+            parameters.setProDate(null);
         } else {
-            if (Objects.isNull(parameters.getStrPrivate()) || Objects.isNull(parameters.getStrCorporal()) || Objects.isNull(parameters.getStrSergeant())) {
-                if (Objects.isNull(parameters.getProDate()) || parameters.getProDate().length() == 0) {
-                    return new BaseResponse<>(EMPTY_PRO_DATE);
-                }
-                if (!Validation.isRegexDate(parameters.getProDate())) {
-                    return new BaseResponse<>(INVALID_PRO_DATE);
-                }
-                LocalDate proDate = LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE);
-                if (startDate.isAfter(proDate)) {
-                    return new BaseResponse<>(FASTER_THAN_PRO_DATE);
-                }
+            if (Objects.isNull(parameters.getProDate()) || parameters.getProDate().length() == 0) {
+                return new BaseResponse<>(EMPTY_PRO_DATE);
             }
+            if (!Validation.isRegexDate(parameters.getProDate())) {
+                return new BaseResponse<>(INVALID_PRO_DATE);
+            }
+            LocalDate proDate = LocalDate.parse(parameters.getProDate(), DateTimeFormatter.ISO_DATE);
+            if (startDate.isAfter(proDate)) {
+                return new BaseResponse<>(FASTER_THAN_PRO_DATE);
+            }
+            if (proDate.isAfter(endDate)) {
+                return new BaseResponse<>(FASTER_THAN_END_DATE_ABN);
+            }
+            parameters.setStrPrivate(null);
+            parameters.setStrCorporal(null);
+            parameters.setStrSergeant(null);
         }
 
         if (Objects.nonNull(parameters.getGoal())) {

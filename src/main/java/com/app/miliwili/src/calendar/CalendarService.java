@@ -405,6 +405,98 @@ public class CalendarService {
         }
     }
 
+    /**
+     * 회원 삭제시, 회원별 일정 삭제
+     *
+     * @param userId
+     * @throws BaseException
+     */
+    public void deletePlanByUser(Long userId) throws BaseException {
+        List<Plan> plans = calendarProvider.retrievePlanByUser(userId);
+
+        for (Plan plan : plans) {
+            plan.setStatus("N");
+
+            if (plan.getPlanType().equals("휴가")) {
+               for (PlanVacation planVacation : plan.getPlanVacations()) {
+                   planVacation.setStatus("N");
+               }
+            }
+        }
+
+        try {
+            planRepository.saveAll(plans);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_PLAN);
+        }
+    }
+
+    /**
+     * 회원 삭제 문제 발생시, 회원별 일정 삭제
+     *
+     * @param userId
+     * @throws BaseException
+     */
+    public void deleteRollbackPlanByUser(Long userId) throws BaseException {
+        List<Plan> plans = calendarProvider.retrievePlanByUserAndStatusN(userId);
+
+        for (Plan plan : plans) {
+            plan.setStatus("Y");
+
+            if (plan.getPlanType().equals("휴가")) {
+                for (PlanVacation planVacation : plan.getPlanVacations()) {
+                    planVacation.setStatus("Y");
+                }
+            }
+        }
+
+        try {
+            planRepository.saveAll(plans);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_ROLLBACK_PLAN);
+        }
+    }
+
+    /**
+     * 회원 삭제시, 회원별 디데이 삭제
+     *
+     * @param userId
+     * @throws BaseException
+     */
+    public void deleteDDayByUser(Long userId) throws BaseException {
+        List<DDay> ddays = calendarProvider.retrieveDDayByUser(userId);
+
+        for (DDay dday : ddays) {
+            dday.setStatus("N");
+        }
+
+        try {
+            ddayRepository.saveAll(ddays);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_D_DAY);
+        }
+    }
+
+    /**
+     * 회원 삭제 문제 발생시, 회원별 디데이 삭제 롤백
+     *
+     * @param userId
+     * @throws BaseException
+     */
+    public void deleteRollbackDDayByUser(Long userId) throws BaseException {
+        List<DDay> ddays = calendarProvider.retrieveDDayByUserAndStatusN(userId);
+
+        for (DDay dday : ddays) {
+            dday.setStatus("Y");
+        }
+
+        try {
+            ddayRepository.saveAll(ddays);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_ROLLBACK_D_DAY);
+        }
+    }
+
 
 
 
