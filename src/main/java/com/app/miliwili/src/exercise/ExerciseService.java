@@ -502,10 +502,14 @@ public class ExerciseService {
     public void deleteExerciseInfo(Long userId) throws BaseException{
         ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(userId);
         List<ExerciseRoutine> routine = exerciseInfo.getExerciseRoutines();
-
+        List<ExerciseWeightRecord> weightRecords = exerciseInfo.getWeightRecords();
         exerciseInfo.setStatus("N");
         for(ExerciseRoutine r : routine){
             deleteRoutine(exerciseInfo.getId(), r.getId());
+        }
+
+        for(ExerciseWeightRecord weight : weightRecords){
+            weight.setStatus("N");
         }
 
         try{

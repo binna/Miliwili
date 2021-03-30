@@ -74,7 +74,7 @@ public enum BaseResponseStatus {
 
     //vivi: 2500~
 
-    INVALID_TOKEN(false, 2500, "유효하지 않은 토큰입니다."),
+    INVALID_GOOGLE_TOKEN(false, 2500, "유효하지 않은 토큰입니다."),
     INVALID_USER(false, 2501, "권한이 없는 사용자입니다."),
 
     INVALID_START_DATE(false, 2510, "입대일 형식을 확인해주세요."),

@@ -44,7 +44,7 @@ public class SNSLogin {
                 isr = new InputStreamReader(is, "UTF-8");
                 in = new BufferedReader(isr);
             } catch (Exception e) {
-                throw new BaseException(INVALID_TOKEN);
+                throw new BaseException(INVALID_GOOGLE_TOKEN);
             }
 
             System.out.println("??");
@@ -54,7 +54,7 @@ public class SNSLogin {
 
             userId = (jsonObj.get("sub").toString());
             if (responseCode != 200) {
-                throw new BaseException(INVALID_TOKEN);
+                throw new BaseException(INVALID_GOOGLE_TOKEN);
             }
 
         } catch (IOException e) {
