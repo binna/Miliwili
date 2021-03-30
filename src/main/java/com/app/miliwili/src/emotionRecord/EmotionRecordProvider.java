@@ -81,6 +81,36 @@ public class EmotionRecordProvider {
         }
     }
 
+    /**
+     * 회원별 모든 감정일기 조회
+     *
+     * @return List<EmotionRecord>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<EmotionRecord> retrieveEmotionByUser() throws BaseException {
+        try {
+            return emotionRecordRepository.findByUserInfo_Id(jwtService.getUserId());
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
+        }
+    }
+
+    /**
+     * 회원별 상태 "N"의 모든 감정일기 조회
+     *
+     * @return List<EmotionRecord>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<EmotionRecord> retrieveEmotionByUserAndStatusN() throws BaseException {
+        try {
+            return emotionRecordRepository.findByUserInfo_IdAndStatus(jwtService.getUserId(), "N");
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
+        }
+    }
+
 
 
 

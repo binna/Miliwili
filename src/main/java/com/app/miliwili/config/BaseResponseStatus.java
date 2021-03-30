@@ -176,6 +176,7 @@ public enum BaseResponseStatus {
     FAILED_TO_DELETE_EMOTION_RECORD(false, 3073, "감정기록 삭제에 실패하였습니다."),
     FAILED_TO_GET_EMOTION_RECORD(false, 3074, "감정기록 조회에 실패하였습니다."),
     ALREADY_EXIST_EMOTION_RECORD(false, 3075, "이미 해당 날짜에는 감정일기가 존재합니다."),
+    FAILED_TO_DELETE_ROLLBACK_EMOTION_RECORD(false, 3076, "감정기록 삭제에 실패하였습니다."),
 
     NOT_FOUND_PLAN_VACATION(false, 3080, "일정에 등록된 휴가가 없습니다."),
     FAILED_TO_GET_PLAN_VACATION(false, 3081, "일정에 등록된 휴가 조회에 실패했습니다."),
