@@ -4,6 +4,7 @@ import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.exercise.dto.*;
+import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,6 @@ public class ExerciseController {
     private final ExerciseService exerciseService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
     /**
      * 처음 운동 탭 입장시 call
      * 목표 체중, 현재 체중 입력 --> 입력 안해도 되지만 안할시에는 체중 기록 사용 불가
@@ -32,10 +32,30 @@ public class ExerciseController {
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther vivi
      */
+    @ApiOperation(value = "첫 입장시 호출", notes = "X-ACCESS-TOKEN 필요")
+    @ResponseBody
+    @PostMapping("/first-entrances")
+    public BaseResponse<Long> postFirstEntrance(@RequestHeader("X-ACCESS-TOKEN") String token){
+        try{
+            Long exerciseId = exerciseService.createFirstEntrance();
+            return new BaseResponse<>(SUCCESS,exerciseId);
+        }catch (BaseException e){
+            logger.warn(Validation.getPrintStackTrace(e));
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * 처음 목표 체중, 현재 체중 입력.
+     * @return BaseResponse<Long>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
     @ApiOperation(value = "목표체중, 현재체중 첫 입력", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @PostMapping("/first-weights")
-    public BaseResponse<Long> postFirstWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseFirstWeightReq param){
+    @PostMapping("/{exerciseId}/first-weights")
+    public BaseResponse<String> postFirstWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseFirstWeightReq param,
+                                              @PathVariable Long exerciseId){
         //몸무게 정보가 잘 들어왔는지 검증
         try{
             if(param.getFirstWeight() < -1.0 || param.getGoalWeight() < -1.0)
@@ -45,8 +65,8 @@ public class ExerciseController {
         }
 
         try{
-            Long exerciseId = exerciseService.createFistWeight(param);
-            return new BaseResponse<>(SUCCESS,exerciseId);
+            String result = exerciseService.createFistWeight(param,exerciseId);
+            return new BaseResponse<>(SUCCESS,result);
         }catch (BaseException e){
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());

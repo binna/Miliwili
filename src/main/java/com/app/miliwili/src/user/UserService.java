@@ -5,6 +5,7 @@ import com.app.miliwili.src.calendar.CalendarProvider;
 import com.app.miliwili.src.calendar.CalendarService;
 import com.app.miliwili.src.calendar.models.PlanVacation;
 import com.app.miliwili.src.emotionRecord.EmotionRecordService;
+import com.app.miliwili.src.exercise.ExerciseProvider;
 import com.app.miliwili.src.exercise.ExerciseService;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
@@ -39,6 +40,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final VacationRepository vacationRepository;
     private final ExerciseService exerciseService;
+    private final ExerciseProvider exerciseProvider;
 
 
     /**
@@ -191,6 +193,7 @@ public class UserService {
             emotionRecordService.deleteEmotionRecordByUser(user.getId());
         } catch (BaseException exception) {
             if (exception.getStatus() == FAILED_TO_DELTE_EXERCISE_INFO) {
+                exerciseService.rollbackExerciseInfo(user.getId());
                 throw new BaseException(FAILED_TO_DELTE_EXERCISE_INFO);
             }
             if (exception.getStatus() == FAILED_TO_DELETE_PLAN) {

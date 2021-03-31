@@ -1,6 +1,7 @@
 package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.UserProvider;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -34,34 +36,48 @@ public class ExerciseService {
     private final JwtService jwtService;
     private PostExerciseFirstWeightReq pa;
 
-
     /**
-     * 운동탭 처음 입장시 --> 목표 몸무게, 현재 몸무게 입력 ui
-     *
+     * 처음 탭에 입장시
      */
-
-    public Long createFistWeight(PostExerciseFirstWeightReq param) throws BaseException{
+    public Long createFirstEntrance() throws BaseException{
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         if(exerciseProvider.isExerciseInfoUser(user.getId()) == true)
             throw new BaseException(FAILED_CHECK_FIRST_WIEHGT);
 
-        Double goalWeight = (param.getGoalWeight() == -1.0) ? null : param.getGoalWeight();
-        Double firstWeight = (param.getFirstWeight() == -1.0) ? null : param.getFirstWeight();
-
-
         ExerciseInfo exerciseInfo = ExerciseInfo.builder()
                 .user(user)
-                .firstWeight(firstWeight)
-                .goalWeight(goalWeight)
+                .firstWeight(-1.0)
+                .goalWeight(-1.0)
                 .weightRecords(new ArrayList<>())
                 .build();
 
         try{
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
-            throw new BaseException(FAILED_POST_FIRST_WIEHGT);
+            throw new BaseException(FAILED_POST_FIRST_ENTRANCE);
         }
+
+        return exerciseInfo.getId();
+    }
+
+    /**
+     *목표 몸무게, 현재 몸무게 입력 ui
+     *
+     */
+
+    public String createFistWeight(PostExerciseFirstWeightReq param, Long exerciseId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        Double goalWeight = (param.getGoalWeight() == -1.0) ? null : param.getGoalWeight();
+        Double firstWeight = (param.getFirstWeight() == -1.0) ? null : param.getFirstWeight();
+
+        exerciseInfo.setFirstWeight(firstWeight);
+        exerciseInfo.setGoalWeight(goalWeight);
 
         //첫 몸무게 체중 기록에 기록하기
         if(firstWeight != null) {
@@ -79,7 +95,7 @@ public class ExerciseService {
         }
 
 
-        return exerciseInfo.getId();
+        return "Success";
     }
 
     /**
@@ -222,7 +238,7 @@ public class ExerciseService {
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(INVALID_USER);
         }
-        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
 
         routine.setName(param.getRoutineName());
         routine.setBodyPart(param.getBodyPart());
@@ -245,13 +261,16 @@ public class ExerciseService {
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(INVALID_USER);
         }
-        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
         routine.setStatus("N");
         for(ExerciseRoutineDetail detail: routine.getRoutineDetails()){
             for(ExerciseDetailSet set: detail.getDetailSets()){
                 set.setStatus("N");
             }
             detail.setStatus("N");
+        }
+        for(ExerciseReport report: routine.getReports()){
+            report.setStatus("N");
         }
 
 //        routine.setExerciseInfo(null);
@@ -276,7 +295,7 @@ public class ExerciseService {
             throw new BaseException(INVALID_USER);
         }
 
-        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
         String[] statusSplit = param.getExerciseStatus().split("#");
         List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
         if(statusSplit.length != detailList.size())
@@ -313,8 +332,8 @@ public class ExerciseService {
             throw new BaseException(INVALID_USER);
         }
 
-        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
-        ExerciseReport report  = exerciseProvider.getExerciseReportByDate(routine, LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE));
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
+        ExerciseReport report  = exerciseProvider.getAvaliableExerciseReport(routine, LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE));
 
 
         if(routine.getDone().equals("Y"))
@@ -354,8 +373,8 @@ public class ExerciseService {
             throw new BaseException(INVALID_USER);
         }
 
-        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
-        ExerciseReport report  = exerciseProvider.getExerciseReportByDate(routine, LocalDate.parse(param.getReportDate(), DateTimeFormatter.ISO_DATE));
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
+        ExerciseReport report  = exerciseProvider.getAvaliableExerciseReport(routine, LocalDate.parse(param.getReportDate(), DateTimeFormatter.ISO_DATE));
 
         if(report == null)
             throw new BaseException(NOT_FOUNT_REPORT);
@@ -501,13 +520,25 @@ public class ExerciseService {
     /**
      * 회원삭제 실패시 롤백을 위해
      */
-    public void rollbackExerciseInfo(Long exerciseId) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+    public void rollbackExerciseInfo(Long userId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.unAvaliableExerciseInfoByUserId(userId);
+
         List<ExerciseRoutine> routine = exerciseInfo.getExerciseRoutines();
         List<ExerciseWeightRecord> weightRecords = exerciseInfo.getWeightRecords();
+
         exerciseInfo.setStatus("Y");
+
         for(ExerciseRoutine r : routine){
-            deleteRoutine(exerciseInfo.getId(), r.getId());
+            r.setStatus("Y");
+            for(ExerciseRoutineDetail detail: r.getRoutineDetails()){
+                for(ExerciseDetailSet set: detail.getDetailSets()){
+                    set.setStatus("Y");
+                }
+                detail.setStatus("Y");
+            }
+            for(ExerciseReport report: r.getReports()){
+                report.setStatus("Y");
+            }
         }
 
         for(ExerciseWeightRecord weight : weightRecords){
@@ -517,7 +548,7 @@ public class ExerciseService {
         try{
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
-            throw new BaseException(FAILED_TO_DELTE_EXERCISE_INFO);
+            throw new BaseException(FAILED_TO_ROLLBACK_EXERCISE_INFO);
         }
 
     }

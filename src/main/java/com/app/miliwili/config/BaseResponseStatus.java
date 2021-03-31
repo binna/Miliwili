@@ -203,6 +203,8 @@ public enum BaseResponseStatus {
 
     FAILED_POST_FIRST_WIEHGT(false, 3520, "첫 몸무게 등록에 실패하였습니다"),
     FAILED_CHECK_FIRST_WIEHGT(false, 3521, "이미 몸무게가 등록된(운동탭에 방문했던) 사용자입니다 "),
+    FAILED_POST_FIRST_ENTRANCE(false, 3522, "exerciseId생성에 실패하였습니다."),
+
 
     NOT_FOUND_EXERCISEINFO(false, 3530, "존재하지 않는 운동 정보입니다 "),
     FAILED_POST_DAILY_WEIGHT(false, 3531, "일일 체중 기록에 실패하였습니다. "),
@@ -243,6 +245,7 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_TODAY_WEIGHT(false, 3601, "오늘의 체중 기록을 불러오는데 실패하였습니다."),
 
     FAILED_TO_DELTE_EXERCISE_INFO(false, 3650, "ExerciseInfo를 삭제하는데 실패하였습니다."),
+    FAILED_TO_ROLLBACK_EXERCISE_INFO(false, 3651, "ExerciseInfo Rollback에 실패하였습니다."),
 
     FAILED_TO_POST_FIRST_WEIGHT(false, 3660, "첫 몸무게 체중 기록에 실패하였습니다."),
 

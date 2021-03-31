@@ -40,6 +40,15 @@ public class ExerciseProvider {
         return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
     }
+    /**
+     * UserId
+     */
+    public ExerciseInfo unAvaliableExerciseInfoByUserId(Long userId) throws BaseException{
+        return exerciseRepository.findExerciseInfoByUserIdAndStatus(userId, "N")
+                .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
+    }
+
+
 
     /**
      * 일별 체중 조회
@@ -398,7 +407,7 @@ public class ExerciseProvider {
             throw new BaseException(INVALID_USER);
         }
 
-        ExerciseRoutine routine = findRoutine(routineId, exerciseInfo);
+        ExerciseRoutine routine = getAvaliableRoutine(routineId, exerciseInfo);
 
         List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
         List<ExerciseDetailRes> detailResList = new ArrayList<>();
@@ -466,7 +475,7 @@ public class ExerciseProvider {
         if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
             throw new BaseException(INVALID_USER);
         }
-        ExerciseRoutine routine = findRoutine(routineId, exerciseInfo);
+        ExerciseRoutine routine = getAvaliableRoutine(routineId, exerciseInfo);
 
         List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
         List<GetStartExerciseDetailRes> detailResList = new ArrayList<>();
@@ -513,13 +522,13 @@ public class ExerciseProvider {
         if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
             throw new BaseException(INVALID_USER);
         }
-        ExerciseRoutine routine = findRoutine(routineId, exerciseInfo);
+        ExerciseRoutine routine = getAvaliableRoutine(routineId, exerciseInfo);
         if(routine.getDone().equals("N"))
             throw new BaseException(FAILED_GET_REPORT_DONE);
 
 
         LocalDate date = LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE);
-        ExerciseReport report = getExerciseReportByDate(routine, date);
+        ExerciseReport report = getAvaliableExerciseReport(routine, date);
 
         String[] doneSplit = report.getExerciseStatus().split("#");
 
@@ -726,7 +735,7 @@ public class ExerciseProvider {
      *RoutineId로 루틴 찾기
      */
     @NotNull
-    public ExerciseRoutine findRoutine(long routineId, ExerciseInfo exerciseInfo) throws BaseException {
+    public ExerciseRoutine getAvaliableRoutine(long routineId, ExerciseInfo exerciseInfo) throws BaseException {
         ExerciseRoutine routine = null;
         for(ExerciseRoutine r: exerciseInfo.getExerciseRoutines()){
             if(r.getId() == routineId){
@@ -743,7 +752,7 @@ public class ExerciseProvider {
 
 
     @NotNull
-    public ExerciseReport getExerciseReportByDate(ExerciseRoutine routine, LocalDate date) throws BaseException {
+    public ExerciseReport getAvaliableExerciseReport(ExerciseRoutine routine, LocalDate date) throws BaseException {
         ExerciseReport report = null;
         for (ExerciseReport r : routine.getReports()) {
             if (r.getDateCreated().toLocalDate().equals(date) && r.getStatus().equals("Y")) {
@@ -756,6 +765,7 @@ public class ExerciseProvider {
 
         return report;
     }
+
 
 
         /**
