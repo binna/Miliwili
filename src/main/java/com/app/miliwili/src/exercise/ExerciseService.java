@@ -340,8 +340,6 @@ public class ExerciseService {
             routine.setDone("N");
 
         report.setStatus("N");
-        report.setExerciseRoutine(null);
-        routine.getReports().remove(report);
 
         try{
             exerciseReportRepository.save(report);
@@ -375,9 +373,6 @@ public class ExerciseService {
 
         ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
         ExerciseReport report  = exerciseProvider.getAvaliableExerciseReport(routine, LocalDate.parse(param.getReportDate(), DateTimeFormatter.ISO_DATE));
-
-        if(report == null)
-            throw new BaseException(NOT_FOUNT_REPORT);
 
         report.setReportText(param.getReportText());
         try {
