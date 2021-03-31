@@ -75,7 +75,7 @@ public class UserProvider {
      * socialId로 유효한 회원조회
      *
      * @param socialId
-     * @return User
+     * @return UserInfo
      * @throws BaseException
      * @Auther shine
      */

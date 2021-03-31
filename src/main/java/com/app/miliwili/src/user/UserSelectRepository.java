@@ -2,7 +2,6 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.src.calendar.models.QPlanVacation;
 import com.app.miliwili.src.main.dto.*;
-import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.*;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
@@ -36,10 +35,6 @@ public class UserSelectRepository extends QuerydslRepositorySupport {
                 .where(user.socialId.eq(gsocialId), user.socialType.eq("G"), user.status.eq("Y"))
                 .fetch();
     }
-
-
-
-
 
     /**
      * UserMain Date 조회
