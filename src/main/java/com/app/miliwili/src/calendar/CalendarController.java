@@ -82,13 +82,13 @@ public class CalendarController {
             return new BaseResponse<>(EXCEED_MAX20);
         }
         if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_CALENDAR_START_DATE);
+            return new BaseResponse<>(EMPTY_PLAN_START_DATE);
         }
         if (!Validation.isRegexDate(parameters.getStartDate())) {
             return new BaseResponse<>(INVALID_PLAN_START_DATE);
         }
         if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_CALENDAR_END_DATE);
+            return new BaseResponse<>(EMPTY_PLAN_END_DATE);
         }
         if (!Validation.isRegexDate(parameters.getEndDate())) {
             return new BaseResponse<>(INVALID_PLAN_END_DATE);
@@ -161,13 +161,13 @@ public class CalendarController {
             return new BaseResponse<>(EXCEED_MAX20);
         }
         if (Objects.isNull(parameters.getStartDate()) || parameters.getStartDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_CALENDAR_START_DATE);
+            return new BaseResponse<>(EMPTY_PLAN_START_DATE);
         }
         if (!Validation.isRegexDate(parameters.getStartDate())) {
             return new BaseResponse<>(INVALID_PLAN_START_DATE);
         }
         if (Objects.isNull(parameters.getEndDate()) || parameters.getEndDate().length() == 0) {
-            return new BaseResponse<>(EMPTY_CALENDAR_END_DATE);
+            return new BaseResponse<>(EMPTY_PLAN_END_DATE);
         }
         if (!Validation.isRegexDate(parameters.getEndDate())) {
             return new BaseResponse<>(INVALID_PLAN_END_DATE);

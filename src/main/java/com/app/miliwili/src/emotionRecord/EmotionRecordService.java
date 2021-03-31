@@ -2,7 +2,7 @@ package com.app.miliwili.src.emotionRecord;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.emotionRecord.dto.EmotionRecordReq;
-import com.app.miliwili.src.emotionRecord.dto.EmotionRecordRes;
+import com.app.miliwili.src.emotionRecord.dto.DayEmotionRecordRes;
 import com.app.miliwili.src.emotionRecord.models.EmotionRecord;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.UserInfo;
@@ -33,7 +33,7 @@ public class EmotionRecordService {
      * @throws BaseException
      * @Auther shine
      */
-    public EmotionRecordRes createEmotionRecord(EmotionRecordReq parameters) throws BaseException {
+    public DayEmotionRecordRes createEmotionRecord(EmotionRecordReq parameters) throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         EmotionRecord newEmotionRecord = EmotionRecord.builder()
@@ -43,13 +43,13 @@ public class EmotionRecordService {
                 .userInfo(user)
                 .build();
 
-        if (emotionRecordProvider.isEmotionRecordByDateAndStatusY(newEmotionRecord.getDate())) {
+        if (emotionRecordProvider.isEmotionRecordByDateAndUserIdAndStatusY(newEmotionRecord.getDate(), jwtService.getUserId())) {
             throw new BaseException(ALREADY_EXIST_EMOTION_RECORD);
         }
 
         try {
             EmotionRecord savedEmotionRecord = emotionRecordRepository.save(newEmotionRecord);
-            return EmotionRecordRes.builder()
+            return DayEmotionRecordRes.builder()
                     .emotionRecordId(savedEmotionRecord.getId())
                     .date(savedEmotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                     .content(savedEmotionRecord.getContent())
@@ -70,7 +70,7 @@ public class EmotionRecordService {
      * @throws BaseException
      * @Auther shine
      */
-    public EmotionRecordRes updateEmotionRecord(EmotionRecordReq parameters, Long emotionRecordId) throws BaseException {
+    public DayEmotionRecordRes updateEmotionRecord(EmotionRecordReq parameters, Long emotionRecordId) throws BaseException {
         EmotionRecord emotionRecord = emotionRecordProvider.retrieveEmotionRecordByIdAndStatusY(emotionRecordId);
 
         if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
@@ -82,7 +82,7 @@ public class EmotionRecordService {
 
         try {
             EmotionRecord savedEmotionRecord = emotionRecordRepository.save(emotionRecord);
-            return EmotionRecordRes.builder()
+            return DayEmotionRecordRes.builder()
                     .emotionRecordId(savedEmotionRecord.getId())
                     .date(savedEmotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                     .content(savedEmotionRecord.getContent())

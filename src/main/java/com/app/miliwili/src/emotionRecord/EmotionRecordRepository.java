@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface EmotionRecordRepository extends CrudRepository<EmotionRecord, Long> {
     Optional<EmotionRecord> findByIdAndStatus(Long emotionRecordId, String status);
     Optional<EmotionRecord> findByDateAndUserInfo_idAndStatus(LocalDate date, Long userId, String status);
-    List<EmotionRecord> findByStatusAndDateBetween(String status, LocalDate start, LocalDate date);
+    List<EmotionRecord> findByStatusAndUserInfo_IdAndDateBetween(String status, Long userId, LocalDate start, LocalDate date);
     List<EmotionRecord> findByUserInfo_Id(Long userId);
     List<EmotionRecord> findByUserInfo_IdAndStatus(Long userId, String status);
-    boolean existsByDateAndStatus(LocalDate date, String status);
+    boolean existsByDateAndUserInfo_IdAndStatus(LocalDate date, Long userId, String status);
 }

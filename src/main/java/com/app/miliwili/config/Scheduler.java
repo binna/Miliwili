@@ -51,10 +51,9 @@ public class Scheduler {
             String strSergeant = user.getNormalPromotionState().getThirdDate().format(DateTimeFormatter.ISO_DATE);
             NormalPromotionState normalPromotionState = user.getNormalPromotionState();
 
-            userService.setStateIdx(strPrivate, strCorporal, strSergeant, normalPromotionState);
-            userService.setHobong(normalPromotionState.getStateIdx(), startDate, strPrivate, strCorporal, strSergeant, normalPromotionState);
-
             try {
+                userService.setStateIdx(strPrivate, strCorporal, strSergeant, normalPromotionState);
+                userService.setHobong(normalPromotionState.getStateIdx(), startDate, strPrivate, strCorporal, strSergeant, normalPromotionState);
                 userRepository.save(user);
             } catch (Exception exception) {
                 logger.warn(new BaseResponse<>(FAILED_TO_SET_DAILY_HOBONG_STATUSIDX).toString() + Validation.getPrintStackTrace(exception));
@@ -69,7 +68,6 @@ public class Scheduler {
         List<Plan> schedules = planRepository.findByPushAndStatusAndStartDate("Y", "Y", LocalDate.now().plusDays(1));
 
         for (Plan schedule : schedules) {
-            System.out.println(schedule.getStartDate() + ", " + schedule.getTitle());
             try {
                     firebaseCloudMessageService.sendMessageTo(
                             schedule.getPushDeviceToken(),
