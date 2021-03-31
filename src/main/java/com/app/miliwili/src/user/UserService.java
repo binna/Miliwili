@@ -2,10 +2,10 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.calendar.CalendarProvider;
+import com.app.miliwili.src.calendar.CalendarService;
 import com.app.miliwili.src.calendar.models.PlanVacation;
-import com.app.miliwili.src.exercise.ExerciseProvider;
+import com.app.miliwili.src.emotionRecord.EmotionRecordService;
 import com.app.miliwili.src.exercise.ExerciseService;
-import com.app.miliwili.src.exercise.model.ExerciseInfo;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
 import com.app.miliwili.src.user.models.NormalPromotionState;
@@ -32,6 +32,8 @@ import static com.app.miliwili.config.BaseResponseStatus.*;
 public class UserService {
     private final UserProvider userProvider;
     private final CalendarProvider calendarProvider;
+    private final CalendarService calendarService;
+    private final EmotionRecordService emotionRecordService;
     private final SNSLogin snsLogin;
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -181,10 +183,28 @@ public class UserService {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
         user.setStatus("N");
 
-        exerciseService.deleteExerciseInfo(user.getId());
-
         try {
             userRepository.save(user);
+            exerciseService.deleteExerciseInfo(user.getId());
+            calendarService.deletePlanByUser(user.getId());
+            calendarService.deleteDDayByUser(user.getId());
+            emotionRecordService.deleteEmotionRecordByUser(user.getId());
+        } catch (BaseException exception) {
+            if (exception.getStatus() == FAILED_TO_DELTE_EXERCISE_INFO) {
+                throw new BaseException(FAILED_TO_DELTE_EXERCISE_INFO);
+            }
+            if (exception.getStatus() == FAILED_TO_DELETE_PLAN) {
+                calendarService.deleteRollbackPlanByUser(user.getId());
+                throw new BaseException(FAILED_TO_DELETE_PLAN);
+            }
+            if (exception.getStatus() == FAILED_TO_DELETE_D_DAY) {
+                calendarService.deleteRollbackDDayByUser(user.getId());
+                throw new BaseException(FAILED_TO_DELETE_D_DAY);
+            }
+            if (exception.getStatus() == FAILED_TO_DELETE_EMOTION_RECORD) {
+                emotionRecordService.deleteRollbackEmotionRecord(user.getId());
+            }
+            throw new BaseException(FAILED_TO_DELETE_USER);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_USER);
         }
@@ -479,7 +499,7 @@ public class UserService {
                     .userInfo(user)
                     .build();
             setStateIdx(strPrivate, strCorporal, strSergeant, normalPromotionState);
-            setHobong(user.getStateIdx(), user.getStartDate().format(DateTimeFormatter.ISO_DATE), strPrivate, strCorporal, strSergeant, normalPromotionState);
+            setHobong(normalPromotionState.getStateIdx(), user.getStartDate().format(DateTimeFormatter.ISO_DATE), strPrivate, strCorporal, strSergeant, normalPromotionState);
             user.setNormalPromotionState(normalPromotionState);
             return;
         }

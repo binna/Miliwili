@@ -161,7 +161,7 @@ public class EmotionRecordController {
     public BaseResponse<Void> deleteEmotionRecord(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                   @PathVariable Long emotionsRecordId) {
         try {
-            emotionRecordService.deleteEmotionRecord(emotionsRecordId);
+            emotionRecordService.deleteEmotionRecordByEmotionRecordId(emotionsRecordId);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());

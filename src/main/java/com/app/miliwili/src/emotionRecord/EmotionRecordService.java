@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -100,7 +101,7 @@ public class EmotionRecordService {
      * @throws BaseException
      * @Auther shine
      */
-    public void deleteEmotionRecord(Long emotionRecordId) throws BaseException {
+    public void deleteEmotionRecordByEmotionRecordId(Long emotionRecordId) throws BaseException {
         EmotionRecord emotionRecord = emotionRecordProvider.retrieveEmotionRecordByIdAndStatusY(emotionRecordId);
 
         if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
@@ -113,6 +114,46 @@ public class EmotionRecordService {
             emotionRecordRepository.save(emotionRecord);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_EMOTION_RECORD);
+        }
+    }
+
+    /**
+     * 회원 삭제시, 회원별 감정기록 삭제
+     *
+     * @throws BaseException
+     * @Auther shine
+     */
+    public void deleteEmotionRecordByUser(Long userId) throws BaseException {
+        List<EmotionRecord> emotionRecords = emotionRecordProvider.retrieveEmotionByUser(userId);
+
+        for (EmotionRecord emotionRecord : emotionRecords) {
+            emotionRecord.setStatus("N");
+        }
+
+        try {
+            emotionRecordRepository.saveAll(emotionRecords);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_EMOTION_RECORD);
+        }
+    }
+
+    /**
+     * 회원 삭제 문제 발생시, 회원별 감정기록 삭제 롤백
+     *
+     * @throws BaseException
+     * @Auther shine
+     */
+    public void deleteRollbackEmotionRecord(Long userId) throws BaseException {
+        List<EmotionRecord> emotionRecords = emotionRecordProvider.retrieveEmotionByUserAndStatusN(userId);
+
+        for (EmotionRecord emotionRecord : emotionRecords) {
+            emotionRecord.setStatus("Y");
+        }
+
+        try {
+            emotionRecordRepository.saveAll(emotionRecords);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_ROLLBACK_EMOTION_RECORD);
         }
     }
 }

@@ -18,4 +18,18 @@ public class PostSignUpReq {
     private String proDate;
     private String goal;
     private String socialType;
+
+
+    public void setStrPrivate(String strPrivate) {
+        this.strPrivate = strPrivate;
+    }
+    public void setStrCorporal(String strCorporal) {
+        this.strCorporal = strCorporal;
+    }
+    public void setStrSergeant(String strSergeant) {
+        this.strSergeant = strSergeant;
+    }
+    public void setProDate(String proDate) {
+        this.proDate = proDate;
+    }
 }

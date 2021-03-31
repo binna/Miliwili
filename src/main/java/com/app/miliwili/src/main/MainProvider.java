@@ -17,8 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.app.miliwili.config.BaseResponseStatus.FAILED_TO_GET_USER_MAIN_INFO;
-
+import static com.app.miliwili.config.BaseResponseStatus.*;
 
 @RequiredArgsConstructor
 @Service
@@ -36,6 +35,7 @@ public class MainProvider {
      */
     public GetUserCalendarMainRes getUserCalendarMainById() throws BaseException {
         UserMainData userMainData = userProvider.retrieveUserMainDataById();
+
         List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc();
         List<PlanMainData> planMainData = calendarProvider.retrievePlanMainDataByDateAndStatusY(LocalDate.now());
 
@@ -62,10 +62,11 @@ public class MainProvider {
 
         List<PlanCalendarData> planCalendarData = calendarProvider.retrievePlanCalendarDataByMonthAndStatusY(start, end);
         List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc();
+
         List<String> ddayCalendar = retrieveDDayCalendarByMonth(ddayMainDate, start, end);
         List<PlanMainData> planMainData = calendarProvider.retrievePlanMainDataByDateAndStatusY(LocalDate.parse(date, DateTimeFormatter.ISO_DATE));
 
-        return change(planCalendarData, ddayCalendar, ddayMainDate, planMainData);
+        return changeGetCalendarMainRes(planCalendarData, ddayCalendar, ddayMainDate, planMainData);
     }
 
 
@@ -89,9 +90,7 @@ public class MainProvider {
                     .title(dday.getTitle())
                     .build());
         }
-
-        Collections.sort(ddayMainData, new dateSortAsc());
-
+        Collections.sort(ddayMainData, new dateSortDesc());
         return ddayMainData;
     }
 
@@ -101,14 +100,15 @@ public class MainProvider {
         for (DDayMainDataRes ddayMain : ddayMainDate) {
             LocalDate targetDate = LocalDate.parse(ddayMain.getDate(), DateTimeFormatter.ISO_DATE);
 
-            if ((targetDate.isEqual(startDate) || targetDate.isAfter(startDate)) && (endDate.isEqual(targetDate) || endDate.isBefore(targetDate))) {
+            if ((targetDate.isEqual(startDate) || targetDate.isAfter(startDate)) && (targetDate.isEqual(endDate) || targetDate.isBefore(endDate))) {
                 ddayCalendar.add(targetDate.format(DateTimeFormatter.ISO_DATE));
             }
         }
+
         return ddayCalendar;
     }
 
-    private GetCalendarMainRes change(List<PlanCalendarData> planCalendarData, List<String> ddayCalendar, List<DDayMainDataRes> ddayMainDate, List<PlanMainData> planMainData) {
+    private GetCalendarMainRes changeGetCalendarMainRes(List<PlanCalendarData> planCalendarData, List<String> ddayCalendar, List<DDayMainDataRes> ddayMainDate, List<PlanMainData> planMainData) {
         return GetCalendarMainRes.builder()
                 .planCalendar(planCalendarData)
                 .ddayCalendar(ddayCalendar)
@@ -160,8 +160,7 @@ public class MainProvider {
 
 
 
-class dateSortAsc implements Comparator<DDayMainDataRes> {
-
+class dateSortDesc implements Comparator<DDayMainDataRes> {
     @Override
     public int compare(DDayMainDataRes o1, DDayMainDataRes o2) {
         LocalDate date1 = LocalDate.parse(o1.getDate(), DateTimeFormatter.ISO_DATE);
