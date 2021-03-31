@@ -1,6 +1,7 @@
 package com.app.miliwili.src.exercise;
 
 import com.app.miliwili.config.BaseException;
+import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.UserProvider;
@@ -8,6 +9,7 @@ import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -33,34 +36,48 @@ public class ExerciseService {
     private final JwtService jwtService;
     private PostExerciseFirstWeightReq pa;
 
-
     /**
-     * 운동탭 처음 입장시 --> 목표 몸무게, 현재 몸무게 입력 ui
-     *
+     * 처음 탭에 입장시
      */
-
-    public Long createFistWeight(PostExerciseFirstWeightReq param) throws BaseException{
+    public Long createFirstEntrance() throws BaseException{
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         if(exerciseProvider.isExerciseInfoUser(user.getId()) == true)
             throw new BaseException(FAILED_CHECK_FIRST_WIEHGT);
 
-        Double goalWeight = (param.getGoalWeight() == -1.0) ? null : param.getGoalWeight();
-        Double firstWeight = (param.getFirstWeight() == -1.0) ? null : param.getFirstWeight();
-
-
         ExerciseInfo exerciseInfo = ExerciseInfo.builder()
                 .user(user)
-                .firstWeight(firstWeight)
-                .goalWeight(goalWeight)
+                .firstWeight(-1.0)
+                .goalWeight(-1.0)
                 .weightRecords(new ArrayList<>())
                 .build();
 
         try{
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
-            throw new BaseException(FAILED_POST_FIRST_WIEHGT);
+            throw new BaseException(FAILED_POST_FIRST_ENTRANCE);
         }
+
+        return exerciseInfo.getId();
+    }
+
+    /**
+     *목표 몸무게, 현재 몸무게 입력 ui
+     *
+     */
+
+    public String createFistWeight(PostExerciseFirstWeightReq param, Long exerciseId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+
+        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
+            throw new BaseException(INVALID_USER);
+        }
+
+        Double goalWeight = (param.getGoalWeight() == -1.0) ? null : param.getGoalWeight();
+        Double firstWeight = (param.getFirstWeight() == -1.0) ? null : param.getFirstWeight();
+
+        exerciseInfo.setFirstWeight(firstWeight);
+        exerciseInfo.setGoalWeight(goalWeight);
 
         //첫 몸무게 체중 기록에 기록하기
         if(firstWeight != null) {
@@ -78,7 +95,7 @@ public class ExerciseService {
         }
 
 
-        return exerciseInfo.getId();
+        return "Success";
     }
 
     /**
@@ -221,18 +238,7 @@ public class ExerciseService {
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(INVALID_USER);
         }
-
-        List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
-        ExerciseRoutine routine = null;
-        for(ExerciseRoutine r : routineList){
-            if(r.getId() == routineId){
-                routine = r;
-                break;
-            }
-        }
-        if(routine == null)
-            throw new BaseException(NOT_FOUND_ROUTINE);
-
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
 
         routine.setName(param.getRoutineName());
         routine.setBodyPart(param.getBodyPart());
@@ -245,6 +251,8 @@ public class ExerciseService {
 
     }
 
+
+
     /**
      * 루틴 삭제
      */
@@ -253,27 +261,28 @@ public class ExerciseService {
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(INVALID_USER);
         }
-        List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
-        ExerciseRoutine routine = null;
-        int i=0;
-        for(i=0;i<routineList.size();i++){
-            if(routineList.get(i).getId() == routineId){
-                routine = routineList.get(i);
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
+        routine.setStatus("N");
+        for(ExerciseRoutineDetail detail: routine.getRoutineDetails()){
+            for(ExerciseDetailSet set: detail.getDetailSets()){
+                set.setStatus("N");
             }
+            detail.setStatus("N");
         }
-        if(i == routineList.size()-1 || routine == null)
-            throw new BaseException(FAILED_FIND_DELETE_ROUTINE);
+        for(ExerciseReport report: routine.getReports()){
+            report.setStatus("N");
+        }
 
-        routine.setExerciseInfo(null);
+//        routine.setExerciseInfo(null);
+//        exerciseInfo.getExerciseRoutines().remove(routine);
 
-        exerciseInfo.getExerciseRoutines().remove(routine);
         try {
-            exerciseRoutineRepository.delete(routine);
+            exerciseRoutineRepository.save(routine);
         }catch (Exception e){
             throw new BaseException(FAILED_TO_DELETE_ROUTINE);
         }
 
-        return "\""+routine.getName()+"\""+"루틴이 삭제되었습니다";
+        return routine.getName()+"루틴이 삭제되었습니다";
     }
 
     /**
@@ -286,7 +295,7 @@ public class ExerciseService {
             throw new BaseException(INVALID_USER);
         }
 
-        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
         String[] statusSplit = param.getExerciseStatus().split("#");
         List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
         if(statusSplit.length != detailList.size())
@@ -323,18 +332,9 @@ public class ExerciseService {
             throw new BaseException(INVALID_USER);
         }
 
-        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
+        ExerciseReport report  = exerciseProvider.getAvaliableExerciseReport(routine, LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE));
 
-        ExerciseReport report = null;
-        LocalDate date = LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE);
-        for(ExerciseReport r: routine.getReports()){
-            if(r.getDateCreated().toLocalDate().equals(date)){
-                report = r;
-                break;
-            }
-        }
-        if(report == null)
-            throw new BaseException(FAILED_GET_REPORT);
 
         if(routine.getDone().equals("Y"))
             routine.setDone("N");
@@ -361,6 +361,8 @@ public class ExerciseService {
 
     }
 
+
+
     /**
      * 운동 리포트 수정
      */
@@ -371,19 +373,10 @@ public class ExerciseService {
             throw new BaseException(INVALID_USER);
         }
 
-        ExerciseRoutine routine = exerciseProvider.findRoutine(routineId, exerciseInfo);
+        ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
+        ExerciseReport report  = exerciseProvider.getAvaliableExerciseReport(routine, LocalDate.parse(param.getReportDate(), DateTimeFormatter.ISO_DATE));
 
-        ExerciseReport report = null;
-        LocalDate date = LocalDate.parse(param.getReportDate(), DateTimeFormatter.ISO_DATE);
-        for(ExerciseReport r: routine.getReports()){
-            if(r.getDateCreated().toLocalDate().equals(date)){
-                report = r;
-                break;
-            }
-        }
         if(report == null)
-            throw new BaseException(NOT_FOUNT_REPORT);
-        if(report.getStatus().equals("N"))
             throw new BaseException(NOT_FOUNT_REPORT);
 
         report.setReportText(param.getReportText());
@@ -396,8 +389,11 @@ public class ExerciseService {
 
 
     }
+
+
     /**
      * 루틴 안한상태로 초기화
+     * --> 스케줄러에 의해
      */
     public void resetRoutineDone(ExerciseRoutine routine) throws BaseException{
         routine.setDone("N");
@@ -516,6 +512,43 @@ public class ExerciseService {
             exerciseRepository.save(exerciseInfo);
         }catch (Exception e){
             throw new BaseException(FAILED_TO_DELTE_EXERCISE_INFO);
+        }
+
+    }
+
+
+    /**
+     * 회원삭제 실패시 롤백을 위해
+     */
+    public void rollbackExerciseInfo(Long userId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.unAvaliableExerciseInfoByUserId(userId);
+
+        List<ExerciseRoutine> routine = exerciseInfo.getExerciseRoutines();
+        List<ExerciseWeightRecord> weightRecords = exerciseInfo.getWeightRecords();
+
+        exerciseInfo.setStatus("Y");
+
+        for(ExerciseRoutine r : routine){
+            r.setStatus("Y");
+            for(ExerciseRoutineDetail detail: r.getRoutineDetails()){
+                for(ExerciseDetailSet set: detail.getDetailSets()){
+                    set.setStatus("Y");
+                }
+                detail.setStatus("Y");
+            }
+            for(ExerciseReport report: r.getReports()){
+                report.setStatus("Y");
+            }
+        }
+
+        for(ExerciseWeightRecord weight : weightRecords){
+            weight.setStatus("Y");
+        }
+
+        try{
+            exerciseRepository.save(exerciseInfo);
+        }catch (Exception e){
+            throw new BaseException(FAILED_TO_ROLLBACK_EXERCISE_INFO);
         }
 
     }
