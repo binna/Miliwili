@@ -40,6 +40,7 @@ public class ExerciseProvider {
         return exerciseRepository.findByIdAndStatus(exerciseId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
     }
+
     /**
      * UserId
      */
