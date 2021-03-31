@@ -7,10 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 @Getter
-public class EmotionRecordRes {
-    private final Long emotionRecordId;
+public class MonthEmotionRecordRes {
     private final String date;
-    private final String content;
     private final Integer emotion;
-    private final String emotionText;
 }

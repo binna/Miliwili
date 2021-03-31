@@ -39,7 +39,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final VacationRepository vacationRepository;
     private final ExerciseService exerciseService;
-    private final ExerciseProvider exerciseProvider;
 
 
     /**
@@ -132,13 +131,14 @@ public class UserService {
             throw new BaseException(DUPLICATED_USER);
         }
 
+        UserInfo savedUser = null;
         try {
-            newUser = userRepository.save(newUser);
-            setVacationData(newUser);
-            return new PostSignUpRes(newUser.getId(), jwtService.createJwt(newUser.getId()));
+            savedUser = userRepository.save(newUser);
+            setVacationData(savedUser);
+            return new PostSignUpRes(savedUser.getId(), jwtService.createJwt(savedUser.getId()));
         } catch (BaseException exception) {
             if (exception.getStatus() == SET_PLAN_VACATION) {
-                userRepository.delete(newUser);
+                userRepository.delete(savedUser);
             }
             throw new BaseException(FAILED_TO_SIGNUP_USER);
         } catch (Exception exception) {

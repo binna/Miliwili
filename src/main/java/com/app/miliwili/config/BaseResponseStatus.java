@@ -43,6 +43,8 @@ public enum BaseResponseStatus {
     INVALID_SOCIAL_TYPE(false, 2055, "가입 요청하는 소셜타입의 형식을 확인해주세요."),
     INVALID_D_DAY_TYPE(false, 2056, "유효하지 않은 디데이 타입입니다."),
     INVALID_EMOTION(false, 2057, "감정 이모티콘 아이디는 1부터 9까지 입력 가능합니다."),
+    INVALID_EMOTION_RECORD_MONTH(false, 2057, "월 형식을 확인해주세요."),
+    INVALID_EMOTION_RECORD_DATE(false, 2057, "일 형식을 확인해주세요."),
 
     EXCEED_MAX10(false, 2100, "입력할 수 있는 최대 10글자 미만의 수를 초과하였습니다."),
     EXCEED_MAX20(false, 2101, "입력할 수 있는 최대 20글자 미만의 수를 초과하였습니다."),
@@ -73,7 +75,7 @@ public enum BaseResponseStatus {
 
     //vivi: 2500~
 
-    INVALID_GOOGLE_TOKEN(false, 2500, "유효하지 않은 토큰입니다."),
+    INVALID_GOOGLE_TOKEN(false, 2500, "[구글 토큰] 유효하지 않은 토큰입니다."),
     INVALID_USER(false, 2501, "권한이 없는 사용자입니다."),
 
     INVALID_START_DATE(false, 2510, "입대일 형식을 확인해주세요."),
@@ -175,9 +177,11 @@ public enum BaseResponseStatus {
     FAILED_TO_POST_EMOTION_RECORD(false, 3071, "감정기록 등록에 실패하였습니다."),
     FAILED_TO_PATCH_EMOTION_RECORD(false, 3072, "감정기록 수정에 실패하였습니다."),
     FAILED_TO_DELETE_EMOTION_RECORD(false, 3073, "감정기록 삭제에 실패하였습니다."),
-    FAILED_TO_GET_EMOTION_RECORD(false, 3074, "감정기록 조회에 실패하였습니다."),
-    ALREADY_EXIST_EMOTION_RECORD(false, 3075, "이미 해당 날짜에는 감정일기가 존재합니다."),
-    FAILED_TO_DELETE_ROLLBACK_EMOTION_RECORD(false, 3076, "감정기록 삭제 롤백에 실패하였습니다."),
+    FAILED_TO_GET_MONTH_EMOTION_RECORD(false, 3074, "월 감정기록 조회에 실패하였습니다."),
+    FAILED_TO_GET_DAY_EMOTION_RECORD(false, 3075, "일 감정기록 조회에 실패하였습니다."),
+    FAILED_TO_GET_EMOTION_RECORD(false, 3076, "감정기록 조회에 실패하였습니다."),
+    ALREADY_EXIST_EMOTION_RECORD(false, 3077, "이미 해당 날짜에는 감정일기가 존재합니다."),
+    FAILED_TO_DELETE_ROLLBACK_EMOTION_RECORD(false, 3078, "감정기록 삭제 롤백에 실패하였습니다."),
 
     NOT_FOUND_PLAN_VACATION(false, 3080, "일정에 등록된 휴가가 없습니다."),
     FAILED_TO_GET_PLAN_VACATION(false, 3081, "일정에 등록된 휴가 조회에 실패했습니다."),
