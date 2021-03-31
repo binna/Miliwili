@@ -47,8 +47,6 @@ public class ExerciseService {
 
         ExerciseInfo exerciseInfo = ExerciseInfo.builder()
                 .user(user)
-                .firstWeight(-1.0)
-                .goalWeight(-1.0)
                 .weightRecords(new ArrayList<>())
                 .build();
 
@@ -255,12 +253,20 @@ public class ExerciseService {
 
     /**
      * 루틴 삭제
+     * isDelete = 탈퇴된 회원인지 --> 회원 탈퇴를 위해
      */
-    public String deleteRoutine(long exerciseId, long routineId) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+    public String deleteRoutine(long exerciseId, long routineId , boolean isDeleted) throws BaseException{
+        ExerciseInfo exerciseInfo = null;
+        if(isDeleted == true)
+            exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+        else{
+            exerciseInfo = exerciseProvider.unAvaliableExerciseInfoByUserId(jwtService.getUserId());
+        }
+
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
             throw new BaseException(INVALID_USER);
         }
+
         ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
         routine.setStatus("N");
         for(ExerciseRoutineDetail detail: routine.getRoutineDetails()){
@@ -491,14 +497,20 @@ public class ExerciseService {
      * --> UserService 에
      */
     public void deleteExerciseInfo(Long userId) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(userId);
+        ExerciseInfo exerciseInfo = null;
+        //운동탭 한번도 방문 안해서 exerciseInfo없는 회원 그냥 RETurn
+        try {
+            exerciseInfo = exerciseProvider.getExerciseInfo(userId);
+        }catch (BaseException e){
+            if(e.getStatus() == NOT_FOUND_EXERCISEINFO)
+                return;
+        }
         List<ExerciseRoutine> routine = exerciseInfo.getExerciseRoutines();
         List<ExerciseWeightRecord> weightRecords = exerciseInfo.getWeightRecords();
         exerciseInfo.setStatus("N");
         for(ExerciseRoutine r : routine){
-            deleteRoutine(exerciseInfo.getId(), r.getId());
+            deleteRoutine(exerciseInfo.getId(), r.getId(), false);
         }
-
         for(ExerciseWeightRecord weight : weightRecords){
             weight.setStatus("N");
         }
@@ -516,8 +528,13 @@ public class ExerciseService {
      * 회원삭제 실패시 롤백을 위해
      */
     public void rollbackExerciseInfo(Long userId) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.unAvaliableExerciseInfoByUserId(userId);
-
+        ExerciseInfo exerciseInfo = null;
+        try {
+            exerciseInfo = exerciseProvider.unAvaliableExerciseInfoByUserId(userId);
+        }catch (BaseException e){
+            if(e.getStatus() == NOT_FOUND_EXERCISEINFO)
+                return;
+        }
         List<ExerciseRoutine> routine = exerciseInfo.getExerciseRoutines();
         List<ExerciseWeightRecord> weightRecords = exerciseInfo.getWeightRecords();
 
