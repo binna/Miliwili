@@ -8,6 +8,7 @@ import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -313,6 +314,8 @@ public class ExerciseProvider {
         List<MyRoutineInfo> myAllRoutines = new ArrayList<>();
         for(int i=0; i< routineList.size(); i++){
             ExerciseRoutine routine = routineList.get(i);
+            if(routine.getStatus().equals("N"))
+                continue;
             MyRoutineInfo myRoutineInfo = MyRoutineInfo.builder()
                     .routineName(routine.getName())
                     .routineRepeatDay(repeatDayChange(routine.getRepeaDay()))
@@ -345,6 +348,8 @@ public class ExerciseProvider {
 
         for(int i=0;i<routineList.size();i++){
             ExerciseRoutine routine = routineList.get(i);
+            if(routine.getStatus().equals("N"))
+                continue;
         //오늘 운동을 한 기록이 있으면 True처리 -->빼기/ 저번주에 같은 요일에도 들어감
            // Boolean isDone = (routine.getDone().equals("Y")) ? true : false;
             Boolean isDone = false;
@@ -399,24 +404,32 @@ public class ExerciseProvider {
         List<ExerciseDetailRes> detailResList = new ArrayList<>();
 
         for( ExerciseRoutineDetail detail: detailList){
+            if(detail.getStatus().equals("N"))
+                continue;
             List<ExerciseDetailSet> setList = detail.getDetailSets();
             List<ExerciseDetailSetRes> setResList = new ArrayList<>();
 
-            if(detail.getIsSame().equals("Y")){              //전세트 동일
+            if(detail.getIsSame().equals("Y")){//전세트 동일
+                ExerciseDetailSet set = setList.get(0);
+                if(set.getStatus().equals("N"))
+                    continue;
                 ExerciseDetailSetRes setRes = ExerciseDetailSetRes.builder()
                         .setStr(detail.getSetCount()+"세트")
-                        .weight((setList.get(0).getSetWeight()))
-                        .count(setList.get(0).getSetCount())
-                        .time(setList.get(0).getSetTime())
+                        .weight((set.getSetWeight()))
+                        .count(set.getSetCount())
+                        .time(set.getSetTime())
                         .build();
                 setResList.add(setRes);
             }else {                                 //전세트 동일 아님
                 for (int i = 0; i < setList.size(); i++) {
+                    ExerciseDetailSet set = setList.get(i);
+                    if(set.getStatus().equals("N"))
+                        continue;
                     ExerciseDetailSetRes setRes = ExerciseDetailSetRes.builder()
                             .setStr((i + 1) + "세트")
-                            .weight(setList.get(i).getSetWeight())
-                            .count(setList.get(i).getSetCount())
-                            .time(setList.get(i).getSetTime())
+                            .weight(set.getSetWeight())
+                            .count(set.getSetCount())
+                            .time(set.getSetTime())
                             .build();
                     setResList.add(setRes);
                 }
@@ -459,6 +472,8 @@ public class ExerciseProvider {
         List<GetStartExerciseDetailRes> detailResList = new ArrayList<>();
 
         for( ExerciseRoutineDetail detail: detailList){
+            if(detail.getStatus().equals("N"))
+                continue;
             List<ExerciseDetailSet> setList = detail.getDetailSets();
             List<GetStartExerciseDetailSetRes> setResList = new ArrayList<>();
 
@@ -503,19 +518,8 @@ public class ExerciseProvider {
             throw new BaseException(FAILED_GET_REPORT_DONE);
 
 
-        ExerciseReport report = null;
         LocalDate date = LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE);
-        for(ExerciseReport r: routine.getReports()){
-            if(r.getDateCreated().toLocalDate().equals(date)){
-                report = r;
-                break;
-            }
-        }
-        if(report == null)
-            throw new BaseException(NOT_FOUNT_REPORT);
-        if(report.getStatus().equals("N"))
-            throw new BaseException(NOT_FOUNT_REPORT);
-
+        ExerciseReport report = getExerciseReportByDate(routine, date);
 
         String[] doneSplit = report.getExerciseStatus().split("#");
 
@@ -647,6 +651,7 @@ public class ExerciseProvider {
                     .build();
             setResList.add(setRes);
         }
+
     }
     /**
      * Double형 Weight --> 만약 딱 나눠떨어지는 double이라면 그냥 int형태처럼 return
@@ -701,6 +706,8 @@ public class ExerciseProvider {
 
         return resultStr;
     }
+
+
     /**
      * repeatDayStr -> ArrayList
      */
@@ -710,7 +717,6 @@ public class ExerciseProvider {
         for(String str: splitArr){
             changedList.add(Integer.parseInt(str));
         }
-
         return changedList;
     }
 
@@ -724,8 +730,10 @@ public class ExerciseProvider {
         ExerciseRoutine routine = null;
         for(ExerciseRoutine r: exerciseInfo.getExerciseRoutines()){
             if(r.getId() == routineId){
-                routine = r;
-                break;
+                if(r.getStatus().equals("Y")) {
+                    routine = r;
+                    break;
+                }
             }
         }
         if(routine == null)
@@ -733,9 +741,26 @@ public class ExerciseProvider {
         return routine;
     }
 
-    /**
-     * GetExerciseDailywWeightRes에 들어가는 List들 만들기
-     */
+
+    @NotNull
+    public ExerciseReport getExerciseReportByDate(ExerciseRoutine routine, LocalDate date) throws BaseException {
+        ExerciseReport report = null;
+        for (ExerciseReport r : routine.getReports()) {
+            if (r.getDateCreated().toLocalDate().equals(date) && r.getStatus().equals("Y")) {
+                report = r;
+                break;
+            }
+        }
+        if(report == null)
+            throw new BaseException(FAILED_GET_REPORT);
+
+        return report;
+    }
+
+
+        /**
+         * GetExerciseDailywWeightRes에 들어가는 List들 만들기
+         */
 
     public List<String> getDailyWeightTodailyWeightList(List<ExerciseWeightRecord> dailyWeight){
         List<String> changedList = dailyWeight.stream().map(ExerciseWeightRecord -> {
