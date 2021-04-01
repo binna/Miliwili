@@ -46,7 +46,7 @@ public class MainProvider {
         try {
             return changeGetUserCalendarMainRes(userMainData, ddayMainDate, planMainData);
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
+            throw new BaseException(FAILED_TO_GET_USER_CALENDAR_MAIN);
         }
     }
 
@@ -57,7 +57,7 @@ public class MainProvider {
      * @throws BaseException
      */
     public GetCalendarMainRes getCalendarMain() throws BaseException {
-        String month = LocalDate.now().getYear() + "-" + Validation.isRegexMonth(LocalDate.now().getMonthValue() + "");
+        String month = Validation.getCurrentMonth();
 
         LocalDate start = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
         LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());

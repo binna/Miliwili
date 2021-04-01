@@ -1,11 +1,12 @@
 package com.app.miliwili.src.emotionRecord;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.emotionRecord.dto.DayEmotionRecordRes;
-import com.app.miliwili.src.emotionRecord.dto.GetMonthEmotionRecordRes;
+import com.app.miliwili.src.emotionRecord.dto.DateEmotionRecordRes;
+import com.app.miliwili.src.emotionRecord.dto.GetCurrentMonthTodayEmotionRecordRes;
 import com.app.miliwili.src.emotionRecord.dto.MonthEmotionRecordRes;
 import com.app.miliwili.src.emotionRecord.models.EmotionRecord;
 import com.app.miliwili.utils.JwtService;
+import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +57,7 @@ public class EmotionRecordProvider {
      * 날짜로 존재하는 내 감정일기 여부 확인
      *
      * @param date
+     * @param userId
      * @return boolean
      * @Auther shine
      */
@@ -72,8 +74,6 @@ public class EmotionRecordProvider {
      * @Auther shine
      */
     public List<EmotionRecord> retrieveEmotionByStatusYAndDateBetween(String month, Long userId) throws BaseException {
-        month = month.substring(0, 4) + "-" + month.substring(4, 6);
-
         LocalDate start = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
         LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
 
@@ -121,33 +121,56 @@ public class EmotionRecordProvider {
 
 
     /**
-     * 감정기록 월별 조회
+     * 이번달, 오늘 내 감정일기 조회
      *
-     * @param month
-     * @return List<EmotionRecordRes>
+     * @return GetCurrentMonthTodayEmotionRecordRes
      * @throws BaseException
      * @Auther shine
      */
-    public GetMonthEmotionRecordRes getEmotionRecordFromMonth(String month) throws BaseException {
+    public GetCurrentMonthTodayEmotionRecordRes getEmotionRecordFromCurrentMonthAndToday() throws BaseException {
         List<EmotionRecord> monthEmotionRecord = null;
         Long userId = jwtService.getUserId();
 
         try {
-            monthEmotionRecord = retrieveEmotionByStatusYAndDateBetween(month, userId);
+            monthEmotionRecord = retrieveEmotionByStatusYAndDateBetween(Validation.getCurrentMonth(), userId);
             EmotionRecord dayEmotionRecord = retrieveEmotionByDateAndUserIdAndStatusY(LocalDate.now().format(DateTimeFormatter.ISO_DATE), userId);
-            return GetMonthEmotionRecordRes.builder()
+            return GetCurrentMonthTodayEmotionRecordRes.builder()
                     .month(changeListEmotionRecordToListMonthEmotionRecordRes(monthEmotionRecord))
-                    .today(changeEmotionRecordToDayEmotionRecordRes(dayEmotionRecord))
+                    .today(changeEmotionRecordToDateEmotionRecordRes(dayEmotionRecord))
                     .build();
         } catch (BaseException exception) {
             if (exception.getStatus() == NOT_FOUND_EMOTION_RECORD) {
-                return GetMonthEmotionRecordRes.builder()
+                return GetCurrentMonthTodayEmotionRecordRes.builder()
                         .month(changeListEmotionRecordToListMonthEmotionRecordRes(monthEmotionRecord))
                         .today(null)
                         .build();
             }
-            throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
+            exception.printStackTrace();
+            throw new BaseException(exception.getStatus());
         } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
+        }
+    }
+
+    /**
+     * 월별 감정 조회
+     *
+     * @param month
+     * @return List<MonthEmotionRecordRes>
+     * @throws BaseException
+     */
+    public List<MonthEmotionRecordRes> getEmotionRecordFromMonth(String month) throws BaseException {
+        try {
+            List<EmotionRecord> monthEmotionRecord = retrieveEmotionByStatusYAndDateBetween(month.substring(0, 4) + "-" + month.substring(4, 6), jwtService.getUserId());
+            return monthEmotionRecord.stream().map(emotionRecord -> {
+                return MonthEmotionRecordRes.builder()
+                        .date(emotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
+                        .emotion(emotionRecord.getEmoticon())
+                        .build();
+            }).collect(Collectors.toList());
+        } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
         }
     }
@@ -160,12 +183,16 @@ public class EmotionRecordProvider {
      * @throws BaseException
      * @Auther shine
      */
-    public DayEmotionRecordRes getEmotionRecordFromDate(String date) throws BaseException {
+    public DateEmotionRecordRes getEmotionRecordFromDate(String date) throws BaseException {
         date = date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6);
+
+        if (LocalDate.parse(date).isAfter(LocalDate.now())) {
+            throw new BaseException(FASTER_THAN_TODAY);
+        }
 
         try {
             EmotionRecord dateEmotionRecord = retrieveEmotionByDateAndUserIdAndStatusY(date, jwtService.getUserId());
-            return changeEmotionRecordToDayEmotionRecordRes(dateEmotionRecord);
+            return changeEmotionRecordToDateEmotionRecordRes(dateEmotionRecord);
         } catch (BaseException exception) {
             if (exception.getStatus() == NOT_FOUND_EMOTION_RECORD) {
                 throw new BaseException(NOT_FOUND_EMOTION_RECORD);
@@ -188,7 +215,7 @@ public class EmotionRecordProvider {
     public String changeEmotionToEmotionText(Integer emotion) {
         String[] emotionText = {"행복해", "슬퍼", "화가나!", "힘들어..", "gunchim", "흠..", "???", "룰루~", "좋-아"};
 
-        return emotionText[emotion + 1];
+        return emotionText[emotion - 1];
     }
 
 
@@ -206,10 +233,10 @@ public class EmotionRecordProvider {
 
     }
 
-    private DayEmotionRecordRes changeEmotionRecordToDayEmotionRecordRes(EmotionRecord parameter) {
+    private DateEmotionRecordRes changeEmotionRecordToDateEmotionRecordRes(EmotionRecord parameter) {
         if (Objects.isNull(parameter)) return null;
 
-        return DayEmotionRecordRes.builder()
+        return DateEmotionRecordRes.builder()
                 .emotionRecordId(parameter.getId())
                 .date(parameter.getDate().format(DateTimeFormatter.ISO_DATE))
                 .emotion(parameter.getEmoticon())

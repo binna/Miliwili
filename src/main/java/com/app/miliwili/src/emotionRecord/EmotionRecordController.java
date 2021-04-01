@@ -2,10 +2,7 @@ package com.app.miliwili.src.emotionRecord;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
-import com.app.miliwili.src.emotionRecord.dto.PatchEmotionRecordReq;
-import com.app.miliwili.src.emotionRecord.dto.DayEmotionRecordRes;
-import com.app.miliwili.src.emotionRecord.dto.GetMonthEmotionRecordRes;
-import com.app.miliwili.src.emotionRecord.dto.PostEmotionRecordReq;
+import com.app.miliwili.src.emotionRecord.dto.*;
 import com.app.miliwili.utils.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +13,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -32,6 +30,29 @@ public class EmotionRecordController {
 
 
     /**
+     * 당월, 금일 감정 조회 API
+     * [GET] /app/emotions-record/current-month-today
+     *
+     * @return BaseResponse<GetMonthEmotionRecordRes>
+     * @Token X-ACCESS-TOKEN
+     * @RequestParam String month
+     * @Auther shine
+     */
+    @ApiOperation(value = "당월, 금일 감정 조회(감정탭 눌렀을때 처음 세팅되는 값)", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ResponseBody
+    @GetMapping("/emotions-record/current-month-today")
+    public BaseResponse<GetCurrentMonthTodayEmotionRecordRes> getEmotionRecordFromCurrentMonthAndToday(@RequestHeader("X-ACCESS-TOKEN") String token) {
+        try {
+            GetCurrentMonthTodayEmotionRecordRes emotionRecord = emotionRecordProvider.getEmotionRecordFromCurrentMonthAndToday();
+            return new BaseResponse<>(SUCCESS, emotionRecord);
+        } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
      * 감정기록 월별 조회 API
      * [GET] /app/emotions-record/month?month=
      *
@@ -43,14 +64,17 @@ public class EmotionRecordController {
     @ApiOperation(value = "감정기록 월별 조회", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @GetMapping("/emotions-record/month")
-    public BaseResponse<GetMonthEmotionRecordRes> getEmotionRecordFromMonth(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                                            @RequestParam(value = "month", required = false) String month) {
+    public BaseResponse<List<MonthEmotionRecordRes>> getEmotionRecordFromMonth(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                                               @RequestParam(value = "month", required = false) String month) {
         if (!Validation.isRegexMonthParam(month)) {
             return new BaseResponse<>(INVALID_MONTH_PARAM);
         }
+        if (Integer.valueOf(month.substring(5)) > LocalDate.now().getMonthValue()) {
+            return new BaseResponse<>(FASTER_THAN_CURRENT_MONTH);
+        }
 
         try {
-            GetMonthEmotionRecordRes emotionRecords = emotionRecordProvider.getEmotionRecordFromMonth(month);
+            List<MonthEmotionRecordRes> emotionRecords = emotionRecordProvider.getEmotionRecordFromMonth(month);
             return new BaseResponse<>(SUCCESS, emotionRecords);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
@@ -71,14 +95,14 @@ public class EmotionRecordController {
     @ApiOperation(value = "감정기록 일별 조회", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @GetMapping("/emotions-record/day")
-    public BaseResponse<DayEmotionRecordRes> getEmotionRecordFromDate(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                                      @RequestParam(value = "date", required = false) String date) {
+    public BaseResponse<DateEmotionRecordRes> getEmotionRecordFromDate(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                                       @RequestParam(value = "date", required = false) String date) {
         if (!Validation.isRegexDateParam(date)) {
             return new BaseResponse<>(INVALID_DATE_PARAM);
         }
 
         try {
-            DayEmotionRecordRes emotionRecord = emotionRecordProvider.getEmotionRecordFromDate(date);
+            DateEmotionRecordRes emotionRecord = emotionRecordProvider.getEmotionRecordFromDate(date);
             return new BaseResponse<>(SUCCESS, emotionRecord);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
@@ -91,16 +115,16 @@ public class EmotionRecordController {
      * 감정기록 생성 API
      * [POST] /app/emotions-record
      *
-     * @return BaseResponse<EmotionRecordRes>
+     * @return BaseResponse<DateEmotionRecordRes>
      * @Token X-ACCESS-TOKEN
-     * @RequestBody EmotionRecordReq parameters
+     * @RequestBody PostEmotionRecordReq parameters
      * @Auther shine
      */
     @ApiOperation(value = "감정기록 생성", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PostMapping("/emotions-record")
-    public BaseResponse<DayEmotionRecordRes> postEmotionRecord(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                               @RequestBody(required = false) PostEmotionRecordReq parameters) {
+    public BaseResponse<DateEmotionRecordRes> postEmotionRecord(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                                @RequestBody(required = false) PostEmotionRecordReq parameters) {
         if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
             return new BaseResponse<>(EMPTY_DATE);
         }
@@ -116,12 +140,12 @@ public class EmotionRecordController {
         if (Objects.isNull(parameters.getEmotion())) {
             return new BaseResponse<>(EMPTY_EMOTION);
         }
-        if(parameters.getEmotion() < 1 && parameters.getEmotion() < 9) {
+        if(parameters.getEmotion() < 1 || parameters.getEmotion() > 9) {
             return new BaseResponse<>(INVALID_EMOTION);
         }
 
         try {
-            DayEmotionRecordRes emotionRecord = emotionRecordService.createEmotionRecord(parameters);
+            DateEmotionRecordRes emotionRecord = emotionRecordService.createEmotionRecord(parameters);
             return new BaseResponse<>(SUCCESS, emotionRecord);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
@@ -134,30 +158,30 @@ public class EmotionRecordController {
      * 감정기록 수정 API
      * [PATCH] /app/emotions-record/:emotionsRecordId
      *
-     * @return BaseResponse<EmotionRecordRes>
+     * @return BaseResponse<DateEmotionRecordRes>
      * @Token X-ACCESS-TOKEN
-     * @RequestBody EmotionRecordReq parameters
+     * @RequestBody PatchEmotionRecordReq parameters
      * @PathVariable Long emotionsRecordId
      * @Auther shine
      */
     @ApiOperation(value = "감정기록 수정", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @PatchMapping("/emotions-record/{emotionsRecordId}")
-    public BaseResponse<DayEmotionRecordRes> updateEmotionRecord(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                                 @RequestBody(required = false) PatchEmotionRecordReq parameters,
-                                                                 @PathVariable Long emotionsRecordId) {
+    public BaseResponse<DateEmotionRecordRes> updateEmotionRecord(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                                  @RequestBody(required = false) PatchEmotionRecordReq parameters,
+                                                                  @PathVariable Long emotionsRecordId) {
         if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
             return new BaseResponse<>(EMPTY_CONTENT);
         }
         if (Objects.isNull(parameters.getEmotion())) {
             return new BaseResponse<>(EMPTY_EMOTION);
         }
-        if(parameters.getEmotion() < 1 && parameters.getEmotion() < 9) {
+        if(parameters.getEmotion() < 1 || parameters.getEmotion() > 9) {
             return new BaseResponse<>(INVALID_EMOTION);
         }
 
         try {
-            DayEmotionRecordRes emotionRecord = emotionRecordService.updateEmotionRecord(parameters, emotionsRecordId);
+            DateEmotionRecordRes emotionRecord = emotionRecordService.updateEmotionRecord(parameters, emotionsRecordId);
             return new BaseResponse<>(SUCCESS, emotionRecord);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());

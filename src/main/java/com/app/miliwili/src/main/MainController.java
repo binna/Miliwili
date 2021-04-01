@@ -58,7 +58,7 @@ public class MainController {
      */
     @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @GetMapping("/main/calendar")
+    @GetMapping("/main/calendars")
     public BaseResponse<GetCalendarMainRes> getCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try{
             GetCalendarMainRes calendarMain = mainProvider.getCalendarMain();
@@ -80,7 +80,7 @@ public class MainController {
      */
     @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @GetMapping("/main/calendar")
+    @GetMapping("/main/calendars-month")
     public BaseResponse<GetMonthCalendarMainRes> getCalendarMainFromMonth(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                                           @RequestParam(value = "month", required = false) String month) {
         if (!Validation.isRegexMonthParam(month)) {
@@ -107,7 +107,7 @@ public class MainController {
      */
     @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @GetMapping("/main/calendar")
+    @GetMapping("/main/calendars-day")
     public BaseResponse<GetDateCalendarMainRes> getCalendarMainFromDate(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                                         @RequestParam(value = "date", required = false) String date) {
         if (!Validation.isRegexDateParam(date)) {

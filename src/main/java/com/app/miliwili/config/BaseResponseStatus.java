@@ -60,6 +60,7 @@ public enum BaseResponseStatus {
     FASTER_THAN_PLAN_START_DATE(false, 2117, "종료일은 시작일보다 빠를 수 없습니다."),
     FASTER_THAN_END_DATE_ABN(false, 2118, "전역일은 진급심사일보다 빠를 수 없습니다."),
     FASTER_THAN_TODAY(false, 2119, "감정 기록은 오늘 날짜보다 빠를 수 없습니다."),
+    FASTER_THAN_CURRENT_MONTH(false, 2119, "감정 기록 월별 조회는 금월보다 클 수 없습니다."),
 
     ONLY_ON_THE_SAME_DAY(false, 2150, "날짜 범위 등록 불가, 당일만 등록 가능합니다."),
 
@@ -180,8 +181,8 @@ public enum BaseResponseStatus {
     FAILED_TO_POST_EMOTION_RECORD(false, 3071, "감정기록 등록에 실패하였습니다."),
     FAILED_TO_PATCH_EMOTION_RECORD(false, 3072, "감정기록 수정에 실패하였습니다."),
     FAILED_TO_DELETE_EMOTION_RECORD(false, 3073, "감정기록 삭제에 실패하였습니다."),
-    FAILED_TO_GET_MONTH_EMOTION_RECORD(false, 3074, "월 감정기록 조회에 실패하였습니다."),
-    FAILED_TO_GET_DAY_EMOTION_RECORD(false, 3075, "일 감정기록 조회에 실패하였습니다."),
+    FAILED_TO_GET_MONTH_EMOTION_RECORD(false, 3074, "월별 감정기록 조회에 실패하였습니다."),
+    FAILED_TO_GET_DAY_EMOTION_RECORD(false, 3075, "날짜별 감정기록 조회에 실패하였습니다."),
     FAILED_TO_GET_EMOTION_RECORD(false, 3076, "감정기록 조회에 실패하였습니다."),
     ALREADY_EXIST_EMOTION_RECORD(false, 3077, "이미 해당 날짜에는 감정일기가 존재합니다."),
     FAILED_TO_DELETE_ROLLBACK_EMOTION_RECORD(false, 3078, "감정기록 삭제 롤백에 실패하였습니다."),
@@ -193,15 +194,15 @@ public enum BaseResponseStatus {
     FAILED_TO_SET_DAILY_HOBONG_STATUSIDX(false, 3090, "스케줄러, 호봉과 상위계급 업데이트에 실패하였습니다."),
     FAILED_TO_PUSH_MESSAGE(false, 3091, "스케줄러, PUSH 메시지 발송에 실패하였습니다."),
 
+    NOT_FOUND_USER_MAIN(false, 3100, "해당 회원과 일치하는 메인 정보가 없습니다."),
+
 
     //vivi: 3500 ~
     FAILED_TO_GET_USER(false, 3500, "회원 정보 조회에 실패하였습니다."),
     FAILED_TO_SIGNUP_USER(false, 3501, "회원 가입에 실패하였습니다."),
     FAILED_TO_SIGNUP_USER_NORMAL_STATE(false, 3502, "회원 가입(일반병사 table)에 실패하였습니다."),
     FAILED_TO_SIGNUP_USER_ABNORMAL_STATE(false, 3503, "회원 가입(일반병사 외 table)에 실패하였습니다."),
-    FAILED_TO_GET_USER_MAIN_INFO(false, 3504, "메인 정보를 조회하는데 실패하였습니다."),
-    FAILED_TO_GET_USER_MAIN_LIST(false, 3505, "회원의 메인페이지 정보 리스트를 가져오는데 실패하였습니다."),
-    NOT_FOUND_MAIN_INFO(false, 3506, "해당 회원과 일치하는 메인 정보가 없습니다."),
+    FAILED_TO_GET_USER_CALENDAR_MAIN(false, 3504, "메인 정보를 조회하는데 실패하였습니다."),
 
 
     FAILED_TO_GET_USER_STATE_IDX(false, 3510, "회원 복무 형태 조회에 실패하였습니다."),

@@ -43,15 +43,16 @@ public class Validation {
         Matcher matcher = pattern.matcher(target);
         return matcher.find();
     }
-    public static String isRegexMonth(String target) {
+
+    public static String getCurrentMonth() {
         String regex = "^[1-9]$";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(target);
+        Matcher matcher = pattern.matcher(LocalDate.now().getMonthValue() + "");
 
         if (matcher.find()) {
-            return "0" + target;
+            return LocalDate.now().getYear() + "-" + "0" + LocalDate.now().getMonthValue();
         }
-        return target;
+        return LocalDate.now().getYear() + "-" + LocalDate.now().getMonthValue();
     }
 
     public static boolean isFullString(String target){

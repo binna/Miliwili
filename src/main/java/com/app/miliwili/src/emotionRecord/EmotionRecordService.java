@@ -2,7 +2,7 @@ package com.app.miliwili.src.emotionRecord;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.emotionRecord.dto.PatchEmotionRecordReq;
-import com.app.miliwili.src.emotionRecord.dto.DayEmotionRecordRes;
+import com.app.miliwili.src.emotionRecord.dto.DateEmotionRecordRes;
 import com.app.miliwili.src.emotionRecord.dto.PostEmotionRecordReq;
 import com.app.miliwili.src.emotionRecord.models.EmotionRecord;
 import com.app.miliwili.src.user.UserProvider;
@@ -30,11 +30,11 @@ public class EmotionRecordService {
      * 감정기록 생성
      *
      * @param parameters
-     * @return EmotionRecordRes
+     * @return DateEmotionRecordRes
      * @throws BaseException
      * @Auther shine
      */
-    public DayEmotionRecordRes createEmotionRecord(PostEmotionRecordReq parameters) throws BaseException {
+    public DateEmotionRecordRes createEmotionRecord(PostEmotionRecordReq parameters) throws BaseException {
         Long userId = jwtService.getUserId();
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(userId);
 
@@ -51,7 +51,7 @@ public class EmotionRecordService {
 
         try {
             EmotionRecord savedEmotionRecord = emotionRecordRepository.save(newEmotionRecord);
-            return DayEmotionRecordRes.builder()
+            return DateEmotionRecordRes.builder()
                     .emotionRecordId(savedEmotionRecord.getId())
                     .date(savedEmotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                     .content(savedEmotionRecord.getContent())
@@ -59,6 +59,7 @@ public class EmotionRecordService {
                     .emotionText(emotionRecordProvider.changeEmotionToEmotionText(savedEmotionRecord.getEmoticon()))
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_EMOTION_RECORD);
         }
     }
@@ -68,11 +69,11 @@ public class EmotionRecordService {
      *
      * @param parameters
      * @param emotionRecordId
-     * @return EmotionRecordRes
+     * @return DateEmotionRecordRes
      * @throws BaseException
      * @Auther shine
      */
-    public DayEmotionRecordRes updateEmotionRecord(PatchEmotionRecordReq parameters, Long emotionRecordId) throws BaseException {
+    public DateEmotionRecordRes updateEmotionRecord(PatchEmotionRecordReq parameters, Long emotionRecordId) throws BaseException {
         EmotionRecord emotionRecord = emotionRecordProvider.retrieveEmotionRecordByIdAndStatusY(emotionRecordId);
 
         if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {
@@ -84,7 +85,7 @@ public class EmotionRecordService {
 
         try {
             EmotionRecord savedEmotionRecord = emotionRecordRepository.save(emotionRecord);
-            return DayEmotionRecordRes.builder()
+            return DateEmotionRecordRes.builder()
                     .emotionRecordId(savedEmotionRecord.getId())
                     .date(savedEmotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
                     .content(savedEmotionRecord.getContent())
@@ -92,6 +93,7 @@ public class EmotionRecordService {
                     .emotionText(emotionRecordProvider.changeEmotionToEmotionText(savedEmotionRecord.getEmoticon()))
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_PATCH_EMOTION_RECORD);
         }
     }
@@ -115,6 +117,7 @@ public class EmotionRecordService {
         try {
             emotionRecordRepository.save(emotionRecord);
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_DELETE_EMOTION_RECORD);
         }
     }
