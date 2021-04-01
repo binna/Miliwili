@@ -162,7 +162,6 @@ public class CalendarProvider {
         LocalDate startDate = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
 
-
         try {
             return planSelectRepository.findPlanByMonth(userId, startDate, endDate);
         } catch (Exception exception) {

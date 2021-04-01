@@ -10,6 +10,6 @@ import java.util.List;
 @Builder
 @Getter
 public class GetMonthCalendarMainRes {
-    private final List<PlanCalendarData> planCalendar;
+    private final List<PlanCalendarDataRes> planCalendar;
     private final List<String> ddayCalendar;
 }

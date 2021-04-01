@@ -27,14 +27,14 @@ public class MainController {
 
 
     /**
-     * 메인조회
+     * 메인 유저, 캘린더 조회
      * [GET] /app/main/users-calendars
      *
      * @return BaseResponse<GetUserCalendarMainRes>
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
      */
-    @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "메인 유저, 캘린더 조회", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @GetMapping("/main/users-calendars")
     public BaseResponse<GetUserCalendarMainRes> getUserCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token) {

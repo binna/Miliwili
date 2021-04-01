@@ -324,6 +324,9 @@ public class CalendarController {
             if (!Validation.isRegexBirthdayDate(parameters.getDate())) {
                 return new BaseResponse<>(INVALID_DATE);
             }
+            if (Objects.isNull(parameters.getChoiceCalendar()) || parameters.getChoiceCalendar().length() == 0) {
+                return new BaseResponse<>(EMPTY_CHOICE_CALENDAR);
+            }
             if (!(parameters.getChoiceCalendar().equals("S") || parameters.getChoiceCalendar().equals("L"))) {
                 return new BaseResponse<>(MUST_ENTER_CHOICE_CALENDAR_S_OR_B);
             }

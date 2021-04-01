@@ -34,6 +34,7 @@ public enum BaseResponseStatus {
     EMPTY_CONTENT(false, 2015, "내용을 입력해주세요."),
     EMPTY_D_DAY_TYPE(false, 2016, "디데이 구분을 입력해주세요."),
     EMPTY_EMOTION(false, 2017, "감정 이모티콘 아이디를 입력해주세요."),
+    EMPTY_CHOICE_CALENDAR(false, 2018, "생일 구분시 반드시 양력이나 음력을 입력해주세요."),
 
     INVALID_BIRTHDAY(false, 2050, "생일 형식을 확인해주세요."),
     INVALID_PLAN_START_DATE(false, 2051, "일정의 시작날짜 형식을 확인해주세요."),

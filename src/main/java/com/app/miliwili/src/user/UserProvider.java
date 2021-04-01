@@ -175,7 +175,6 @@ public class UserProvider {
     public UserMainData retrieveUserMainDataById() throws BaseException{
         try{
             UserMainData userMainData = userSelectRepository.findUserMainDataByUserId(jwtService.getUserId());
-
             if (Objects.isNull(userMainData)) {
                 throw new BaseException(NOT_FOUND_USER_MAIN);
             }

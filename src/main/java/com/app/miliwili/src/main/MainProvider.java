@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -64,7 +65,6 @@ public class MainProvider {
 
         List<PlanCalendarData> planCalendarData = calendarProvider.retrievePlanCalendarDataByMonthAndStatusY(userId, month);
         List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc(userId);
-
         List<String> ddayCalendar = retrieveDDayCalendarByMonth(ddayMainDate, month);
         List<PlanMainData> planMainData = calendarProvider.retrievePlanMainDataByDateAndStatusY(userId, LocalDate.now());
 
@@ -88,7 +88,7 @@ public class MainProvider {
         List<String> ddayCalendar = retrieveDDayCalendarByMonth(ddayMainDate, month);
 
         return GetMonthCalendarMainRes.builder()
-                .planCalendar(planCalendarData)
+                .planCalendar(changeListPlanCalendarDataToListPlanCalendarDataRes(planCalendarData))
                 .ddayCalendar(ddayCalendar)
                 .build();
     }
@@ -155,9 +155,20 @@ public class MainProvider {
         return ddayCalendar;
     }
 
+    private List<PlanCalendarDataRes> changeListPlanCalendarDataToListPlanCalendarDataRes(List<PlanCalendarData> planCalendarDataList) {
+        return planCalendarDataList.stream().map(planCalendarData -> {
+            return PlanCalendarDataRes.builder()
+                    .color(planCalendarData.getColor())
+                    .startDate(planCalendarData.getStartDate().format(DateTimeFormatter.ISO_DATE))
+                    .endDate(planCalendarData.getEndDate().format(DateTimeFormatter.ISO_DATE))
+                    .build();
+        }).collect(Collectors.toList());
+
+    }
+
     private GetCalendarMainRes changeGetCalendarMainRes(List<PlanCalendarData> planCalendarData, List<String> ddayCalendar, List<DDayMainDataRes> ddayMainDate, List<PlanMainData> planMainData) {
         return GetCalendarMainRes.builder()
-                .planCalendar(planCalendarData)
+                .planCalendar(changeListPlanCalendarDataToListPlanCalendarDataRes(planCalendarData))
                 .ddayCalendar(ddayCalendar)
                 .dday(ddayMainDate)
                 .plan(planMainData)
