@@ -1,7 +1,6 @@
 package com.app.miliwili.utils;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.exercise.dto.PostExerciseRoutineReq;
 import com.app.miliwili.src.exercise.model.ExerciseRoutineDetail;
@@ -16,7 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
-import static com.app.miliwili.config.BaseResponseStatus.SUCCESS;
 
 public class Validation {
     public static boolean isRegexDate(String target) {
@@ -33,17 +31,27 @@ public class Validation {
         return matcher.find();
     }
 
-    public static boolean isRegexEmotionRecordDate(String target) {
+    public static boolean isRegexDateParam(String target) {
         String regex = "^(19|20)\\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[0-1])$";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(target);
         return matcher.find();
     }
-    public static boolean isRegexEmotionRecordMonth(String target) {
+    public static boolean isRegexMonthParam(String target) {
         String regex = "^(19|20)\\d{2}(0[1-9]|1[012])$";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(target);
         return matcher.find();
+    }
+    public static String isRegexMonth(String target) {
+        String regex = "^[1-9]$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(target);
+
+        if (matcher.find()) {
+            return "0" + target;
+        }
+        return target;
     }
 
     public static boolean isFullString(String target){

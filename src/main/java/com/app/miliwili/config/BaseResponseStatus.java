@@ -43,8 +43,8 @@ public enum BaseResponseStatus {
     INVALID_SOCIAL_TYPE(false, 2055, "가입 요청하는 소셜타입의 형식을 확인해주세요."),
     INVALID_D_DAY_TYPE(false, 2056, "유효하지 않은 디데이 타입입니다."),
     INVALID_EMOTION(false, 2057, "감정 이모티콘 아이디는 1부터 9까지 입력 가능합니다."),
-    INVALID_EMOTION_RECORD_MONTH(false, 2057, "월 형식을 확인해주세요."),
-    INVALID_EMOTION_RECORD_DATE(false, 2057, "일 형식을 확인해주세요."),
+    INVALID_MONTH_PARAM(false, 2057, "월 형식을 확인해주세요."),
+    INVALID_DATE_PARAM(false, 2057, "일 형식을 확인해주세요."),
 
     EXCEED_MAX10(false, 2100, "입력할 수 있는 최대 10글자 미만의 수를 초과하였습니다."),
     EXCEED_MAX20(false, 2101, "입력할 수 있는 최대 20글자 미만의 수를 초과하였습니다."),

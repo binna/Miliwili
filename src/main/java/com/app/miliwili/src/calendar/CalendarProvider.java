@@ -136,9 +136,9 @@ public class CalendarProvider {
      * @throws BaseException
      * @Auther shine
      */
-    public List<PlanMainData> retrievePlanMainDataByDateAndStatusY(LocalDate date) throws BaseException {
+    public List<PlanMainData> retrievePlanMainDataByDateAndStatusY(Long userId, LocalDate date) throws BaseException {
         try {
-            return planSelectRepository.findPlanByDate(jwtService.getUserId(), date);
+            return planSelectRepository.findPlanByDate(userId, date);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
         }
@@ -152,9 +152,9 @@ public class CalendarProvider {
      * @return List<PlanCalendarData>
      * @throws BaseException
      */
-    public List<PlanCalendarData> retrievePlanCalendarDataByMonthAndStatusY(LocalDate startDate, LocalDate endDate) throws BaseException {
+    public List<PlanCalendarData> retrievePlanCalendarDataByMonthAndStatusY(Long userId , LocalDate startDate, LocalDate endDate) throws BaseException {
         try {
-            return planSelectRepository.findPlanByMonth(jwtService.getUserId(), startDate, endDate);
+            return planSelectRepository.findPlanByMonth(userId, startDate, endDate);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
         }
@@ -167,9 +167,9 @@ public class CalendarProvider {
      * @throws BaseException
      * @Auther shine
      */
-    public List<DDayMainData> retrieveDDayMainDataByTodayAndStatusY() throws BaseException {
+    public List<DDayMainData> retrieveDDayMainDataByTodayAndStatusY(Long userId) throws BaseException {
         try {
-            return ddaySelectRepository.findDDayByToday(jwtService.getUserId());
+            return ddaySelectRepository.findDDayByToday(userId);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_D_DAY);
         }

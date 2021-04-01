@@ -45,8 +45,8 @@ public class EmotionRecordController {
     @GetMapping("/emotions-record/month")
     public BaseResponse<GetMonthEmotionRecordRes> getEmotionRecordFromMonth(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                                             @RequestParam(value = "month", required = false) String month) {
-        if (!Validation.isRegexEmotionRecordMonth(month)) {
-            return new BaseResponse<>(INVALID_EMOTION_RECORD_MONTH);
+        if (!Validation.isRegexMonthParam(month)) {
+            return new BaseResponse<>(INVALID_MONTH_PARAM);
         }
 
         try {
@@ -73,8 +73,8 @@ public class EmotionRecordController {
     @GetMapping("/emotions-record/day")
     public BaseResponse<DayEmotionRecordRes> getEmotionRecordFromDate(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                                       @RequestParam(value = "date", required = false) String date) {
-        if (!Validation.isRegexEmotionRecordDate(date)) {
-            return new BaseResponse<>(INVALID_EMOTION_RECORD_DATE);
+        if (!Validation.isRegexDateParam(date)) {
+            return new BaseResponse<>(INVALID_DATE_PARAM);
         }
 
         try {
