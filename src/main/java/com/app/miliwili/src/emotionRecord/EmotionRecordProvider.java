@@ -43,6 +43,7 @@ public class EmotionRecordProvider {
      * 날짜로 내 유효한 감정일기 조회
      *
      * @param date
+     * @param userId
      * @return EmotionRecord
      * @throws BaseException
      * @Auther shine
@@ -69,6 +70,7 @@ public class EmotionRecordProvider {
      * 월별 내 유효한 감정일기 조회
      *
      * @param month
+     * @param userId
      * @return List<EmotionRecord>
      * @throws BaseException
      * @Auther shine
@@ -90,6 +92,7 @@ public class EmotionRecordProvider {
     /**
      * 회원별 모든 감정일기 조회(삭제용)
      *
+     * @param userId
      * @return List<EmotionRecord>
      * @throws BaseException
      * @Auther shine
@@ -105,6 +108,7 @@ public class EmotionRecordProvider {
     /**
      * 회원별 상태 "N"의 모든 감정일기 조회(삭제 롤백용)
      *
+     * @param userId
      * @return List<EmotionRecord>
      * @throws BaseException
      * @Auther shine
@@ -161,18 +165,8 @@ public class EmotionRecordProvider {
      * @throws BaseException
      */
     public List<MonthEmotionRecordRes> getEmotionRecordFromMonth(String month) throws BaseException {
-        try {
-            List<EmotionRecord> monthEmotionRecord = retrieveEmotionByStatusYAndDateBetween(month.substring(0, 4) + "-" + month.substring(4, 6), jwtService.getUserId());
-            return monthEmotionRecord.stream().map(emotionRecord -> {
-                return MonthEmotionRecordRes.builder()
-                        .date(emotionRecord.getDate().format(DateTimeFormatter.ISO_DATE))
-                        .emotion(emotionRecord.getEmoticon())
-                        .build();
-            }).collect(Collectors.toList());
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
-        }
+        List<EmotionRecord> monthEmotionRecord = retrieveEmotionByStatusYAndDateBetween(month.substring(0, 4) + "-" + month.substring(4, 6), jwtService.getUserId());
+        return changeListEmotionRecordToListMonthEmotionRecordRes(monthEmotionRecord);
     }
 
     /**
@@ -197,8 +191,10 @@ public class EmotionRecordProvider {
             if (exception.getStatus() == NOT_FOUND_EMOTION_RECORD) {
                 throw new BaseException(NOT_FOUND_EMOTION_RECORD);
             }
+            exception.printStackTrace();
             throw new BaseException(exception.getStatus());
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_GET_DAY_EMOTION_RECORD);
         }
     }

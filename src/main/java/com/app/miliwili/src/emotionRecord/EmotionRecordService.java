@@ -125,6 +125,7 @@ public class EmotionRecordService {
     /**
      * 회원 삭제시, 회원별 감정기록 삭제
      *
+     * @param userId
      * @throws BaseException
      * @Auther shine
      */
@@ -138,6 +139,7 @@ public class EmotionRecordService {
         try {
             emotionRecordRepository.saveAll(emotionRecords);
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_DELETE_EMOTION_RECORD);
         }
     }
@@ -145,6 +147,7 @@ public class EmotionRecordService {
     /**
      * 회원 삭제 문제 발생시, 회원별 감정기록 삭제 롤백
      *
+     * @param userId
      * @throws BaseException
      * @Auther shine
      */
@@ -158,6 +161,7 @@ public class EmotionRecordService {
         try {
             emotionRecordRepository.saveAll(emotionRecords);
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_DELETE_ROLLBACK_EMOTION_RECORD);
         }
     }

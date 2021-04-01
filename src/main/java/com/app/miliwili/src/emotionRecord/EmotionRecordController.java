@@ -33,9 +33,8 @@ public class EmotionRecordController {
      * 당월, 금일 감정 조회 API
      * [GET] /app/emotions-record/current-month-today
      *
-     * @return BaseResponse<GetMonthEmotionRecordRes>
+     * @return BaseResponse<GetCurrentMonthTodayEmotionRecordRes>
      * @Token X-ACCESS-TOKEN
-     * @RequestParam String month
      * @Auther shine
      */
     @ApiOperation(value = "당월, 금일 감정 조회(감정탭 눌렀을때 처음 세팅되는 값)", notes = "X-ACCESS-TOKEN jwt 필요")
@@ -56,7 +55,7 @@ public class EmotionRecordController {
      * 감정기록 월별 조회 API
      * [GET] /app/emotions-record/month?month=
      *
-     * @return BaseResponse<GetMonthEmotionRecordRes>
+     * @return BaseResponse<List<MonthEmotionRecordRes>>
      * @Token X-ACCESS-TOKEN
      * @RequestParam String month
      * @Auther shine
