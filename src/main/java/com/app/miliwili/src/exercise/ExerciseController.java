@@ -320,7 +320,7 @@ public class ExerciseController {
     public BaseResponse<String> deleteMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
                                                               @PathVariable Long routineId){
         try{
-            String resultStr = exerciseService.deleteRoutine(exerciseId,routineId, false);
+            String resultStr = exerciseService.deleteRoutine(exerciseId,routineId, true);
             return new BaseResponse<>(SUCCESS, resultStr);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());

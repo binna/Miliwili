@@ -44,11 +44,12 @@ public class ExerciseProvider {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
     }
 
+
     /**
-     * UserId
+     * UserId로 ExerciseInfo return
      */
-    public ExerciseInfo getExerciseInfoByUserId(Long userId,String status) throws BaseException{
-        return exerciseRepository.findExerciseInfoByUserIdAndStatus(userId, status)
+    public ExerciseInfo getExerciseInfoByUserId(Long userId,String statusStr) throws BaseException{
+        return exerciseRepository.findExerciseInfoByUserIdAndStatus(userId, statusStr)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
     }
 
