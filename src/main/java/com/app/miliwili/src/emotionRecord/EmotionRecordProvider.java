@@ -165,13 +165,8 @@ public class EmotionRecordProvider {
      * @throws BaseException
      */
     public List<MonthEmotionRecordRes> getEmotionRecordFromMonth(String month) throws BaseException {
-        try {
-            List<EmotionRecord> monthEmotionRecord = retrieveEmotionByStatusYAndDateBetween(month.substring(0, 4) + "-" + month.substring(4, 6), jwtService.getUserId());
-            return changeListEmotionRecordToListMonthEmotionRecordRes(monthEmotionRecord);
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            throw new BaseException(FAILED_TO_GET_EMOTION_RECORD);
-        }
+        List<EmotionRecord> monthEmotionRecord = retrieveEmotionByStatusYAndDateBetween(month.substring(0, 4) + "-" + month.substring(4, 6), jwtService.getUserId());
+        return changeListEmotionRecordToListMonthEmotionRecordRes(monthEmotionRecord);
     }
 
     /**
