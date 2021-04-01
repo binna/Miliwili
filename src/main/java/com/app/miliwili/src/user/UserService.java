@@ -5,7 +5,6 @@ import com.app.miliwili.src.calendar.CalendarProvider;
 import com.app.miliwili.src.calendar.CalendarService;
 import com.app.miliwili.src.calendar.models.PlanVacation;
 import com.app.miliwili.src.emotionRecord.EmotionRecordService;
-import com.app.miliwili.src.exercise.ExerciseProvider;
 import com.app.miliwili.src.exercise.ExerciseService;
 import com.app.miliwili.src.user.dto.*;
 import com.app.miliwili.src.user.models.AbnormalPromotionState;
@@ -97,7 +96,7 @@ public class UserService {
             if (exception.getStatus() == NOT_FOUND_USER) {
                 return new PostLoginRes(false, null);
             }
-            throw new BaseException(FAILED_TO_GET_USER);
+            throw new BaseException(exception.getStatus());
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_USER);
         }
@@ -140,7 +139,7 @@ public class UserService {
             if (exception.getStatus() == SET_PLAN_VACATION) {
                 userRepository.delete(savedUser);
             }
-            throw new BaseException(FAILED_TO_SIGNUP_USER);
+            throw new BaseException(exception.getStatus());
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_SIGNUP_USER);
         }
@@ -182,6 +181,7 @@ public class UserService {
      */
     public void deleteUser() throws BaseException {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+
         user.setStatus("N");
 
         try {
@@ -190,23 +190,25 @@ public class UserService {
             calendarService.deletePlanByUser(user.getId());
             calendarService.deleteDDayByUser(user.getId());
             emotionRecordService.deleteEmotionRecordByUser(user.getId());
+
         } catch (BaseException exception) {
             if (exception.getStatus() == FAILED_TO_DELTE_EXERCISE_INFO) {
-                exerciseService.rollbackExerciseInfo(user.getId());
+                executeRollback(user.getId());
                 throw new BaseException(FAILED_TO_DELTE_EXERCISE_INFO);
             }
             if (exception.getStatus() == FAILED_TO_DELETE_PLAN) {
-                calendarService.deleteRollbackPlanByUser(user.getId());
+                executeRollback(user.getId());
                 throw new BaseException(FAILED_TO_DELETE_PLAN);
             }
             if (exception.getStatus() == FAILED_TO_DELETE_D_DAY) {
-                calendarService.deleteRollbackDDayByUser(user.getId());
+                executeRollback(user.getId());
                 throw new BaseException(FAILED_TO_DELETE_D_DAY);
             }
             if (exception.getStatus() == FAILED_TO_DELETE_EMOTION_RECORD) {
-                emotionRecordService.deleteRollbackEmotionRecord(user.getId());
+                executeRollback(user.getId());
+                throw new BaseException(FAILED_TO_DELETE_EMOTION_RECORD);
             }
-            throw new BaseException(FAILED_TO_DELETE_USER);
+            throw new BaseException(exception.getStatus());
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_USER);
         }
@@ -326,6 +328,26 @@ public class UserService {
 
 
 
+
+    private void executeRollback(Long userId) throws BaseException {
+        deleteRollbackUser(userId);
+        exerciseService.rollbackExerciseInfo(userId);
+        calendarService.deleteRollbackPlanByUser(userId);
+        calendarService.deleteRollbackDDayByUser(userId);
+        emotionRecordService.deleteRollbackEmotionRecord(userId);
+    }
+
+    private void deleteRollbackUser(Long userId) throws BaseException {
+        UserInfo user = userProvider.retrieveUserByIdAndStatusN(userId);
+
+        user.setStatus("Y");
+
+        try {
+            userRepository.save(user);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_ROLLBACK_USER);
+        }
+    }
 
     private void checkValidationOfInputValuesByServeData(Integer stateIdx, PatchUserReq parameters) throws BaseException {
         LocalDate startDate = LocalDate.parse(parameters.getStartDate(), DateTimeFormatter.ISO_DATE);
