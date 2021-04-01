@@ -257,10 +257,10 @@ public class ExerciseService {
      */
     public String deleteRoutine(long exerciseId, long routineId , boolean isDeleted) throws BaseException{
         ExerciseInfo exerciseInfo = null;
-        if(isDeleted == true)
+        if(isDeleted == true)       //루틴 삭제
             exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
-        else{
-            exerciseInfo = exerciseProvider.unAvaliableExerciseInfoByUserId(jwtService.getUserId());
+        else{                       //회원 탈퇴할 때 함께 삭제
+            exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"N");
         }
 
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
@@ -500,7 +500,7 @@ public class ExerciseService {
         ExerciseInfo exerciseInfo = null;
         //운동탭 한번도 방문 안해서 exerciseInfo없는 회원 그냥 RETurn
         try {
-            exerciseInfo = exerciseProvider.getExerciseInfo(userId);
+            exerciseInfo = exerciseProvider.getExerciseInfoByUserId(userId,"Y");
         }catch (BaseException e){
             if(e.getStatus() == NOT_FOUND_EXERCISEINFO)
                 return;
@@ -530,7 +530,7 @@ public class ExerciseService {
     public void rollbackExerciseInfo(Long userId) throws BaseException{
         ExerciseInfo exerciseInfo = null;
         try {
-            exerciseInfo = exerciseProvider.unAvaliableExerciseInfoByUserId(userId);
+            exerciseInfo = exerciseProvider.getExerciseInfoByUserId(userId,"N");
         }catch (BaseException e){
             if(e.getStatus() == NOT_FOUND_EXERCISEINFO)
                 return;

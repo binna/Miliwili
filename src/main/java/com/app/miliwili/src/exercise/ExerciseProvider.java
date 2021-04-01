@@ -4,6 +4,8 @@ import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponseStatus;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.*;
+import com.app.miliwili.src.user.UserProvider;
+import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class ExerciseProvider {
     private final ExerciseWeightRepository exerciseWeightRepository;
     private final ExerciseRoutineRepository exerciseRoutineRepository;
     private final ExerciseReportRepository exerciseReportRepository;
+    private final UserProvider userProvider;
     private final JwtService jwtService;
 
 
@@ -41,15 +44,32 @@ public class ExerciseProvider {
                 .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
     }
 
+
     /**
-     * UserId
+     * UserId로 ExerciseInfo return
      */
-    public ExerciseInfo unAvaliableExerciseInfoByUserId(Long userId) throws BaseException{
-        return exerciseRepository.findExerciseInfoByUserIdAndStatus(userId, "N")
+    public ExerciseInfo getExerciseInfoByUserId(Long userId,String statusStr) throws BaseException{
+        return exerciseRepository.findExerciseInfoByUserIdAndStatus(userId, statusStr)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_EXERCISEINFO));
     }
 
 
+    /**
+     * 운동 Id 조회
+     */
+    public Long retrieveExerciseId() throws BaseException{
+        UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+        Long exerciseInfoId = null;
+        try{
+            exerciseInfoId= exerciseSelectRepository.getExerciseIdByUserId(user.getId());
+        }catch (Exception e){
+            throw new BaseException(NOT_FOUND_EXERCISEINFO);
+        }
+        if(exerciseInfoId == null)
+            return (long)-1;
+        else
+            return exerciseInfoId;
+    }
 
     /**
      * 일별 체중 조회

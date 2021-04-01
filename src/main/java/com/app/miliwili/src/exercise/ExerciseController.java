@@ -40,11 +40,31 @@ public class ExerciseController {
             Long exerciseId = exerciseService.createFirstEntrance();
             return new BaseResponse<>(SUCCESS,exerciseId);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
     }
-
+    /**
+     *  call
+     * 운동 id 조회
+     * @return BaseResponse<Long>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ApiOperation(value = "운동 id 조회 ", notes = "X-ACCESS-TOKEN 필요")
+    @ResponseBody
+    @GetMapping
+    public BaseResponse<Long> getExerciseIdWithUserId(@RequestHeader("X-ACCESS-TOKEN") String token){
+        try{
+            Long exerciseId = exerciseProvider.retrieveExerciseId();
+            return new BaseResponse<>(SUCCESS,exerciseId);
+        }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(e));
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
     /**
      * 처음 목표 체중, 현재 체중 입력.
      * @return BaseResponse<Long>
@@ -68,6 +88,7 @@ public class ExerciseController {
             String result = exerciseService.createFistWeight(param,exerciseId);
             return new BaseResponse<>(SUCCESS,result);
         }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(e));
             return new BaseResponse<>(e.getStatus());
         }
@@ -299,7 +320,7 @@ public class ExerciseController {
     public BaseResponse<String> deleteMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
                                                               @PathVariable Long routineId){
         try{
-            String resultStr = exerciseService.deleteRoutine(exerciseId,routineId, false);
+            String resultStr = exerciseService.deleteRoutine(exerciseId,routineId, true);
             return new BaseResponse<>(SUCCESS, resultStr);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
