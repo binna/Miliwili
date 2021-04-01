@@ -210,6 +210,7 @@ public enum BaseResponseStatus {
     FAILED_POST_FIRST_WIEHGT(false, 3520, "첫 몸무게 등록에 실패하였습니다"),
     FAILED_CHECK_FIRST_WIEHGT(false, 3521, "이미 몸무게가 등록된(운동탭에 방문했던) 사용자입니다 "),
     FAILED_POST_FIRST_ENTRANCE(false, 3522, "exerciseId생성에 실패하였습니다."),
+    FAILED_TO_FIND_EXERCISEINFO(false, 3523, "exerciseInfo 유효 검사에 실패하였습니다."),
 
 
     NOT_FOUND_EXERCISEINFO(false, 3530, "존재하지 않는 운동 정보입니다 "),

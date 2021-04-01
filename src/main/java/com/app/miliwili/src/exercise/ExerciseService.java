@@ -5,6 +5,7 @@ import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.src.exercise.dto.*;
 import com.app.miliwili.src.exercise.model.*;
 import com.app.miliwili.src.user.UserProvider;
+import com.app.miliwili.src.user.UserRepository;
 import com.app.miliwili.src.user.models.UserInfo;
 import com.app.miliwili.utils.JwtService;
 import com.app.miliwili.utils.Validation;
@@ -34,7 +35,6 @@ public class ExerciseService {
     private final ExerciseProvider exerciseProvider;
     private final UserProvider userProvider;
     private final JwtService jwtService;
-    private PostExerciseFirstWeightReq pa;
 
     /**
      * 처음 탭에 입장시
@@ -43,7 +43,7 @@ public class ExerciseService {
         UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
 
         if(exerciseProvider.isExerciseInfoUser(user.getId()) == true)
-            throw new BaseException(FAILED_CHECK_FIRST_WIEHGT);
+            throw new BaseException(FAILED_TO_FIND_EXERCISEINFO);
 
         ExerciseInfo exerciseInfo = ExerciseInfo.builder()
                 .user(user)
@@ -58,6 +58,7 @@ public class ExerciseService {
 
         return exerciseInfo.getId();
     }
+
 
     /**
      *목표 몸무게, 현재 몸무게 입력 ui
@@ -257,10 +258,10 @@ public class ExerciseService {
      */
     public String deleteRoutine(long exerciseId, long routineId , boolean isDeleted) throws BaseException{
         ExerciseInfo exerciseInfo = null;
-        if(isDeleted == true)
+        if(isDeleted == true)       //단순 루틴 삭제를 위한 루틴 삭제
             exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
-        else{
-            exerciseInfo = exerciseProvider.unAvaliableExerciseInfoByUserId(jwtService.getUserId());
+        else{                       //회원 탈퇴를 위한 루틴 삭제
+            exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(), "N");
         }
 
         if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
@@ -278,9 +279,6 @@ public class ExerciseService {
         for(ExerciseReport report: routine.getReports()){
             report.setStatus("N");
         }
-
-//        routine.setExerciseInfo(null);
-//        exerciseInfo.getExerciseRoutines().remove(routine);
 
         try {
             exerciseRoutineRepository.save(routine);
@@ -500,19 +498,24 @@ public class ExerciseService {
         ExerciseInfo exerciseInfo = null;
         //운동탭 한번도 방문 안해서 exerciseInfo없는 회원 그냥 RETurn
         try {
-            exerciseInfo = exerciseProvider.getExerciseInfo(userId);
+            exerciseInfo = exerciseProvider.getExerciseInfoByUserId(userId, "Y");
         }catch (BaseException e){
-            if(e.getStatus() == NOT_FOUND_EXERCISEINFO)
+            if(e.getStatus() == NOT_FOUND_EXERCISEINFO) {
                 return;
+            }
         }
         List<ExerciseRoutine> routine = exerciseInfo.getExerciseRoutines();
         List<ExerciseWeightRecord> weightRecords = exerciseInfo.getWeightRecords();
         exerciseInfo.setStatus("N");
-        for(ExerciseRoutine r : routine){
-            deleteRoutine(exerciseInfo.getId(), r.getId(), false);
+        if(routine.size() != 0) {
+            for (ExerciseRoutine r : routine) {
+                deleteRoutine(exerciseInfo.getId(), r.getId(), false);
+            }
         }
-        for(ExerciseWeightRecord weight : weightRecords){
-            weight.setStatus("N");
+        if(weightRecords.size() != 0) {
+            for (ExerciseWeightRecord weight : weightRecords) {
+                weight.setStatus("N");
+            }
         }
 
         try{
@@ -530,7 +533,7 @@ public class ExerciseService {
     public void rollbackExerciseInfo(Long userId) throws BaseException{
         ExerciseInfo exerciseInfo = null;
         try {
-            exerciseInfo = exerciseProvider.unAvaliableExerciseInfoByUserId(userId);
+            exerciseInfo = exerciseProvider.getExerciseInfoByUserId(userId,"N");
         }catch (BaseException e){
             if(e.getStatus() == NOT_FOUND_EXERCISEINFO)
                 return;
