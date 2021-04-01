@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-public class GetMonthEmotionRecordRes {
+public class GetCurrentMonthTodayEmotionRecordRes {
     private final List<MonthEmotionRecordRes> month;
-    private final DayEmotionRecordRes today;
+    private final DateEmotionRecordRes today;
 }

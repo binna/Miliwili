@@ -177,16 +177,16 @@ public class UserProvider {
             UserMainData userMainData = userSelectRepository.findUserMainDataByUserId(jwtService.getUserId());
 
             if (Objects.isNull(userMainData)) {
-                throw new BaseException(NOT_FOUND_MAIN_INFO);
+                throw new BaseException(NOT_FOUND_USER_MAIN);
             }
             return userMainData;
         } catch (BaseException exception) {
-            if(exception.getStatus() == NOT_FOUND_MAIN_INFO) {
-                throw new BaseException(NOT_FOUND_MAIN_INFO);
+            if(exception.getStatus() == NOT_FOUND_USER_MAIN) {
+                throw new BaseException(NOT_FOUND_USER_MAIN);
             }
-            throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
+            throw new BaseException(exception.getStatus());
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_GET_USER_MAIN_INFO);
+            throw new BaseException(FAILED_TO_GET_USER_CALENDAR_MAIN);
         }
     }
 
