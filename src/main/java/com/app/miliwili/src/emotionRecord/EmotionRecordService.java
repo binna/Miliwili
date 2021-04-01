@@ -1,8 +1,9 @@
 package com.app.miliwili.src.emotionRecord;
 
 import com.app.miliwili.config.BaseException;
-import com.app.miliwili.src.emotionRecord.dto.EmotionRecordReq;
+import com.app.miliwili.src.emotionRecord.dto.PatchEmotionRecordReq;
 import com.app.miliwili.src.emotionRecord.dto.DayEmotionRecordRes;
+import com.app.miliwili.src.emotionRecord.dto.PostEmotionRecordReq;
 import com.app.miliwili.src.emotionRecord.models.EmotionRecord;
 import com.app.miliwili.src.user.UserProvider;
 import com.app.miliwili.src.user.models.UserInfo;
@@ -33,17 +34,18 @@ public class EmotionRecordService {
      * @throws BaseException
      * @Auther shine
      */
-    public DayEmotionRecordRes createEmotionRecord(EmotionRecordReq parameters) throws BaseException {
-        UserInfo user = userProvider.retrieveUserByIdAndStatusY(jwtService.getUserId());
+    public DayEmotionRecordRes createEmotionRecord(PostEmotionRecordReq parameters) throws BaseException {
+        Long userId = jwtService.getUserId();
+        UserInfo user = userProvider.retrieveUserByIdAndStatusY(userId);
 
         EmotionRecord newEmotionRecord = EmotionRecord.builder()
-                .date(LocalDate.now())
+                .date(LocalDate.parse(parameters.getDate(), DateTimeFormatter.ISO_DATE))
                 .content(parameters.getContent())
                 .emoticon(parameters.getEmotion())
                 .userInfo(user)
                 .build();
 
-        if (emotionRecordProvider.isEmotionRecordByDateAndUserIdAndStatusY(newEmotionRecord.getDate(), jwtService.getUserId())) {
+        if (emotionRecordProvider.isEmotionRecordByDateAndUserIdAndStatusY(newEmotionRecord.getDate(), userId)) {
             throw new BaseException(ALREADY_EXIST_EMOTION_RECORD);
         }
 
@@ -70,7 +72,7 @@ public class EmotionRecordService {
      * @throws BaseException
      * @Auther shine
      */
-    public DayEmotionRecordRes updateEmotionRecord(EmotionRecordReq parameters, Long emotionRecordId) throws BaseException {
+    public DayEmotionRecordRes updateEmotionRecord(PatchEmotionRecordReq parameters, Long emotionRecordId) throws BaseException {
         EmotionRecord emotionRecord = emotionRecordProvider.retrieveEmotionRecordByIdAndStatusY(emotionRecordId);
 
         if (emotionRecord.getUserInfo().getId() != jwtService.getUserId()) {

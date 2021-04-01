@@ -59,6 +59,7 @@ public enum BaseResponseStatus {
     FASTER_THAN_VACATION_START_DATE(false, 2116, "휴가종료일은 휴가시작일보다 빠를 수 없습니다."),
     FASTER_THAN_PLAN_START_DATE(false, 2117, "종료일은 시작일보다 빠를 수 없습니다."),
     FASTER_THAN_END_DATE_ABN(false, 2118, "전역일은 진급심사일보다 빠를 수 없습니다."),
+    FASTER_THAN_TODAY(false, 2119, "감정 기록은 오늘 날짜보다 빠를 수 없습니다."),
 
     ONLY_ON_THE_SAME_DAY(false, 2150, "날짜 범위 등록 불가, 당일만 등록 가능합니다."),
 
