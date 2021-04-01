@@ -46,6 +46,7 @@ public class MainProvider {
         try {
             return changeGetUserCalendarMainRes(userMainData, ddayMainDate, planMainData);
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_GET_USER_CALENDAR_MAIN);
         }
     }
@@ -59,15 +60,12 @@ public class MainProvider {
     public GetCalendarMainRes getCalendarMain() throws BaseException {
         String month = Validation.getCurrentMonth();
 
-        LocalDate start = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
-        LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
-
         Long userId = jwtService.getUserId();
 
-        List<PlanCalendarData> planCalendarData = calendarProvider.retrievePlanCalendarDataByMonthAndStatusY(userId, start, end);
+        List<PlanCalendarData> planCalendarData = calendarProvider.retrievePlanCalendarDataByMonthAndStatusY(userId, month);
         List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc(userId);
 
-        List<String> ddayCalendar = retrieveDDayCalendarByMonth(ddayMainDate, start, end);
+        List<String> ddayCalendar = retrieveDDayCalendarByMonth(ddayMainDate, month);
         List<PlanMainData> planMainData = calendarProvider.retrievePlanMainDataByDateAndStatusY(userId, LocalDate.now());
 
         return changeGetCalendarMainRes(planCalendarData, ddayCalendar, ddayMainDate, planMainData);
@@ -82,16 +80,12 @@ public class MainProvider {
     public GetMonthCalendarMainRes getCalendarMainFromMonth(String month) throws BaseException {
         month = month.substring(0, 4) + "-" + month.substring(4, 6);
 
-        LocalDate start = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
-        LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
-
         Long userId = jwtService.getUserId();
 
-        List<PlanCalendarData> planCalendarData = calendarProvider.retrievePlanCalendarDataByMonthAndStatusY(userId, start, end);
+        List<PlanCalendarData> planCalendarData = calendarProvider.retrievePlanCalendarDataByMonthAndStatusY(userId, month);
         List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc(userId);
 
-        List<String> ddayCalendar = retrieveDDayCalendarByMonth(ddayMainDate, start, end);
-        List<PlanMainData> planMainData = calendarProvider.retrievePlanMainDataByDateAndStatusY(userId, LocalDate.now());
+        List<String> ddayCalendar = retrieveDDayCalendarByMonth(ddayMainDate, month);
 
         return GetMonthCalendarMainRes.builder()
                 .planCalendar(planCalendarData)
@@ -122,11 +116,6 @@ public class MainProvider {
 
 
 
-
-
-
-
-
     private List<DDayMainDataRes> retrieveDDayMainDataResSortDateAsc(Long userId) throws BaseException {
         List<DDayMainDataRes> ddayMainData = new ArrayList<>();
 
@@ -149,8 +138,11 @@ public class MainProvider {
         return ddayMainData;
     }
 
-    private List<String> retrieveDDayCalendarByMonth(List<DDayMainDataRes> ddayMainDate, LocalDate startDate, LocalDate endDate) {
+    private List<String> retrieveDDayCalendarByMonth(List<DDayMainDataRes> ddayMainDate, String month) {
         List<String> ddayCalendar = new ArrayList<>();
+
+        LocalDate startDate = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
 
         for (DDayMainDataRes ddayMain : ddayMainDate) {
             LocalDate targetDate = LocalDate.parse(ddayMain.getDate(), DateTimeFormatter.ISO_DATE);
