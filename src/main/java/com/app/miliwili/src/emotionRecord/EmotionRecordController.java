@@ -2,9 +2,10 @@ package com.app.miliwili.src.emotionRecord;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
-import com.app.miliwili.src.emotionRecord.dto.EmotionRecordReq;
+import com.app.miliwili.src.emotionRecord.dto.PatchEmotionRecordReq;
 import com.app.miliwili.src.emotionRecord.dto.DayEmotionRecordRes;
 import com.app.miliwili.src.emotionRecord.dto.GetMonthEmotionRecordRes;
+import com.app.miliwili.src.emotionRecord.dto.PostEmotionRecordReq;
 import com.app.miliwili.utils.Validation;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
@@ -97,7 +100,16 @@ public class EmotionRecordController {
     @ResponseBody
     @PostMapping("/emotions-record")
     public BaseResponse<DayEmotionRecordRes> postEmotionRecord(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                               @RequestBody(required = false) EmotionRecordReq parameters) {
+                                                               @RequestBody(required = false) PostEmotionRecordReq parameters) {
+        if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
+            return new BaseResponse<>(EMPTY_DATE);
+        }
+        if (!Validation.isRegexDate(parameters.getDate())) {
+            return new BaseResponse<>(INVALID_DATE);
+        }
+        if (LocalDate.parse(parameters.getDate(), DateTimeFormatter.ISO_DATE).isAfter(LocalDate.now())) {
+            return new BaseResponse<>(FASTER_THAN_TODAY);
+        }
         if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
             return new BaseResponse<>(EMPTY_CONTENT);
         }
@@ -132,7 +144,7 @@ public class EmotionRecordController {
     @ResponseBody
     @PatchMapping("/emotions-record/{emotionsRecordId}")
     public BaseResponse<DayEmotionRecordRes> updateEmotionRecord(@RequestHeader("X-ACCESS-TOKEN") String token,
-                                                                 @RequestBody(required = false) EmotionRecordReq parameters,
+                                                                 @RequestBody(required = false) PatchEmotionRecordReq parameters,
                                                                  @PathVariable Long emotionsRecordId) {
         if (Objects.isNull(parameters.getContent()) || parameters.getContent().length() == 0) {
             return new BaseResponse<>(EMPTY_CONTENT);

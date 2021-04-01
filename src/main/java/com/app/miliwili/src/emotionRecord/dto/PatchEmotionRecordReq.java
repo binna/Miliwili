@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class EmotionRecordReq {
+public class PatchEmotionRecordReq {
     private String content;
     private Integer emotion;
 }

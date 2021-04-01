@@ -2,7 +2,6 @@ package com.app.miliwili.src.user;
 
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.src.main.dto.UserMainData;
-import com.app.miliwili.src.user.dto.GetAbnormalUserEndDate;
 import com.app.miliwili.src.user.dto.UserRes;
 import com.app.miliwili.src.user.dto.VacationRes;
 import com.app.miliwili.src.user.dto.VacationSelectData;
@@ -50,13 +49,26 @@ public class UserProvider {
      * userId로 유효한 회원조회
      *
      * @param userId
-     * @return User
+     * @return UserInfo
      * @throws BaseException
      * @Auther shine
      */
     public UserInfo retrieveUserByIdAndStatusY(Long userId) throws BaseException {
         return userRepository.findByIdAndStatus(userId, "Y")
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+    }
+
+    /**
+     * userId로 유효하지 않은 회원조회
+     *
+     * @param userId
+     * @return UserInfo
+     * @throws BaseException
+     * @Auther shine
+     */
+    public UserInfo retrieveUserByIdAndStatusN(Long userId) throws BaseException {
+        return userRepository.findByIdAndStatus(userId, "N")
+                .orElseThrow(() -> new BaseException(NOT_FOUND_ROLLBACK_USER));
     }
 
     /**

@@ -88,7 +88,7 @@ public class EmotionRecordProvider {
 
 
     /**
-     * 회원별 모든 감정일기 조회
+     * 회원별 모든 감정일기 조회(삭제용)
      *
      * @return List<EmotionRecord>
      * @throws BaseException
@@ -103,7 +103,7 @@ public class EmotionRecordProvider {
     }
 
     /**
-     * 회원별 상태 "N"의 모든 감정일기 조회
+     * 회원별 상태 "N"의 모든 감정일기 조회(삭제 롤백용)
      *
      * @return List<EmotionRecord>
      * @throws BaseException
@@ -166,6 +166,11 @@ public class EmotionRecordProvider {
         try {
             EmotionRecord dateEmotionRecord = retrieveEmotionByDateAndUserIdAndStatusY(date, jwtService.getUserId());
             return changeEmotionRecordToDayEmotionRecordRes(dateEmotionRecord);
+        } catch (BaseException exception) {
+            if (exception.getStatus() == NOT_FOUND_EMOTION_RECORD) {
+                throw new BaseException(NOT_FOUND_EMOTION_RECORD);
+            }
+            throw new BaseException(exception.getStatus());
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_DAY_EMOTION_RECORD);
         }

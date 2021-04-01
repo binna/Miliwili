@@ -176,7 +176,7 @@ public class CalendarProvider {
     }
 
     /**
-     * 회원별 모든 일정조회
+     * 회원별 모든 일정조회(삭제용)
      * 
      * @param userId
      * @return List<Plan>
@@ -192,7 +192,7 @@ public class CalendarProvider {
     }
 
     /**
-     * 회원별 상태 "N"의 모든 일정조회
+     * 회원별 상태 "N"의 모든 일정조회(삭제 롤백용)
      *
      * @param userId
      * @return List<Plan>
@@ -207,8 +207,11 @@ public class CalendarProvider {
         }
     }
 
+
+
+
     /**
-     * 회원별 모든 디데이 조회
+     * 회원별 모든 디데이 조회(삭제용)
      *
      * @param userId
      * @return List<DDay>
@@ -224,7 +227,7 @@ public class CalendarProvider {
     }
 
     /**
-     * 회원별 상태 "N"의 모든 디데이 조회
+     * 회원별 상태 "N"의 모든 디데이 조회(삭제 롤백용)
      *
      * @param userId
      * @return List<DDay>
