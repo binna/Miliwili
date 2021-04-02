@@ -263,7 +263,7 @@ public class UserController {
      * 회원정보 수정 API
      * [PATCH] /app/users
      *
-     * @return BaseResponse<PatchUserRes>
+     * @return BaseResponse<UserRes>
      * @RequestBody PatchUserReq parameters
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
@@ -353,7 +353,7 @@ public class UserController {
      * [PATCH] /app/users/vacation/:vacationId
      *
      * @return BaseResponse<PatchVacationRes>
-     * @RequestBody PatchVacationReq parameters
+     * @RequestBody VacationReq parameters
      * @RequestHeader X-ACCESS-TOKEN
      * @PathVariable Long vacationId
      * @Auther shine
@@ -380,9 +380,9 @@ public class UserController {
 
     /**
      * 내 휴가조회 API
-     * [GET] /app/users/vacation
+     * [GET] /app/users/vacations
      *
-     * @return List<VacationRes>
+     * @return BaseResponse<List<VacationRes>>
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
      */
