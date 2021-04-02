@@ -145,6 +145,7 @@ public class CalendarService {
         }
     }
 
+
     /**
      * 일정 다이어리 수정
      *
@@ -172,6 +173,7 @@ public class CalendarService {
                     .content(savedDiary.getContent())
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_PATCH_DIARY);
         }
     }
@@ -201,9 +203,12 @@ public class CalendarService {
                     .processingStatus(savedWork.getProcessingStatus())
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_PATCH_WORK);
         }
     }
+
+
 
 
     /**
