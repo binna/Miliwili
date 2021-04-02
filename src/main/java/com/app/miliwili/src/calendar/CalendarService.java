@@ -70,6 +70,7 @@ public class CalendarService {
                     .work(calendarProvider.changeListPlanWorkToListWorkRes(savedPlan.getPlanWorks()))
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_PLAN);
         }
     }
@@ -144,6 +145,7 @@ public class CalendarService {
         }
     }
 
+
     /**
      * 일정 다이어리 수정
      *
@@ -171,6 +173,7 @@ public class CalendarService {
                     .content(savedDiary.getContent())
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_PATCH_DIARY);
         }
     }
@@ -200,9 +203,12 @@ public class CalendarService {
                     .processingStatus(savedWork.getProcessingStatus())
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_PATCH_WORK);
         }
     }
+
+
 
 
     /**
@@ -599,10 +605,10 @@ public class CalendarService {
             for (PlanVacationReq planVacationCount : planVacation) {
                 sum += planVacationCount.getCount();
             }
-            if(sum > ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+            if(sum > (ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) + 1) {
                 throw new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS);
             }
-            if(sum < ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+            if(sum < (ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) + 1) {
                 throw new BaseException(NOT_BE_LESS_THAN_USE_DAYS);
             }
 
@@ -669,10 +675,10 @@ public class CalendarService {
             for (PlanVacationReq planVacationCount : planVacation) {
                 sum += planVacationCount.getCount();
             }
-            if(sum > ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+            if(sum > (ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate()) + 1)) {
                 throw new BaseException(NOT_BE_GREATER_THAN_TOTAL_DAYS);
             }
-            if(sum < ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate())) {
+            if(sum < (ChronoUnit.DAYS.between(plan.getStartDate(), plan.getEndDate()) + 1)) {
                 throw new BaseException(NOT_BE_LESS_THAN_USE_DAYS);
             }
 

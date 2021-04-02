@@ -101,8 +101,8 @@ public class CalendarController {
             if (!startDate.isEqual(endDate)) {
                 return new BaseResponse<>(ONLY_ON_THE_SAME_DAY);
             }
-        } else if (parameters.getPlanType().equals("일정") ||
-                parameters.getPlanType().equals("휴가") || parameters.getPlanType().equals("외박")) {
+        } else if (parameters.getPlanType().equals("일정") || parameters.getPlanType().equals("휴가")
+                || parameters.getPlanType().equals("외박") || parameters.getPlanType().equals("훈련")) {
             if (startDate.isAfter(endDate)) {
                 return new BaseResponse<>(FASTER_THAN_PLAN_START_DATE);
             }
