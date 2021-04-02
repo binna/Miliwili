@@ -27,14 +27,14 @@ public class MainController {
 
 
     /**
-     * 메인조회
-     * [GET] /app/main
+     * 메인 유저, 캘린더 조회
+     * [GET] /app/main/users-calendars
      *
      * @return BaseResponse<GetUserCalendarMainRes>
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther shine
      */
-    @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "메인 유저, 캘린더 조회", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @GetMapping("/main/users-calendars")
     public BaseResponse<GetUserCalendarMainRes> getUserCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token) {
@@ -49,16 +49,16 @@ public class MainController {
     }
 
     /**
-     * 월별 메인 캘린더 조회
-     * [GET] /app/main/calendar
+     * 당월, 금일 캘린더 조회(캘린더 클릭했을 때 처음 세팅되는 값)
+     * [GET] /app/main/calendars/current-month-today
      *
-     * @return
+     * @return BaseResponse<GetCalendarMainRes>
      * @RequestHeader X-ACCESS-TOKEN
-     * @Auther
+     * @Auther Shine
      */
-    @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "당월, 금일 캘린더 조회(캘린더 클릭했을 때 처음 세팅되는 값)", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @GetMapping("/main/calendars")
+    @GetMapping("/main/calendars/current-month-today")
     public BaseResponse<GetCalendarMainRes> getCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try{
             GetCalendarMainRes calendarMain = mainProvider.getCalendarMain();
@@ -71,16 +71,17 @@ public class MainController {
     }
 
     /**
-     * 월별 메인 캘린더 조회
-     * [GET] /app/main/calendar?month=
+     * 월별 캘린더 조회
+     * [GET] /app/main/calendars/month?month=
      *
-     * @return
+     * @return GetMonthCalendarMainRes
+     * @RequestParam String month
      * @RequestHeader X-ACCESS-TOKEN
      * @Auther
      */
-    @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "월별 캘린더 조회", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @GetMapping("/main/calendars-month")
+    @GetMapping("/main/calendars/month")
     public BaseResponse<GetMonthCalendarMainRes> getCalendarMainFromMonth(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                                           @RequestParam(value = "month", required = false) String month) {
         if (!Validation.isRegexMonthParam(month)) {
@@ -98,16 +99,17 @@ public class MainController {
     }
 
     /**
-     * 일별 메인 캘린더 조회
-     * [GET] /app/main/calendar?month=
+     * 날짜별 메인 캘린더 조회
+     * [GET] /app/main/calendars/day?month=
      *
-     * @return
+     * @return GetDateCalendarMainRes
+     * @RequestParam String date
      * @RequestHeader X-ACCESS-TOKEN
-     * @Auther
+     * @Auther Shine
      */
-    @ApiOperation(value = "메인 화면", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ApiOperation(value = "날짜별 메인 캘린더 조회", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
-    @GetMapping("/main/calendars-day")
+    @GetMapping("/main/calendars/day")
     public BaseResponse<GetDateCalendarMainRes> getCalendarMainFromDate(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                                         @RequestParam(value = "date", required = false) String date) {
         if (!Validation.isRegexDateParam(date)) {

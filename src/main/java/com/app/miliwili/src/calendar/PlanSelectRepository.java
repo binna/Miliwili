@@ -66,8 +66,8 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
                 ))
                 .from(plan)
                 .where(plan.userInfo.id.eq(userId), plan.status.eq("Y"),
-                        plan.startDate.eq(startDate).or(plan.startDate.before(startDate)),
-                        plan.endDate.eq(endDate).or(plan.endDate.after(endDate))
+                        plan.startDate.eq(startDate).or(plan.startDate.after(startDate)),
+                        plan.endDate.eq(endDate).or(plan.endDate.before(endDate))
                 )
                 .orderBy(plan.startDate.asc())
                 .fetch();

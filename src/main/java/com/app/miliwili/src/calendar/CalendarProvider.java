@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -129,9 +130,14 @@ public class CalendarProvider {
         }
     }
 
+
+
+
     /**
      * 날짜별 유효한 내 일정 전체조회(메인조회용)
      *
+     * @param userId
+     * @param date
      * @return List<PlanData>
      * @throws BaseException
      * @Auther shine
@@ -147,12 +153,15 @@ public class CalendarProvider {
     /**
      * 월별 유효한 내 일정 전체조회(메인조회용)
      *
-     * @param startDate
-     * @param endDate
+     * @param userId
+     * @param month
      * @return List<PlanCalendarData>
      * @throws BaseException
      */
-    public List<PlanCalendarData> retrievePlanCalendarDataByMonthAndStatusY(Long userId , LocalDate startDate, LocalDate endDate) throws BaseException {
+    public List<PlanCalendarData> retrievePlanCalendarDataByMonthAndStatusY(Long userId , String month) throws BaseException {
+        LocalDate startDate = LocalDate.parse((month + "-01"), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+
         try {
             return planSelectRepository.findPlanByMonth(userId, startDate, endDate);
         } catch (Exception exception) {
@@ -163,6 +172,7 @@ public class CalendarProvider {
     /**
      * 유효한 디데이 전체조회(메인조회용)
      *
+     * @param userId
      * @return List<DDayMainData>
      * @throws BaseException
      * @Auther shine
@@ -174,6 +184,9 @@ public class CalendarProvider {
             throw new BaseException(FAILED_TO_GET_D_DAY);
         }
     }
+
+
+
 
     /**
      * 회원별 모든 일정조회(삭제용)
