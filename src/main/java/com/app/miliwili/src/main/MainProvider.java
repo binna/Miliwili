@@ -19,8 +19,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.app.miliwili.config.BaseResponseStatus.*;
-
 @RequiredArgsConstructor
 @Service
 public class MainProvider {
@@ -44,12 +42,7 @@ public class MainProvider {
         List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc(userId);
         List<PlanMainData> planMainData = calendarProvider.retrievePlanMainDataByDateAndStatusY(userId, LocalDate.now());
 
-        try {
-            return changeGetUserCalendarMainRes(userMainData, ddayMainDate, planMainData);
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            throw new BaseException(FAILED_TO_GET_USER_CALENDAR_MAIN);
-        }
+        return changeGetUserCalendarMainRes(userMainData, ddayMainDate, planMainData);
     }
 
     /**
