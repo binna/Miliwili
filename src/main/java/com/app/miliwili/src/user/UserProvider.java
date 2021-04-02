@@ -139,7 +139,7 @@ public class UserProvider {
             if (exception.getStatus() == THIS_USER_NOT_FOUND_VACATION) {
                 throw new BaseException(THIS_USER_NOT_FOUND_VACATION);
             }
-            throw new BaseException(FAILED_TO_GET_VACATION);
+            throw new BaseException(exception.getStatus());
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_VACATION);
         }
@@ -166,11 +166,15 @@ public class UserProvider {
         }
     }
 
+
+
+
     /**
      * 메인에 노출할 내 회원정보 조회
      *
      * @return UserMainData
      * @throws BaseException
+     * @Auther shine
      */
     public UserMainData retrieveUserMainDataById() throws BaseException{
         try{
