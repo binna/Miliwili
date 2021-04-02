@@ -74,6 +74,7 @@ public enum BaseResponseStatus {
     MUST_ENTER_CHOICE_CALENDAR_S_OR_B(false, 2180, "반드시 양력 S, 음력 L을 입력해주셔야 합니다."),
 
     NOT_ENTER_LINK_PLACE_WORK(false, 2190, "링크와 장소, 준비물을 기입할 수 없습니다."),
+    NOT_ENTER_CHOICE_CALENDAR(false, 2191, "양력과 음력을 기입할 수 없습니다."),
 
 
     //vivi: 2500~
