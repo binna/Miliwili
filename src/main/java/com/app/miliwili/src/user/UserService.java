@@ -265,8 +265,9 @@ public class UserService {
         LocalDate strPrivateDate = LocalDate.parse(strPrivate, DateTimeFormatter.ISO_DATE);
         LocalDate strCorporalDate = LocalDate.parse(strCorporal, DateTimeFormatter.ISO_DATE);
         LocalDate strSergeantDate = LocalDate.parse(strSergeant, DateTimeFormatter.ISO_DATE);
+        System.out.println(nowDay);
 
-        if (nowDay.isBefore(strPrivateDate)) {
+        if (nowDay.isBefore(strPrivateDate) || nowDay.isEqual(strPrivateDate)) {
             normalPromotionState.setStateIdx(0);
             return;
         }
