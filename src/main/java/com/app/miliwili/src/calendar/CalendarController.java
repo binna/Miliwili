@@ -347,12 +347,18 @@ public class CalendarController {
             if (!Validation.isRegexDate(parameters.getDate())) {
                 return new BaseResponse<>(INVALID_DATE);
             }
+            if (Objects.nonNull(parameters.getChoiceCalendar())) {
+                return new BaseResponse<>(NOT_ENTER_CHOICE_CALENDAR);
+            }
         } else if (parameters.getDdayType().equals("자격증") || parameters.getDdayType().equals("수능")) {
             if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
                 return new BaseResponse<>(EMPTY_DATE);
             }
             if (!Validation.isRegexDate(parameters.getDate())) {
                 return new BaseResponse<>(INVALID_DATE);
+            }
+            if (Objects.nonNull(parameters.getChoiceCalendar())) {
+                return new BaseResponse<>(NOT_ENTER_CHOICE_CALENDAR);
             }
         } else {
             return new BaseResponse<>(INVALID_D_DAY_TYPE);

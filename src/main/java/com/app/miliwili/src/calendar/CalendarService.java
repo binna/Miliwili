@@ -233,8 +233,6 @@ public class CalendarService {
         setLinkOrPlaceOrWork(parameters.getDdayType(), parameters.getLink(), parameters.getPlaceLat(), parameters.getPlaceLon(), parameters.getWork(), newDDay);
         newDDay.setDdayDiaries(getDDayDiaries(newDDay));
 
-        System.out.println(newDDay.getDate().toString());
-
         try {
             DDay savedDDay = ddayRepository.save(newDDay);
             return DDayRes.builder()
@@ -250,6 +248,7 @@ public class CalendarService {
                     .work(calendarProvider.changeListDDayWorkToListWorkRes(savedDDay.getDdayWorks()))
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_D_DAY);
         }
     }
