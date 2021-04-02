@@ -57,6 +57,7 @@ public class MainProvider {
      *
      * @return GetCalendarMainRes
      * @throws BaseException
+     * @Auther Shine
      */
     public GetCalendarMainRes getCalendarMain() throws BaseException {
         String month = Validation.getCurrentMonth();
@@ -74,8 +75,10 @@ public class MainProvider {
     /**
      * 월별 내 메인 캘린더 조회
      *
-     * @return GetCalendarMainRes
+     * @param month
+     * @return GetMonthCalendarMainRes
      * @throws BaseException
+     * @Auther shine
      */
     public GetMonthCalendarMainRes getCalendarMainFromMonth(String month) throws BaseException {
         month = month.substring(0, 4) + "-" + month.substring(4, 6);
@@ -96,8 +99,9 @@ public class MainProvider {
     /**
      * 일별 내 메인 캘린더 조회
      *
-     * @return GetCalendarMainRes
+     * @return GetDateCalendarMainRes
      * @throws BaseException
+     * @Auther shine
      */
     public GetDateCalendarMainRes getCalendarMainFromDate(String date) throws BaseException {
         date = date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6);
