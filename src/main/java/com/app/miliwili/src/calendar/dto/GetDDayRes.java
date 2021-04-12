@@ -18,5 +18,5 @@ public class GetDDayRes {
     private final String choiceCalendarText;
     private final String solarCalendarDate;
     private final List<WorkRes> work;
-    private final List<DiaryRes> diary;
+    private final List<DDayDiaryRes> diary;
 }

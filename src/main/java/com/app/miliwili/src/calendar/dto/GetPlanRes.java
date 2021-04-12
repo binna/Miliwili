@@ -17,5 +17,5 @@ public class GetPlanRes {
     private final String dateInfo;
     private final String planType;
     private final List<WorkRes> work;
-    private final List<DiaryRes> diary;
+    private final List<PlanDiaryRes> diary;
 }
