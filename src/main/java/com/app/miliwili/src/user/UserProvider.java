@@ -170,7 +170,7 @@ public class UserProvider {
 
 
     /**
-     * 메인에 노출할 내 회원정보 조회
+     * 메인에 노출할 내 회원정보 조회(메인조회용)
      *
      * @return UserMainData
      * @throws BaseException

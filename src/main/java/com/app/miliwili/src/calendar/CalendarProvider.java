@@ -5,6 +5,7 @@ import com.app.miliwili.src.calendar.dto.*;
 import com.app.miliwili.src.calendar.models.*;
 import com.app.miliwili.src.main.dto.DDayMainData;
 import com.app.miliwili.src.main.dto.PlanCalendarData;
+import com.app.miliwili.src.main.dto.PlanMainCalendarData;
 import com.app.miliwili.src.main.dto.PlanMainData;
 import com.app.miliwili.utils.ChineseCalendarUtil;
 import com.app.miliwili.utils.JwtService;
@@ -150,20 +151,37 @@ public class CalendarProvider {
      *
      * @param userId
      * @param date
-     * @return List<PlanData>
+     * @return List<PlanMainData>
      * @throws BaseException
      * @Auther shine
      */
     public List<PlanMainData> retrievePlanMainDataByDateAndStatusY(Long userId, LocalDate date) throws BaseException {
         try {
-            return planSelectRepository.findPlanByDate(userId, date);
+            return planSelectRepository.findPlanMainDataByDate(userId, date);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
         }
     }
 
     /**
-     * 월별 유효한 내 일정 전체조회(메인조회용)
+     * 날짜별 유효한 내 일정 전체조회(메인켈린더조회용)
+     *
+     * @param userId
+     * @param date
+     * @return List<PlanMainCalendarData>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<PlanMainCalendarData> retrievePlanMainCalendarDataByDateAndStatusY(Long userId, LocalDate date) throws BaseException {
+        try {
+            return planSelectRepository.findPlanMainCalendarDataByDate(userId, date);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_PLAN);
+        }
+    }
+
+    /**
+     * 월별 유효한 내 일정 전체조회(메인켈린더조회용)
      *
      * @param userId
      * @param month
@@ -175,14 +193,30 @@ public class CalendarProvider {
         LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
 
         try {
-            return planSelectRepository.findPlanByMonth(userId, startDate, endDate);
+            return planSelectRepository.findPlanCalendarDataByStartDateAndEndDate(userId, startDate, endDate);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
         }
     }
 
     /**
-     * 유효한 디데이 전체조회(메인조회용)
+     * 날짜별 유효한 내 일정 전체조회(메인켈린더조회용)
+     *
+     * @param userId
+     * @param date
+     * @return List<PlanCalendarData>
+     * @throws BaseException
+     */
+    public List<PlanCalendarData> retrievePlanCalendarDataByDateAndStatusY(Long userId, LocalDate date) throws BaseException {
+        try {
+            return planSelectRepository.findPlanCalendarDataByStartDateAndEndDate(userId, date, date);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_PLAN);
+        }
+    }
+
+    /**
+     * 유효한 디데이 전체조회(메인조회용, 메인켈린더조회용)
      *
      * @param userId
      * @return List<DDayMainData>
