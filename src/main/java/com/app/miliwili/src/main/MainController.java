@@ -47,6 +47,9 @@ public class MainController {
         }
     }
 
+
+
+
     /**
      * 당월, 금일 캘린더 조회(캘린더 클릭했을 때 처음 세팅되는 값)
      * [GET] /app/main/calendars/current-month-today

@@ -43,7 +43,7 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
                         plan.startDate.eq(date).or(plan.startDate.before(date)),
                         plan.endDate.eq(date).or(plan.endDate.after(date))
                 )
-                .orderBy(plan.startDate.asc())
+                .orderBy(plan.startDate.asc(), plan.endDate.asc())
                 .fetch();
     }
 
@@ -64,14 +64,14 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
 
         return queryFactory
                 .select(Projections.constructor(PlanMainCalendarData.class,
-                        plan.id.as("planId"), plan.title.as("color"), plan.title.as("title")
+                        plan.id.as("planId"), plan.color.as("color"), plan.title.as("title")
                 ))
                 .from(plan)
                 .where(plan.userInfo.id.eq(userId), plan.status.eq("Y"),
                         plan.startDate.eq(date).or(plan.startDate.before(date)),
                         plan.endDate.eq(date).or(plan.endDate.after(date))
                 )
-                .orderBy(plan.startDate.asc())
+                .orderBy(plan.startDate.asc(), plan.endDate.asc())
                 .fetch();
     }
 
@@ -94,10 +94,10 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
                 ))
                 .from(plan)
                 .where(plan.userInfo.id.eq(userId), plan.status.eq("Y"),
-                        plan.startDate.eq(startDate).or(plan.startDate.after(startDate)),
-                        plan.endDate.eq(endDate).or(plan.endDate.before(endDate))
+                        plan.startDate.eq(startDate).or(plan.startDate.before(startDate)),
+                        plan.endDate.eq(endDate).or(plan.endDate.after(endDate))
                 )
-                .orderBy(plan.startDate.asc())
+                .orderBy(plan.startDate.asc(), plan.endDate.asc())
                 .fetch();
     }
 }
