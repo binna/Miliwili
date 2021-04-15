@@ -271,11 +271,11 @@ public class UserService {
             normalPromotionState.setStateIdx(0);
             return;
         }
-        if (nowDay.isAfter(strPrivateDate) && nowDay.isBefore(strCorporalDate)) {
+        if ((nowDay.isEqual(strPrivateDate) || nowDay.isAfter(strPrivateDate)) && (nowDay.isEqual(strCorporalDate) || nowDay.isBefore(strCorporalDate))) {
             normalPromotionState.setStateIdx(1);
             return;
         }
-        if (nowDay.isAfter(strCorporalDate) && nowDay.isBefore(strSergeantDate)) {
+        if ((nowDay.isEqual(strCorporalDate) || nowDay.isAfter(strCorporalDate)) && (nowDay.isEqual(strSergeantDate) || nowDay.isBefore(strSergeantDate))) {
             normalPromotionState.setStateIdx(2);
             return;
         }
