@@ -76,7 +76,7 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
     }
 
     /**
-     * 시작일 ~ 종료일, 유효한 내 일정 전체조회(메인켈린더조회용)
+     * 월별, 유효한 내 일정 전체조회(메인켈린더조회용)
      * (일정 시작일로 오름차순)
      *
      * @param userId
@@ -96,6 +96,31 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
                 .where(plan.userInfo.id.eq(userId), plan.status.eq("Y"),
                         plan.startDate.eq(startDate).or(plan.startDate.after(startDate)),
                         plan.endDate.eq(endDate).or(plan.endDate.before(endDate))
+                )
+                .orderBy(plan.startDate.asc(), plan.endDate.asc())
+                .fetch();
+    }
+
+    /**
+     * 날짜별, 유효한 내 일정 전체조회(메인켈린더조회용)
+     * (일정 시작일로 오름차순)
+     *
+     * @param userId
+     * @param date
+     * @return List<PlanCalendarData>
+     * @Auther shine
+     */
+    public List<PlanCalendarData> findPlanCalendarDataByDate(Long userId, LocalDate date) {
+        QPlan plan = QPlan.plan;
+
+        return queryFactory
+                .select(Projections.constructor(PlanCalendarData.class,
+                        plan.color.as("color"), plan.startDate.as("startDate"), plan.endDate.as("endDate")
+                ))
+                .from(plan)
+                .where(plan.userInfo.id.eq(userId), plan.status.eq("Y"),
+                        plan.startDate.eq(date).or(plan.startDate.before(date)),
+                        plan.endDate.eq(date).or(plan.endDate.after(date))
                 )
                 .orderBy(plan.startDate.asc(), plan.endDate.asc())
                 .fetch();
