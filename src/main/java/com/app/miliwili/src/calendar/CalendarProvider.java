@@ -209,7 +209,7 @@ public class CalendarProvider {
      */
     public List<PlanCalendarData> retrievePlanCalendarDataByDateAndStatusY(Long userId, LocalDate date) throws BaseException {
         try {
-            return planSelectRepository.findPlanCalendarDataByStartDateAndEndDate(userId, date, date);
+            return planSelectRepository.findPlanCalendarDataByDate(userId, date);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
         }
