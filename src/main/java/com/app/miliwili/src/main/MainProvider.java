@@ -45,8 +45,11 @@ public class MainProvider {
         return changeGetUserCalendarMainRes(userMainData, ddayMainDate, planMainData);
     }
 
+
+
+
     /**
-     * 내 메인 캘린더 조회
+     * 당월, 금일 캘린더 조회
      *
      * @return GetCalendarMainRes
      * @throws BaseException
@@ -60,7 +63,7 @@ public class MainProvider {
         List<PlanCalendarData> planCalendarData = calendarProvider.retrievePlanCalendarDataByMonthAndStatusY(userId, month);
         List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc(userId);
         List<String> ddayCalendar = retrieveDDayCalendarByMonth(ddayMainDate, month);
-        List<PlanMainData> planMainData = calendarProvider.retrievePlanMainDataByDateAndStatusY(userId, LocalDate.now());
+        List<PlanMainCalendarData> planMainData = calendarProvider.retrievePlanMainCalendarDataByDateAndStatusY(userId, LocalDate.now());
 
         return changeGetCalendarMainRes(planCalendarData, ddayCalendar, ddayMainDate, planMainData);
     }
@@ -79,8 +82,8 @@ public class MainProvider {
         Long userId = jwtService.getUserId();
 
         List<PlanCalendarData> planCalendarData = calendarProvider.retrievePlanCalendarDataByMonthAndStatusY(userId, month);
-        List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc(userId);
 
+        List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc(userId);
         List<String> ddayCalendar = retrieveDDayCalendarByMonth(ddayMainDate, month);
 
         return GetMonthCalendarMainRes.builder()
@@ -96,18 +99,20 @@ public class MainProvider {
      * @throws BaseException
      * @Auther shine
      */
-    public GetDateCalendarMainRes getCalendarMainFromDate(String date) throws BaseException {
+    public GetCalendarMainRes getCalendarMainFromDate(String date) throws BaseException {
         date = date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6);
 
         Long userId = jwtService.getUserId();
+        LocalDate day = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+
+        List<PlanCalendarData> planCalendarData = calendarProvider.retrievePlanCalendarDataByDateAndStatusY(userId, day);
 
         List<DDayMainDataRes> ddayMainDate = retrieveDDayMainDataResSortDateAsc(userId);
-        List<PlanMainData> planMainData = calendarProvider.retrievePlanMainDataByDateAndStatusY(userId, LocalDate.parse(date, DateTimeFormatter.ISO_DATE));
+        List<String> ddayCalendar = retrieveDDayCalendarByDate(ddayMainDate, day);
 
-        return GetDateCalendarMainRes.builder()
-                .dday(ddayMainDate)
-                .plan(planMainData)
-                .build();
+        List<PlanMainCalendarData> planMainData = calendarProvider.retrievePlanMainCalendarDataByDateAndStatusY(userId, day);
+
+        return changeGetCalendarMainRes(planCalendarData, ddayCalendar, ddayMainDate, planMainData);
     }
 
 
@@ -152,6 +157,20 @@ public class MainProvider {
         return ddayCalendar;
     }
 
+    private List<String> retrieveDDayCalendarByDate(List<DDayMainDataRes> ddayMainDate, LocalDate date) {
+        List<String> ddayCalendar = new ArrayList<>();
+
+        for (DDayMainDataRes ddayMain : ddayMainDate) {
+            LocalDate targetDate = LocalDate.parse(ddayMain.getDate(), DateTimeFormatter.ISO_DATE);
+
+            if ((targetDate.isEqual(date) || targetDate.isAfter(date)) && (targetDate.isEqual(date) || targetDate.isBefore(date))) {
+                ddayCalendar.add(targetDate.format(DateTimeFormatter.ISO_DATE));
+            }
+        }
+
+        return ddayCalendar;
+    }
+
     private List<PlanCalendarDataRes> changeListPlanCalendarDataToListPlanCalendarDataRes(List<PlanCalendarData> planCalendarDataList) {
         return planCalendarDataList.stream().map(planCalendarData -> {
             return PlanCalendarDataRes.builder()
@@ -163,12 +182,12 @@ public class MainProvider {
 
     }
 
-    private GetCalendarMainRes changeGetCalendarMainRes(List<PlanCalendarData> planCalendarData, List<String> ddayCalendar, List<DDayMainDataRes> ddayMainDate, List<PlanMainData> planMainData) {
+    private GetCalendarMainRes changeGetCalendarMainRes(List<PlanCalendarData> planCalendarData, List<String> ddayCalendar, List<DDayMainDataRes> ddayMainDate, List<PlanMainCalendarData> planMainCalendar) {
         return GetCalendarMainRes.builder()
                 .planCalendar(changeListPlanCalendarDataToListPlanCalendarDataRes(planCalendarData))
                 .ddayCalendar(ddayCalendar)
                 .dday(ddayMainDate)
-                .plan(planMainData)
+                .plan(planMainCalendar)
                 .build();
     }
 

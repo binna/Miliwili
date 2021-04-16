@@ -23,7 +23,7 @@ public class ChineseCalendarUtil {
         if (choiceCalendar.equals("S")) {
             LocalDate targetDate = LocalDate.parse(LocalDate.now().getYear() + "-"+ date);
 
-            if (targetDate.isAfter(LocalDate.now())) {
+            if (targetDate.isAfter(LocalDate.now()) || targetDate.isEqual(LocalDate.now())) {
                 return targetDate.format(DateTimeFormatter.ISO_DATE);
             }
 
@@ -31,7 +31,7 @@ public class ChineseCalendarUtil {
         }
 
         LocalDate targetDate = LocalDate.parse(convertLunarToSolar(LocalDate.now().getYear() + date.replaceAll("-", "")));
-        if (targetDate.isAfter(LocalDate.now())) {
+        if (targetDate.isAfter(LocalDate.now()) || targetDate.isEqual(LocalDate.now())) {
             return targetDate.format(DateTimeFormatter.ISO_DATE);
         }
 

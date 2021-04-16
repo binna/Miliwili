@@ -31,7 +31,7 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
      * @return List<PlanData>
      * @Auther shine
      */
-    public List<PlanMainData> findPlanByDate(Long userId, LocalDate date) {
+    public List<PlanMainData> findPlanMainDataByDate(Long userId, LocalDate date) {
         QPlan plan = QPlan.plan;
 
         return queryFactory
@@ -43,12 +43,40 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
                         plan.startDate.eq(date).or(plan.startDate.before(date)),
                         plan.endDate.eq(date).or(plan.endDate.after(date))
                 )
-                .orderBy(plan.startDate.asc())
+                .orderBy(plan.startDate.asc(), plan.endDate.asc())
+                .fetch();
+    }
+
+
+
+
+    /**
+     * 날짜별 유요한 내 일정 전체조회(메인켈린더조회용, 기존 메인조회용에 색상 정보 추가)
+     * (일정 시작일로 오름차순)
+     * 
+     * @param userId
+     * @param date
+     * @return List<PlanMainCalendarData>
+     * @Auther shine
+     */
+    public List<PlanMainCalendarData> findPlanMainCalendarDataByDate(Long userId, LocalDate date) {
+        QPlan plan = QPlan.plan;
+
+        return queryFactory
+                .select(Projections.constructor(PlanMainCalendarData.class,
+                        plan.id.as("planId"), plan.color.as("color"), plan.title.as("title")
+                ))
+                .from(plan)
+                .where(plan.userInfo.id.eq(userId), plan.status.eq("Y"),
+                        plan.startDate.eq(date).or(plan.startDate.before(date)),
+                        plan.endDate.eq(date).or(plan.endDate.after(date))
+                )
+                .orderBy(plan.startDate.asc(), plan.endDate.asc())
                 .fetch();
     }
 
     /**
-     * 월별 유효한 내 일정 전체조회(메인조회용)
+     * 시작일 ~ 종료일, 유효한 내 일정 전체조회(메인켈린더조회용)
      * (일정 시작일로 오름차순)
      *
      * @param userId
@@ -57,7 +85,7 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
      * @return List<PlanCalendarData>
      * @Auther shine
      */
-    public List<PlanCalendarData> findPlanByMonth(Long userId, LocalDate startDate, LocalDate endDate) {
+    public List<PlanCalendarData> findPlanCalendarDataByStartDateAndEndDate(Long userId, LocalDate startDate, LocalDate endDate) {
         QPlan plan = QPlan.plan;
 
         return queryFactory
@@ -69,7 +97,7 @@ public class PlanSelectRepository extends QuerydslRepositorySupport {
                         plan.startDate.eq(startDate).or(plan.startDate.after(startDate)),
                         plan.endDate.eq(endDate).or(plan.endDate.before(endDate))
                 )
-                .orderBy(plan.startDate.asc())
+                .orderBy(plan.startDate.asc(), plan.endDate.asc())
                 .fetch();
     }
 }

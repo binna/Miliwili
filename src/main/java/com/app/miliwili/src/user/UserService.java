@@ -505,7 +505,7 @@ public class UserService {
     private void setProfileImg(String socialType, String token, UserInfo user) throws BaseException {
         if (socialType.equals("K")) {
             String img = snsLogin.getProfileImgFromKakao(token);
-            if (!img.isEmpty()) {
+            if (Objects.nonNull(img) && !img.isEmpty()) {
                 user.setProfileImg(img);
                 return;
             }

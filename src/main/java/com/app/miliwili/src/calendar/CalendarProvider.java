@@ -5,6 +5,7 @@ import com.app.miliwili.src.calendar.dto.*;
 import com.app.miliwili.src.calendar.models.*;
 import com.app.miliwili.src.main.dto.DDayMainData;
 import com.app.miliwili.src.main.dto.PlanCalendarData;
+import com.app.miliwili.src.main.dto.PlanMainCalendarData;
 import com.app.miliwili.src.main.dto.PlanMainData;
 import com.app.miliwili.utils.ChineseCalendarUtil;
 import com.app.miliwili.utils.JwtService;
@@ -130,6 +131,18 @@ public class CalendarProvider {
         }
     }
 
+    /**
+     * date와 userId로 다이어리 존재여부 체크
+     *
+     * @param date
+     * @param userId
+     * @return boolean
+     * @Auther shine
+     */
+    public boolean isDDayDiaryByDateAndDDayId(LocalDate date, Long ddayId) {
+        return ddayDiaryRepository.existsByDateAndDday_Id(date, ddayId);
+    }
+
 
 
 
@@ -138,20 +151,37 @@ public class CalendarProvider {
      *
      * @param userId
      * @param date
-     * @return List<PlanData>
+     * @return List<PlanMainData>
      * @throws BaseException
      * @Auther shine
      */
     public List<PlanMainData> retrievePlanMainDataByDateAndStatusY(Long userId, LocalDate date) throws BaseException {
         try {
-            return planSelectRepository.findPlanByDate(userId, date);
+            return planSelectRepository.findPlanMainDataByDate(userId, date);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
         }
     }
 
     /**
-     * 월별 유효한 내 일정 전체조회(메인조회용)
+     * 날짜별 유효한 내 일정 전체조회(메인켈린더조회용)
+     *
+     * @param userId
+     * @param date
+     * @return List<PlanMainCalendarData>
+     * @throws BaseException
+     * @Auther shine
+     */
+    public List<PlanMainCalendarData> retrievePlanMainCalendarDataByDateAndStatusY(Long userId, LocalDate date) throws BaseException {
+        try {
+            return planSelectRepository.findPlanMainCalendarDataByDate(userId, date);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_PLAN);
+        }
+    }
+
+    /**
+     * 월별 유효한 내 일정 전체조회(메인켈린더조회용)
      *
      * @param userId
      * @param month
@@ -163,14 +193,30 @@ public class CalendarProvider {
         LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
 
         try {
-            return planSelectRepository.findPlanByMonth(userId, startDate, endDate);
+            return planSelectRepository.findPlanCalendarDataByStartDateAndEndDate(userId, startDate, endDate);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_PLAN);
         }
     }
 
     /**
-     * 유효한 디데이 전체조회(메인조회용)
+     * 날짜별 유효한 내 일정 전체조회(메인켈린더조회용)
+     *
+     * @param userId
+     * @param date
+     * @return List<PlanCalendarData>
+     * @throws BaseException
+     */
+    public List<PlanCalendarData> retrievePlanCalendarDataByDateAndStatusY(Long userId, LocalDate date) throws BaseException {
+        try {
+            return planSelectRepository.findPlanCalendarDataByStartDateAndEndDate(userId, date, date);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_PLAN);
+        }
+    }
+
+    /**
+     * 유효한 디데이 전체조회(메인조회용, 메인켈린더조회용)
      *
      * @param userId
      * @return List<DDayMainData>
@@ -323,7 +369,7 @@ public class CalendarProvider {
                     .choiceCalendarText(getCalendarText(dday.getChoiceCalendar()))
                     .solarCalendarDate(ChineseCalendarUtil.convertSolar(dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5), dday.getChoiceCalendar()))
                     .work(changeListDDayWorkToListWorkRes(dday.getDdayWorks()))
-                    .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
+                    .diary(changeSetDDayDiaryTOListDDayDiaryRes(dday.getDdayDiaries()))
                     .build();
         }
         return GetDDayRes.builder()
@@ -335,31 +381,23 @@ public class CalendarProvider {
                 .choiceCalendarText(null)
                 .solarCalendarDate(null)
                 .work(changeListDDayWorkToListWorkRes(dday.getDdayWorks()))
-                .diary(changeSetDDayDiaryTOListDiaryRes(dday.getDdayDiaries()))
+                .diary(changeSetDDayDiaryTOListDDayDiaryRes(dday.getDdayDiaries()))
                 .build();
     }
 
     /**
-     * DDayDiary -> DiaryRes 변환
+     * DDayDiary -> DDayDiaryRes 변환
      * (구분이 생일일때, title 연도까지)
      *
      * @param diary
-     * @return DiaryRes
+     * @return DDayDiaryRes
      * @Auther shine
      */
-    public DiaryRes changeDDayDiaryToDiaryRes(DDayDiary diary) {
-        if (diary.getDday().getDdayType().equals("생일")) {
-            return DiaryRes.builder()
-                    .diaryId(diary.getId())
-                    .date(diary.getDate().format(DateTimeFormatter.ISO_DATE))
-                    .title(diary.getDate().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")))
-                    .content(diary.getContent())
-                    .build();
-        }
-        return DiaryRes.builder()
+    public DDayDiaryRes changeDDayDiaryToDDayDiaryRes(DDayDiary diary) {
+        return DDayDiaryRes.builder()
                 .diaryId(diary.getId())
                 .date(diary.getDate().format(DateTimeFormatter.ISO_DATE))
-                .title(diary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
+                .title(diary.getDate().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")))
                 .content(diary.getContent())
                 .build();
     }
@@ -371,11 +409,11 @@ public class CalendarProvider {
      * @return List<DiaryRes>
      * @Auther shine
      */
-    public List<DiaryRes> changeSetDDayDiaryTOListDiaryRes(Set<DDayDiary> parameters) {
+    public List<DDayDiaryRes> changeSetDDayDiaryTOListDDayDiaryRes(Set<DDayDiary> parameters) {
         if (Objects.isNull(parameters)) return null;
 
-        return parameters.stream().map(dDayDiary -> {
-            return changeDDayDiaryToDiaryRes(dDayDiary);
+        return parameters.stream().map(ddayDiary -> {
+            return changeDDayDiaryToDDayDiaryRes(ddayDiary);
         }).collect(Collectors.toList());
     }
 
@@ -386,11 +424,11 @@ public class CalendarProvider {
      * @return List<DiaryRes>
      * @Auther shine
      */
-    public List<DiaryRes> changeSetPlanDiaryToListDiaryRes(Set<PlanDiary> parameters) {
+    public List<PlanDiaryRes> changeSetPlanDiaryToListDiaryRes(Set<PlanDiary> parameters) {
         if (Objects.isNull(parameters)) return null;
 
         return parameters.stream().map(planDiary -> {
-            return DiaryRes.builder()
+            return PlanDiaryRes.builder()
                     .diaryId(planDiary.getId())
                     .date(planDiary.getDate().format(DateTimeFormatter.ISO_DATE))
                     .title(planDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))

@@ -3,7 +3,6 @@ package com.app.miliwili.src.main;
 import com.app.miliwili.config.BaseException;
 import com.app.miliwili.config.BaseResponse;
 import com.app.miliwili.src.main.dto.GetCalendarMainRes;
-import com.app.miliwili.src.main.dto.GetDateCalendarMainRes;
 import com.app.miliwili.src.main.dto.GetMonthCalendarMainRes;
 import com.app.miliwili.src.main.dto.GetUserCalendarMainRes;
 import com.app.miliwili.utils.Validation;
@@ -40,13 +39,16 @@ public class MainController {
     public BaseResponse<GetUserCalendarMainRes> getUserCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try{
             GetUserCalendarMainRes userMain = mainProvider.getUserCalendarMainById();
-            return new BaseResponse(SUCCESS,userMain);
+            return new BaseResponse(SUCCESS, userMain);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
             return new BaseResponse(exception.getStatus());
         }
     }
+
+
+
 
     /**
      * 당월, 금일 캘린더 조회(캘린더 클릭했을 때 처음 세팅되는 값)
@@ -62,7 +64,7 @@ public class MainController {
     public BaseResponse<GetCalendarMainRes> getCalendarMain(@RequestHeader("X-ACCESS-TOKEN") String token) {
         try{
             GetCalendarMainRes calendarMain = mainProvider.getCalendarMain();
-            return new BaseResponse(SUCCESS,calendarMain);
+            return new BaseResponse(SUCCESS, calendarMain);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
@@ -90,7 +92,7 @@ public class MainController {
 
         try{
             GetMonthCalendarMainRes calendarMain = mainProvider.getCalendarMainFromMonth(month);
-            return new BaseResponse(SUCCESS,calendarMain);
+            return new BaseResponse(SUCCESS, calendarMain);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));
@@ -110,15 +112,15 @@ public class MainController {
     @ApiOperation(value = "날짜별 메인 캘린더 조회", notes = "X-ACCESS-TOKEN jwt 필요")
     @ResponseBody
     @GetMapping("/main/calendars/day")
-    public BaseResponse<GetDateCalendarMainRes> getCalendarMainFromDate(@RequestHeader("X-ACCESS-TOKEN") String token,
+    public BaseResponse<GetCalendarMainRes> getCalendarMainFromDate(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                                         @RequestParam(value = "date", required = false) String date) {
         if (!Validation.isRegexDateParam(date)) {
             return new BaseResponse<>(INVALID_DATE_PARAM);
         }
 
         try{
-            GetDateCalendarMainRes calendarMain = mainProvider.getCalendarMainFromDate(date);
-            return new BaseResponse(SUCCESS,calendarMain);
+            GetCalendarMainRes calendarMain = mainProvider.getCalendarMainFromDate(date);
+            return new BaseResponse(SUCCESS, calendarMain);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));

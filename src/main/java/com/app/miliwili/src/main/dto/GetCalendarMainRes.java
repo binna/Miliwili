@@ -13,5 +13,5 @@ public class GetCalendarMainRes {
     private final List<PlanCalendarDataRes> planCalendar;
     private final List<String> ddayCalendar;
     private final List<DDayMainDataRes> dday;
-    private final List<PlanMainData> plan;
+    private final List<PlanMainCalendarData> plan;
 }

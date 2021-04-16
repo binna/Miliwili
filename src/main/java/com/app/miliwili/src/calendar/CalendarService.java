@@ -27,6 +27,7 @@ public class CalendarService {
     private final DDayRepository ddayRepository;
     private final DDayWorkRepository ddayWorkRepository;
     private final DDayDiaryRepository ddayDiaryRepository;
+    private final TargetAmountRepository targetAmountRepository;
     private final JwtService jwtService;
     private final CalendarProvider calendarProvider;
     private final UserProvider userProvider;
@@ -155,7 +156,7 @@ public class CalendarService {
      * @throws BaseException
      * @Auther shine
      */
-    public DiaryRes updatePlanDiary(DiaryReq parameters, Long diaryId) throws BaseException {
+    public PlanDiaryRes updatePlanDiary(PlanDiaryReq parameters, Long diaryId) throws BaseException {
         PlanDiary diary = calendarProvider.retrievePlanDiaryById(diaryId);
 
         if (diary.getPlan().getUserInfo().getId() != jwtService.getUserId()) {
@@ -166,7 +167,7 @@ public class CalendarService {
 
         try {
             PlanDiary savedDiary = planDiaryRepository.save(diary);
-            return DiaryRes.builder()
+            return PlanDiaryRes.builder()
                     .diaryId(savedDiary.getId())
                     .date(savedDiary.getDate().format(DateTimeFormatter.ISO_DATE))
                     .title(savedDiary.getDate().format(DateTimeFormatter.ofPattern("MM월 dd일")))
@@ -231,7 +232,6 @@ public class CalendarService {
         setSubTitle(parameters.getSubTitle(), newDDay);
         setChoiceCalendar(newDDay, parameters.getDdayType(), parameters.getChoiceCalendar());
         setLinkOrPlaceOrWork(parameters.getDdayType(), parameters.getLink(), parameters.getPlaceLat(), parameters.getPlaceLon(), parameters.getWork(), newDDay);
-        newDDay.setDdayDiaries(getDDayDiaries(newDDay));
 
         try {
             DDay savedDDay = ddayRepository.save(newDDay);
@@ -292,6 +292,7 @@ public class CalendarService {
                     .work(calendarProvider.changeListDDayWorkToListWorkRes(savedDDay.getDdayWorks()))
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_PATCH_D_DAY);
         }
     }
@@ -316,6 +317,7 @@ public class CalendarService {
         try {
             ddayRepository.save(dday);
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_DELETE_D_DAY);
         }
     }
@@ -326,31 +328,30 @@ public class CalendarService {
      *
      * @param parameters
      * @param ddayId
-     * @return PostDiaryRes
+     * @return DDayDiaryRes
      * @throws BaseException
      */
-    public DiaryRes createDDayDiary(Long ddayId) throws BaseException {
+    public DDayDiaryRes createDDayDiary(PostDDayDiaryReq parameters, Long ddayId) throws BaseException {
         DDay dday = calendarProvider.retrieveDDayByIdAndStatusY(ddayId);
+        LocalDate date = LocalDate.parse(parameters.getDate(), DateTimeFormatter.ISO_DATE);
 
         if (dday.getUserInfo().getId() != jwtService.getUserId()) {
             throw new BaseException(DO_NOT_AUTH_USER);
         }
+        if (calendarProvider.isDDayDiaryByDateAndDDayId(date, ddayId)) {
+            throw new BaseException(ALREADY_EXIST_DIARY);
+        }
 
         DDayDiary newDiary = DDayDiary.builder()
-                .date(LocalDate.parse(LocalDate.now().getYear() + "-" + dday.getDate().format(DateTimeFormatter.ISO_DATE).substring(5)))
+                .date(date)
                 .dday(dday)
                 .build();
 
-        if(!dday.getDdayType().equals("생일") && !dday.getDate().isEqual(newDiary.getDate())) {
-            throw new BaseException(OUT_OF_BOUNDS_DATE_DIARY);
-        }
-
-        checkDDayDiaryDay(newDiary.getDate().format(DateTimeFormatter.ISO_DATE), dday);
-
         try {
             DDayDiary savedDiary = ddayDiaryRepository.save(newDiary);
-            return calendarProvider.changeDDayDiaryToDiaryRes(savedDiary);
+            return calendarProvider.changeDDayDiaryToDDayDiaryRes(savedDiary);
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_POST_DIARY);
         }
     }
@@ -363,7 +364,7 @@ public class CalendarService {
      * @return DiaryRes
      * @throws BaseException
      */
-    public DiaryRes updateDDayDiary(DiaryReq parameters, Long diaryId) throws BaseException {
+    public DDayDiaryRes updateDDayDiary(PatchDDayDiaryReq parameters, Long diaryId) throws BaseException {
         DDayDiary diary = calendarProvider.retrieveDDayDiaryById(diaryId);
 
         if (diary.getDday().getUserInfo().getId() != jwtService.getUserId()) {
@@ -374,7 +375,19 @@ public class CalendarService {
 
         try {
             DDayDiary savedDiary = ddayDiaryRepository.save(diary);
-            return calendarProvider.changeDDayDiaryToDiaryRes(savedDiary);
+
+            if (diary.getDday().getDdayType().equals("자격증") || diary.getDday().getDdayType().equals("수능")) {
+                List<TargetAmount> targetAmounts = new ArrayList<>();
+                for (TargetAmountReq targetAmount : parameters.getTargetAmount()) {
+                    targetAmounts.add(TargetAmount.builder()
+                            .content(targetAmount.getContent())
+                            .ddayDiary(diary)
+                            .build());
+                }
+                targetAmountRepository.saveAll(targetAmounts);
+            }
+
+            return calendarProvider.changeDDayDiaryToDDayDiaryRes(savedDiary);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_PATCH_DIARY);
         }
@@ -406,6 +419,7 @@ public class CalendarService {
                     .processingStatus(savedWork.getProcessingStatus())
                     .build();
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_PATCH_WORK);
         }
     }
@@ -513,6 +527,9 @@ public class CalendarService {
             if (!Validation.isRegexBirthdayDate(parameters.getDate())) {
                 throw new BaseException(INVALID_DATE);
             }
+            if (Objects.isNull(parameters.getChoiceCalendar()) || parameters.getChoiceCalendar().length() == 0) {
+                throw new BaseException(EMPTY_CHOICE_CALENDAR);
+            }
             if (!(parameters.getChoiceCalendar().equals("S") || parameters.getChoiceCalendar().equals("L"))) {
                 throw new BaseException(MUST_ENTER_CHOICE_CALENDAR_S_OR_B);
             }
@@ -533,12 +550,18 @@ public class CalendarService {
             if (!Validation.isRegexDate(parameters.getDate())) {
                 throw new BaseException(INVALID_DATE);
             }
+            if (Objects.nonNull(parameters.getChoiceCalendar())) {
+               throw new BaseException(NOT_ENTER_CHOICE_CALENDAR);
+            }
         } else if (dday.equals("자격증") || dday.equals("수능")) {
             if (Objects.isNull(parameters.getDate()) || parameters.getDate().length() == 0) {
                 throw new BaseException(EMPTY_DATE);
             }
             if (!Validation.isRegexDate(parameters.getDate())) {
                 throw new BaseException(INVALID_DATE);
+            }
+            if (Objects.nonNull(parameters.getChoiceCalendar())) {
+                throw new BaseException(NOT_ENTER_CHOICE_CALENDAR);
             }
         }
     }
@@ -558,14 +581,6 @@ public class CalendarService {
         }
         if (work.getProcessingStatus().equals("F")) {
             work.setProcessingStatus("T");
-        }
-    }
-
-    private void checkDDayDiaryDay(String date, DDay dday) throws BaseException {
-        for (DDayDiary diary : dday.getDdayDiaries()) {
-            if(diary.getDate().isEqual(LocalDate.parse(date, DateTimeFormatter.ISO_DATE))) {
-                throw new BaseException(ALREADY_EXIST_DIARY);
-            }
         }
     }
     
@@ -614,11 +629,6 @@ public class CalendarService {
             plan.getPlanVacations().clear();
             plan.getPlanVacations().addAll(calendarProvider.changeListPlanVacationReqToSetPlanVacation(planVacation, plan));
         }
-    }
-
-    private Set<DDayDiary> getDDayDiaries(DDay dday) {
-        if(dday.getDdayType().equals("생일")) return null;
-        return Set.of(DDayDiary.builder().date(dday.getDate()).dday(dday).build());
     }
 
     private Set<PlanDiary> getPlanDiaryData(Plan plan) {
