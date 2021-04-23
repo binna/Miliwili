@@ -80,24 +80,4 @@ public class Scheduler {
         }
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
-    private void resetExerciseRoutineState(){
-        logger.warn("운동루틴 스케줄러 실행!");
-        List<ExerciseRoutine> exerciseRoutines = new ArrayList<>();
-        try {
-            exerciseRoutines = exerciseProvider.getCompleteRoutine();
-        }catch (Exception e){
-            e.printStackTrace();
-            new BaseResponse<>(FAILED_FIND_GET_ROUTINE);
-        }
-        for(ExerciseRoutine routine: exerciseRoutines){
-            try{
-                exerciseService.resetRoutineDone(routine);
-            }catch (Exception exception){
-                //exception.printStackTrace();
-                logger.warn(new BaseResponse<>(FAILED_RESET_ROTUINE_DONE).toString() + Validation.getPrintStackTrace(exception));
-                new BaseResponse<>(FAILED_RESET_ROTUINE_DONE);
-            }
-        }
-    }
 }

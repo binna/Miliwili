@@ -72,19 +72,36 @@ public class ExerciseProvider {
     }
 
     /**
-     * 일별 체중 조회
+     * 오늘의 체중기록 입력 여부 조회
      */
-    public GetExerciseDailyWeightRes retrieveExerciseDailyWeight(long exerciseId) throws BaseException{
-        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
-        List<ExerciseWeightRecord> exerciseDailyWeightList = null;
+    public Integer retrieveExerciseTodayWeight() throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfoByUserId(jwtService.getUserId(),"Y");
+        List<ExerciseWeightRecord> todayWeight;
 
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId())
-            throw new BaseException(INVALID_USER);
-
+        // 1--> 목표체중,현재체중 입력 안한 상태   2--> 오늘의 체중 입력 안한 상태    3--> 오늘의 체중입력해서 그냥 넘어가도 되는 상태
+        int weightStatus = 0;
 
         try{
-            exerciseDailyWeightList = exerciseWeightRepository.findTop5ByExerciseInfo_IdAndStatusOrderByExerciseDateDesc(exerciseId,"Y");
+            todayWeight = exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate(exerciseInfo.getId(),
+                    "Y", LocalDate.now());
+        }catch (Exception e){
+            throw new BaseException(FAILED_GET_DAILY_WEIGHT);
+        }
+        if(todayWeight.size() == 0)
+            return 2;
+        else
+            return 3;
+    }
+
+    /**
+     * 일별 체중 조회
+     */
+    public GetExerciseDailyWeightRes retrieveExerciseDailyWeight() throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfoByUserId(jwtService.getUserId(),"Y");
+        List<ExerciseWeightRecord> exerciseDailyWeightList = null;
+
+        try{
+            exerciseDailyWeightList = exerciseWeightRepository.findTop5ByExerciseInfo_IdAndStatusOrderByExerciseDateDesc(exerciseInfo.getId(),"Y");
         }catch (Exception e){
             throw new BaseException(FAILED_GET_DAILY_WEIGHT);
         }
@@ -124,15 +141,10 @@ public class ExerciseProvider {
      * 체중 기록 조회
      */
     @Transactional
-    public GetExerciseWeightRecordRes retrieveExerciseWeightRecord(Integer viewMonth, Integer viewYear, Long exerciseId) throws BaseException{
-        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
+    public GetExerciseWeightRecordRes retrieveExerciseWeightRecord(Integer viewMonth, Integer viewYear) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfoByUserId(jwtService.getUserId(),"Y");
         List<ExerciseWeightRecord> allRecordList = exerciseInfo.getWeightRecords();
         List<ExerciseWeightRecord> exerciseWeightList = new ArrayList<>();
-
-
-        if (exerciseInfo.getUser().getId() != jwtService.getUserId())
-            throw new BaseException(INVALID_USER);
-
 
         //생성 날짜 오름차순 정렬
         Collections.sort(allRecordList, new Comparator<ExerciseWeightRecord>() {
@@ -163,7 +175,6 @@ public class ExerciseProvider {
         int wantMonth = nowMonth ;
         int wantYear = nowYear;
 
-        int lastIdx=0;
         while(idx <= 5 && continueIndx <=3) {
             List<ExerciseWeightRecord> monthWeightList = new ArrayList<>();
             double sum = 0.0;
@@ -197,12 +208,6 @@ public class ExerciseProvider {
             idx++;
             wantMonth--;
 
-        }
-        for(int i=0;i<monthWeight.size();i++){
-            System.out.println(monthWeight.get(i));
-        }
-        for(int i=0;i<monthWeight.size();i++){
-            System.out.println(monthWeightMonth.get(i));
         }
 
         GetExerciseWeightRecordRes getExerciseWeightRecordRes = GetExerciseWeightRecordRes.builder()
@@ -286,7 +291,6 @@ public class ExerciseProvider {
 
     //dayWeight변환
     public List<String> dayWeightListWeight(List<Double> weightList, int year, int month){
-        System.out.println("ListWeight");
 
         List<String> changedList = new ArrayList<>();
 
@@ -333,12 +337,8 @@ public class ExerciseProvider {
     /**
      * 사용자의 전체 루틴 조회
      */
-    public List<MyRoutineInfo> retrieveAllRoutineList(long exerciseId) throws BaseException{
-        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
-
-        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
-            throw new BaseException(INVALID_USER);
-        }
+    public List<MyRoutineInfo> retrieveAllRoutineList() throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         List<ExerciseRoutine> routineList= exerciseInfo.getExerciseRoutines();
         List<MyRoutineInfo> myAllRoutines = new ArrayList<>();
@@ -359,12 +359,8 @@ public class ExerciseProvider {
     /**
      * 특정 날짜 routine조회
      */
-    public List<RoutineInfo> retrieveDateRoutine(long exerciseId, String targetDate) throws BaseException{
-        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public List<RoutineInfo> retrieveDateRoutine( String targetDate) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
         List<RoutineInfo> returnList = new ArrayList<>();
@@ -381,7 +377,6 @@ public class ExerciseProvider {
             if(routine.getStatus().equals("N"))
                 continue;
         //오늘 운동을 한 기록이 있으면 True처리 -->빼기/ 저번주에 같은 요일에도 들어감
-           // Boolean isDone = (routine.getDone().equals("Y")) ? true : false;
             Boolean isDone = false;
             //그 날짜에 루틴의 운동 기록이 있다면 true처리 
             List<ExerciseReport> reports = routine.getReports();
@@ -411,7 +406,7 @@ public class ExerciseProvider {
     public List<ExerciseRoutine> getCompleteRoutine() throws BaseException{
         List<ExerciseRoutine> routineList = new ArrayList<>();
         try {
-            routineList = exerciseRoutineRepository.findAllByStatusAndAndDone("Y", "Y");
+            routineList = exerciseRoutineRepository.findAllByStatus("Y");
         }catch (Exception e){
             throw new BaseException(FAILED_FIND_GET_ROUTINE);
         }
@@ -421,12 +416,8 @@ public class ExerciseProvider {
     /**
      * 운동 루틴 상세 조회 --> 루틴 수정전에 보여지기 위해
      */
-    public GetExerciseRoutineRes retrieveRoutineDetailForPatchRoutine(long exerciseId, long routineId) throws BaseException{
-        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public GetExerciseRoutineRes retrieveRoutineDetailForPatchRoutine( long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         ExerciseRoutine routine = getAvaliableRoutine(routineId, exerciseInfo);
 
@@ -490,12 +481,8 @@ public class ExerciseProvider {
     /**
      * 루틴 상세 정보 조회 --> 운동 시작 때 필요
      */
-    public GetStartExerciseRes retrieveRoutineInfoForStartExercise(long exerciseId, long routineId) throws BaseException{
-        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public GetStartExerciseRes retrieveRoutineInfoForStartExercise(long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfoByUserId(jwtService.getUserId(),"Y");
         ExerciseRoutine routine = getAvaliableRoutine(routineId, exerciseInfo);
 
         List<ExerciseRoutineDetail> detailList = routine.getRoutineDetails();
@@ -537,15 +524,9 @@ public class ExerciseProvider {
     /**
      * 운동 리포트 조회
      */
-    public GetExerciseReportRes retrieveExerciseReport(Long exerciseId, Long routineId, String reportDate) throws BaseException{
-        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public GetExerciseReportRes retrieveExerciseReport(Long routineId, String reportDate) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfoByUserId(jwtService.getUserId(),"Y");
         ExerciseRoutine routine = getAvaliableRoutine(routineId, exerciseInfo);
-        if(routine.getDone().equals("N"))
-            throw new BaseException(FAILED_GET_REPORT_DONE);
 
 
         LocalDate date = LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE);
@@ -599,12 +580,8 @@ public class ExerciseProvider {
     /**
      * 캘린더 운동 기록 조회
      */
-    public List<String> retrieveCalendarReport(Long exerciseId, Integer viewYear, Integer viewMonth) throws BaseException{
-        ExerciseInfo exerciseInfo = getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public List<String> retrieveCalendarReport( Integer viewYear, Integer viewMonth) throws BaseException{
+        ExerciseInfo exerciseInfo = getExerciseInfoByUserId(jwtService.getUserId(),"Y");
         List<String> dateList = new ArrayList<>();
         List<ExerciseRoutine> routineList = exerciseInfo.getExerciseRoutines();
 

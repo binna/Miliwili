@@ -17,5 +17,7 @@ public interface ExerciseWeightRepository extends CrudRepository<ExerciseWeightR
 
     List<ExerciseWeightRecord> findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate(Long exerciseId, String status, LocalDate targetDate);
 
+
+
 }
 

@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface ExerciseRoutineRepository extends CrudRepository<ExerciseRoutine, Long> {
 
-    List<ExerciseRoutine> findAllByStatusAndAndDone(String status, String done);
+    List<ExerciseRoutine> findAllByStatus(String status);
 
 }

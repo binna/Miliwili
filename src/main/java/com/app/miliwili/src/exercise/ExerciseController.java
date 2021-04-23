@@ -65,6 +65,26 @@ public class ExerciseController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    /**
+     *  오늘의 체중기록 작성 여부
+     * @return BaseResponse<Integer>
+     * @RequestHeader X-ACCESS-TOKEN
+     * @Auther vivi
+     */
+    @ApiOperation(value = "오늘의 체중 기록 상태 조회  ", notes = "X-ACCESS-TOKEN 필요")
+    @ResponseBody
+    @GetMapping("/today-weights")
+    public BaseResponse<Integer> getTodayWeightCheck(@RequestHeader("X-ACCESS-TOKEN") String token){
+        try{
+            Integer todayWeightStatus = exerciseProvider.retrieveExerciseTodayWeight();
+            return new BaseResponse<>(SUCCESS,todayWeightStatus);
+        }catch (BaseException e){
+            logger.warn(e.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(e));
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
     /**
      * 처음 목표 체중, 현재 체중 입력.
      * @return BaseResponse<Long>
@@ -73,9 +93,8 @@ public class ExerciseController {
      */
     @ApiOperation(value = "목표체중, 현재체중 첫 입력", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @PostMapping("/{exerciseId}/first-weights")
-    public BaseResponse<String> postFirstWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseFirstWeightReq param,
-                                              @PathVariable Long exerciseId){
+    @PostMapping("/first-weights")
+    public BaseResponse<String> postFirstWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseFirstWeightReq param){
         //몸무게 정보가 잘 들어왔는지 검증
         try{
             if(param.getFirstWeight() < -1.0 || param.getGoalWeight() < -1.0)
@@ -85,7 +104,7 @@ public class ExerciseController {
         }
 
         try{
-            String result = exerciseService.createFistWeight(param,exerciseId);
+            String result = exerciseService.createFistWeight(param);
             return new BaseResponse<>(SUCCESS,result);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -103,9 +122,8 @@ public class ExerciseController {
      */
     @ApiOperation(value = "daily 체중 입력", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @PostMapping("/{exerciseId}/weights")
-    public BaseResponse<String> postDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseWeightReq param,
-                                                @PathVariable Long exerciseId){
+    @PostMapping("/weights")
+    public BaseResponse<String> postDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseWeightReq param){
         //TODO: 하루에 한번만 입력되도록 검증
         if(param.getDayWeight() == null)
             return new BaseResponse<>(EMPTY_WEIGHT);
@@ -119,7 +137,7 @@ public class ExerciseController {
         }
 
         try{
-            String returnStr = exerciseService.createDayilyWeight(param,exerciseId);
+            String returnStr = exerciseService.createDayilyWeight(param);
             return new BaseResponse<>(SUCCESS,returnStr);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -136,9 +154,8 @@ public class ExerciseController {
      */
     @ApiOperation(value = "daily 체중 수정", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @PatchMapping("/{exerciseId}/weights")
-    public BaseResponse<String> patchDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PatchExerciseDailyWeightReq param,
-                                                 @PathVariable Long exerciseId){
+    @PatchMapping("/weights")
+    public BaseResponse<String> patchDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PatchExerciseDailyWeightReq param){
         if(!Validation.isRegexDate(param.getDayDate())){
             return new BaseResponse<>(INVALID_MODIFY_DATE);
         }
@@ -151,7 +168,7 @@ public class ExerciseController {
         }
 
         try{
-            String resultStr = exerciseService.modifyDailyWeight(param,exerciseId);
+            String resultStr = exerciseService.modifyDailyWeight(param);
             return new BaseResponse<>(SUCCESS,resultStr);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -168,9 +185,8 @@ public class ExerciseController {
      */
     @ApiOperation(value = "목표체중 수정", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @PatchMapping("/{exerciseId}/goal-weights")
-    public BaseResponse<String> patchGoalWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PatchExerciseGoalWeight param,
-                                                @PathVariable Long exerciseId){
+    @PatchMapping("/goal-weights")
+    public BaseResponse<String> patchGoalWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PatchExerciseGoalWeight param){
         if(param.getGoalWeight() == null)
             return new BaseResponse<>(EMPTY_WEIGHT);
         //몸무게 정보가 잘 들어왔는지 검증
@@ -182,7 +198,7 @@ public class ExerciseController {
         }
 
         try{
-            String returnStr = exerciseService.modifyGoalWeight(param,exerciseId);
+            String returnStr = exerciseService.modifyGoalWeight(param);
             return new BaseResponse<>(SUCCESS,returnStr);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -199,10 +215,10 @@ public class ExerciseController {
      */
     @ApiOperation(value = "일별 체중 기록 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @GetMapping("/{exerciseId}/daily-weights")
-    public BaseResponse<GetExerciseDailyWeightRes> getDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId){
+    @GetMapping("/daily-weights")
+    public BaseResponse<GetExerciseDailyWeightRes> getDailyWeight(@RequestHeader("X-ACCESS-TOKEN") String token){
         try{
-            GetExerciseDailyWeightRes exerciseDailyWeightRes= exerciseProvider.retrieveExerciseDailyWeight(exerciseId);
+            GetExerciseDailyWeightRes exerciseDailyWeightRes= exerciseProvider.retrieveExerciseDailyWeight();
             return new BaseResponse<>(SUCCESS, exerciseDailyWeightRes);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -220,15 +236,15 @@ public class ExerciseController {
      */
     @ApiOperation(value = "체중 기록 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @GetMapping("/{exerciseId}/weight-records")
-    public BaseResponse<GetExerciseWeightRecordRes> getWeightRecords(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+    @GetMapping("/weight-records")
+    public BaseResponse<GetExerciseWeightRecordRes> getWeightRecords(@RequestHeader("X-ACCESS-TOKEN") String token,
                                              @RequestParam Integer viewMonth, @RequestParam Integer viewYear){
 
         LocalDate now = LocalDate.now();
         if(viewYear > now.getYear() || (viewYear==now.getYear() && viewMonth>now.getMonthValue()))
             return new BaseResponse<>(INVALID_VIEW_DATE);
         try{
-            GetExerciseWeightRecordRes result = exerciseProvider.retrieveExerciseWeightRecord(viewMonth, viewYear,exerciseId);
+            GetExerciseWeightRecordRes result = exerciseProvider.retrieveExerciseWeightRecord(viewMonth, viewYear);
             return new BaseResponse<>(SUCCESS,result);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -245,15 +261,14 @@ public class ExerciseController {
      */
     @ApiOperation(value = "루틴 생성", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @PostMapping("/{exerciseId}/routines")
-    public BaseResponse<Long> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
-                                           @RequestBody PostExerciseRoutineReq param){
+    @PostMapping("/routines")
+    public BaseResponse<Long> postRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestBody PostExerciseRoutineReq param){
 
         if(Validation.validateForPostExerciseRoutineReq(param) != VALIDATION_SUCCESS)
             return new BaseResponse<>(Validation.validateForPostExerciseRoutineReq(param));
 
         try{
-            Long resultLong = exerciseService.createRoutine(param,exerciseId);
+            Long resultLong = exerciseService.createRoutine(param);
             return new BaseResponse<>(SUCCESS,resultLong);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -270,15 +285,15 @@ public class ExerciseController {
      */
     @ApiOperation(value = "루틴 수정", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @PatchMapping("/{exerciseId}/routines/{routineId}")
-    public BaseResponse<String> patchRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,@PathVariable Long routineId,
+    @PatchMapping("/routines/{routineId}")
+    public BaseResponse<String> patchRoutines(@RequestHeader("X-ACCESS-TOKEN") String token,@PathVariable Long routineId,
                                            @RequestBody PostExerciseRoutineReq param){
 
         if(Validation.validateForPostExerciseRoutineReq(param) != VALIDATION_SUCCESS)
             return new BaseResponse<>(Validation.validateForPostExerciseRoutineReq(param));
 
         try{
-            String resultStr = exerciseService.modifyRoutine(param,exerciseId,routineId);
+            String resultStr = exerciseService.modifyRoutine(param,routineId);
             return new BaseResponse<>(SUCCESS,resultStr);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -295,10 +310,10 @@ public class ExerciseController {
      */
     @ApiOperation(value = "전체 루틴 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @GetMapping("/{exerciseId}/all-routines")
-    public BaseResponse<List<MyRoutineInfo>> getMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId){
+    @GetMapping("/all-routines")
+    public BaseResponse<List<MyRoutineInfo>> getMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token){
         try{
-            List<MyRoutineInfo> myAllRoutineList = exerciseProvider.retrieveAllRoutineList(exerciseId);
+            List<MyRoutineInfo> myAllRoutineList = exerciseProvider.retrieveAllRoutineList();
             return new BaseResponse<>(SUCCESS, myAllRoutineList);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -316,11 +331,10 @@ public class ExerciseController {
      */
     @ApiOperation(value = "루틴 삭제", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @DeleteMapping("/{exerciseId}/routines/{routineId}")
-    public BaseResponse<String> deleteMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
-                                                              @PathVariable Long routineId){
+    @DeleteMapping("/routines/{routineId}")
+    public BaseResponse<String> deleteMyAllRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long routineId){
         try{
-            String resultStr = exerciseService.deleteRoutine(exerciseId,routineId, true);
+            String resultStr = exerciseService.deleteRoutine(routineId, true);
             return new BaseResponse<>(SUCCESS, resultStr);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -338,14 +352,13 @@ public class ExerciseController {
      */
     @ApiOperation(value = "특정 날짜의 루틴 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @GetMapping("/{exerciseId}/routines")
-    public BaseResponse<List<RoutineInfo>> getMyDateRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
-                                                       @RequestParam String targetDate){
+    @GetMapping("/routines")
+    public BaseResponse<List<RoutineInfo>> getMyDateRoutines(@RequestHeader("X-ACCESS-TOKEN") String token, @RequestParam String targetDate){
         if(!Validation.isRegexDate(targetDate)){
             return new BaseResponse<>(INVALID_MODIFY_DATE);
         }
         try{
-            List<RoutineInfo> resultList = exerciseProvider.retrieveDateRoutine(exerciseId, targetDate);
+            List<RoutineInfo> resultList = exerciseProvider.retrieveDateRoutine(targetDate);
             return new BaseResponse<>(SUCCESS, resultList);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -362,11 +375,10 @@ public class ExerciseController {
      */
     @ApiOperation(value = "루틴 상세정보 조회 -> 루틴 수정을 위한", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @GetMapping("/{exerciseId}/routines/{routineId}/detail-exercises")
-    public BaseResponse<GetExerciseRoutineRes> getRoutineDetailForPatchRoutine(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
-                                                                               @PathVariable Long routineId){
+    @GetMapping("/routines/{routineId}/detail-exercises")
+    public BaseResponse<GetExerciseRoutineRes> getRoutineDetailForPatchRoutine(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long routineId){
         try{
-            GetExerciseRoutineRes resultRoutineRes = exerciseProvider.retrieveRoutineDetailForPatchRoutine(exerciseId,routineId);
+            GetExerciseRoutineRes resultRoutineRes = exerciseProvider.retrieveRoutineDetailForPatchRoutine(routineId);
             return new BaseResponse<>(SUCCESS,resultRoutineRes);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -384,11 +396,10 @@ public class ExerciseController {
      */
     @ApiOperation(value = "루틴 상세정보 조회 -> 운동 시작을 위한", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @GetMapping("/{exerciseId}/routines/{routineId}/start-exercises")
-    public BaseResponse<GetStartExerciseRes> getRoutineDetailForStartExercise(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
-                                                                               @PathVariable Long routineId){
+    @GetMapping("/routines/{routineId}/start-exercises")
+    public BaseResponse<GetStartExerciseRes> getRoutineDetailForStartExercise(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long routineId){
         try{
-            GetStartExerciseRes resultRoutineRes = exerciseProvider.retrieveRoutineInfoForStartExercise(exerciseId,routineId);
+            GetStartExerciseRes resultRoutineRes = exerciseProvider.retrieveRoutineInfoForStartExercise(routineId);
             return new BaseResponse<>(SUCCESS,resultRoutineRes);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -406,8 +417,8 @@ public class ExerciseController {
      */
     @ApiOperation(value = "운동 리포트 생성", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @PostMapping("/{exerciseId}/routines/{routineId}/reports")
-    public BaseResponse<Long> postExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
+    @PostMapping("/routines/{routineId}/reports")
+    public BaseResponse<Long> postExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long routineId,
                                                                   @RequestBody PostExerciseReportReq param){
         if(param.getExerciseStatus().length() == 0 || param.getExerciseStatus() == null)
             return new BaseResponse<>(EMPTY_EXERCISESTATUS);
@@ -419,7 +430,7 @@ public class ExerciseController {
 
 
         try{
-            Long reportId = exerciseService.createExerciseReport(exerciseId,routineId,param);
+            Long reportId = exerciseService.createExerciseReport(routineId,param);
             return new BaseResponse<>(SUCCESS, reportId);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -433,14 +444,14 @@ public class ExerciseController {
      */
     @ApiOperation(value = "운동리포트 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @GetMapping("/{exerciseId}/routines/{routineId}/reports")
-    public BaseResponse<GetExerciseReportRes> getExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
+    @GetMapping("/routines/{routineId}/reports")
+    public BaseResponse<GetExerciseReportRes> getExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token,  @PathVariable Long routineId,
                                                                 @RequestParam String reportDate){
         if(!Validation.isRegexDate(reportDate))
             return new BaseResponse<>(INVALID_DATE);
 
         try{
-            GetExerciseReportRes reportRes = exerciseProvider.retrieveExerciseReport(exerciseId,routineId,reportDate);
+            GetExerciseReportRes reportRes = exerciseProvider.retrieveExerciseReport(routineId,reportDate);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -455,14 +466,14 @@ public class ExerciseController {
      */
     @ApiOperation(value = "운동 리포트 삭제", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @DeleteMapping("/{exerciseId}/routines/{routineId}/reports")
-    public BaseResponse<String> delteRoutineExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
+    @DeleteMapping("/routines/{routineId}/reports")
+    public BaseResponse<String> delteRoutineExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token,  @PathVariable Long routineId,
                                                            @RequestParam String reportDate){
         if(!Validation.isRegexDate(reportDate))
             return new BaseResponse<>(INVALID_DATE);
 
         try{
-            String reportRes = exerciseService.deleteExerciseReport(exerciseId,routineId,reportDate);
+            String reportRes = exerciseService.deleteExerciseReport(routineId,reportDate);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -476,8 +487,8 @@ public class ExerciseController {
      */
     @ApiOperation(value = "운동 리포트 수정", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @PatchMapping("/{exerciseId}/routines/{routineId}/reports")
-    public BaseResponse<String> patchExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId, @PathVariable Long routineId,
+    @PatchMapping("/routines/{routineId}/reports")
+    public BaseResponse<String> patchExerciseReport(@RequestHeader("X-ACCESS-TOKEN") String token,  @PathVariable Long routineId,
                                                            @RequestBody PatchExerciseReportReq param){
 
         if(!Validation.isRegexDate(param.getReportDate()))
@@ -487,7 +498,7 @@ public class ExerciseController {
             return new BaseResponse<>(FULL_REPORT_TEXT);
 
         try{
-            String reportRes = exerciseService.modifyExerciseReport(exerciseId,routineId,param);
+            String reportRes = exerciseService.modifyExerciseReport(routineId,param);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());
@@ -501,15 +512,15 @@ public class ExerciseController {
      */
     @ApiOperation(value = "운동리포트 달력 조회", notes = "X-ACCESS-TOKEN 필요")
     @ResponseBody
-    @GetMapping("/{exerciseId}/reports")
-    public BaseResponse<List<String>> getCalendarReports(@RequestHeader("X-ACCESS-TOKEN") String token, @PathVariable Long exerciseId,
+    @GetMapping("/reports")
+    public BaseResponse<List<String>> getCalendarReports(@RequestHeader("X-ACCESS-TOKEN") String token,
                                                     @RequestParam Integer viewYear, @RequestParam Integer viewMonth){
 
         if(viewMonth<=0 || viewMonth>12)
             return new BaseResponse<>(INVALIED_VIEW_MONTH);
 
         try{
-            List<String> reportRes = exerciseProvider.retrieveCalendarReport(exerciseId,viewYear,viewMonth);
+            List<String> reportRes = exerciseProvider.retrieveCalendarReport(viewYear,viewMonth);
             return new BaseResponse<>(SUCCESS,reportRes);
         }catch (BaseException e){
             logger.warn(e.getStatus().toString());

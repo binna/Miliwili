@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -66,5 +67,17 @@ public class ExerciseSelectRepository extends QuerydslRepositorySupport {
 
     }
 
+    /**
+     * 오늘의 체중기록 있는지 없는지
+     */
+    public Long getExerciseTodayWeight(Long exerciseId, LocalDate todayDate) {
+        QExerciseWeightRecord exerciseWeightRecord = QExerciseWeightRecord.exerciseWeightRecord;
+        return queryFactory.select((Projections.constructor(Long.class)))
+                .from(exerciseWeightRecord)
+                .where(exerciseWeightRecord.exerciseInfo.id.eq(exerciseId), exerciseWeightRecord.status.eq("Y"),
+                        exerciseWeightRecord.exerciseDate.eq(todayDate))
+                .fetchOne();
 
+
+    }
 }
