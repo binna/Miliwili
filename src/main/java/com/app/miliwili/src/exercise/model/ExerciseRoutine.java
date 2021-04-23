@@ -30,10 +30,6 @@ public class ExerciseRoutine extends BaseEntity {
     @Column(name = "repeatDay", length = 30, nullable = false)
     private String repeaDay;
 
-    @Builder.Default
-    @Column(name = "done", nullable = false, length = 1)
-    private String done = "N";
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_id", nullable = false )
     private ExerciseInfo exerciseInfo;

@@ -34,7 +34,6 @@ public class ExerciseService {
     private final ExerciseProvider exerciseProvider;
     private final UserProvider userProvider;
     private final JwtService jwtService;
-    private PostExerciseFirstWeightReq pa;
 
     /**
      * 처음 탭에 입장시
@@ -64,12 +63,8 @@ public class ExerciseService {
      *
      */
 
-    public String createFistWeight(PostExerciseFirstWeightReq param, Long exerciseId) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public String createFistWeight(PostExerciseFirstWeightReq param) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         Double goalWeight = (param.getGoalWeight() == -1.0) ? null : param.getGoalWeight();
         Double firstWeight = (param.getFirstWeight() == -1.0) ? null : param.getFirstWeight();
@@ -99,17 +94,13 @@ public class ExerciseService {
     /**
      * 데일리 몸무게 입력
      */
-    public String createDayilyWeight(PostExerciseWeightReq param, long exerciseId) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public String createDayilyWeight(PostExerciseWeightReq param) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         //오늘 이미 썼다면--> 더이상 못씀
         List<ExerciseWeightRecord> weightRecords;
         try {
-            weightRecords= exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate(exerciseId,
+            weightRecords= exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate(exerciseInfo.getId(),
                     "Y", LocalDate.now());
         }catch (Exception e){
             throw new BaseException(FAILED_TO_GET_TODAY_WEIGHT);
@@ -138,19 +129,15 @@ public class ExerciseService {
     /**
      * 데일리 몸무게 수정
      */
-    public String modifyDailyWeight(PatchExerciseDailyWeightReq param, long exerciseId) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public String modifyDailyWeight(PatchExerciseDailyWeightReq param) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         LocalDate targetDate = LocalDate.parse(param.getDayDate(), DateTimeFormatter.ISO_DATE);
 
         List<ExerciseWeightRecord> targetWeightRecord;
         try {
             targetWeightRecord = exerciseWeightRepository.findExerciseWeightRecordsByExerciseInfo_IdAndStatusAndExerciseDate
-                    (exerciseId, "Y", targetDate);
+                    (exerciseInfo.getId(), "Y", targetDate);
         }catch (Exception e){
             throw new BaseException(FAILED_TO_GET_MONTH_WEIGHT_3);
         }
@@ -183,12 +170,9 @@ public class ExerciseService {
     /**
      * 목표 몸무게 수정
      */
-    public String modifyGoalWeight(PatchExerciseGoalWeight param, long exerciseId) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+    public String modifyGoalWeight(PatchExerciseGoalWeight param) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
         exerciseInfo.setGoalWeight(param.getGoalWeight());
 
         try {
@@ -205,12 +189,8 @@ public class ExerciseService {
      *루틴 만들기
      *
      */
-    public Long createRoutine(PostExerciseRoutineReq param, long exerciseId) throws BaseException {
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
-
-        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
-            throw new BaseException(INVALID_USER);
-        }
+    public Long createRoutine(PostExerciseRoutineReq param) throws BaseException {
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         ExerciseRoutine newRoutine = ExerciseRoutine.builder()
                 .name(param.getRoutineName())
@@ -230,12 +210,9 @@ public class ExerciseService {
     /**
      * 루틴 수정
      */
-    public String modifyRoutine(PostExerciseRoutineReq param, long exerciseId, long routineId) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+    public String modifyRoutine(PostExerciseRoutineReq param, long routineId) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
-        if (exerciseInfo.getUser().getId() != jwtService.getUserId()) {
-            throw new BaseException(INVALID_USER);
-        }
         ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
 
         routine.setName(param.getRoutineName());
@@ -255,10 +232,11 @@ public class ExerciseService {
      * 루틴 삭제
      * isDelete = 탈퇴된 회원인지 --> 회원 탈퇴를 위해
      */
-    public String deleteRoutine(long exerciseId, long routineId , boolean isDeleted) throws BaseException{
+    public String deleteRoutine( long routineId , boolean isDeleted) throws BaseException{
         ExerciseInfo exerciseInfo = null;
         if(isDeleted == true)       //루틴 삭제
-            exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
+           exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
+        //exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
         else{                       //회원 탈퇴할 때 함께 삭제
             exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"N");
         }
@@ -294,12 +272,8 @@ public class ExerciseService {
     /**
      * 운동 리포트 생성
      */
-    public Long createExerciseReport(Long exerciseId, Long routineId, PostExerciseReportReq param) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public Long createExerciseReport(Long routineId, PostExerciseReportReq param) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
         String[] statusSplit = param.getExerciseStatus().split("#");
@@ -317,7 +291,6 @@ public class ExerciseService {
                 .reportText("")
                 .exerciseRoutine(routine)
                 .build();
-        routine.setDone("Y");
         routine.addNewReport(newReport);
         try {
             exerciseReportRepository.save(newReport);
@@ -331,19 +304,11 @@ public class ExerciseService {
     /**
      * 운동 리포트 삭제
      */
-    public String deleteExerciseReport(Long exerciseId, Long routineId, String reportDate) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public String deleteExerciseReport(Long routineId, String reportDate) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
         ExerciseReport report  = exerciseProvider.getAvaliableExerciseReport(routine, LocalDate.parse(reportDate, DateTimeFormatter.ISO_DATE));
-
-
-        if(routine.getDone().equals("Y"))
-            routine.setDone("N");
 
         report.setStatus("N");
 
@@ -370,12 +335,8 @@ public class ExerciseService {
     /**
      * 운동 리포트 수정
      */
-    public String modifyExerciseReport(Long exerciseId, Long routineId, PatchExerciseReportReq param) throws BaseException{
-        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfo(exerciseId);
-
-        if(exerciseInfo.getUser().getId() != jwtService.getUserId()){
-            throw new BaseException(INVALID_USER);
-        }
+    public String modifyExerciseReport( Long routineId, PatchExerciseReportReq param) throws BaseException{
+        ExerciseInfo exerciseInfo = exerciseProvider.getExerciseInfoByUserId(jwtService.getUserId(),"Y");
 
         ExerciseRoutine routine = exerciseProvider.getAvaliableRoutine(routineId, exerciseInfo);
         ExerciseReport report  = exerciseProvider.getAvaliableExerciseReport(routine, LocalDate.parse(param.getReportDate(), DateTimeFormatter.ISO_DATE));
@@ -391,19 +352,6 @@ public class ExerciseService {
 
     }
 
-
-    /**
-     * 루틴 안한상태로 초기화
-     * --> 스케줄러에 의해
-     */
-    public void resetRoutineDone(ExerciseRoutine routine) throws BaseException{
-        routine.setDone("N");
-        try {
-            exerciseRoutineRepository.save(routine);
-        }catch (Exception e){
-            throw new BaseException(FAILED_TO_CHANGE_ROUTINE_STATUS);
-        }
-    }
 
     /**
      * 루틴 저장
@@ -509,7 +457,7 @@ public class ExerciseService {
         List<ExerciseWeightRecord> weightRecords = exerciseInfo.getWeightRecords();
         exerciseInfo.setStatus("N");
         for(ExerciseRoutine r : routine){
-            deleteRoutine(exerciseInfo.getId(), r.getId(), false);
+            deleteRoutine( r.getId(), false);
         }
         for(ExerciseWeightRecord weight : weightRecords){
             weight.setStatus("N");
