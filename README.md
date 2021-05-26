@@ -46,7 +46,7 @@
 
 <br>
 
-### 천 다운로드 달성!
+### 천 명 다운로드
 ![image](https://user-images.githubusercontent.com/7114874/119636860-06762800-be50-11eb-9b70-6da73da6a8da.png)
 
 <br>
