@@ -1,3 +1,2 @@
 # miliwili Server(2021.03.02 ~ 2021.04.03)
-* 서비스 설명
-     > 국군 장병들을 위한 자기관리 
+![image](https://user-images.githubusercontent.com/7114874/119609679-f439c100-be32-11eb-93f3-42bb12bbf8bf.png)
