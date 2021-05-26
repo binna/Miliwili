@@ -7,5 +7,5 @@
 
 <br>
 
-# 기술스택
+### 기술스택
 > Java, Spring Boot, MySQL, JPA, AWS RDS, AWS EC2, SSH, JWT, OAuth
