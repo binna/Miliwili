@@ -17,17 +17,6 @@
 
 <br>
 
-### 기능
-> 1. 일정과 D-Day
-
-> 2. 운동
-
-> 3. 감정일기
-
-> 4. 로그인(카카오, 구글 OAuth)
-
-<br>
-
 ### REST API
 > [스웨거로_만든_프로젝트로_이동](https://shine94.kr/swagger-ui.html)
 
@@ -48,6 +37,17 @@
 
 ### 천 명 다운로드
 ![image](https://user-images.githubusercontent.com/7114874/119636860-06762800-be50-11eb-9b70-6da73da6a8da.png)
+
+<br>
+
+### 기능
+> 1. 일정과 D-Day
+
+> 2. 운동
+
+> 3. 감정일기
+
+> 4. 로그인(카카오, 구글 OAuth)
 
 <br>
 
