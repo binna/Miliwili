@@ -18,10 +18,9 @@
 <br>
 
 ### 기능
-> 1. 일정과 D-Day
-![image](https://user-images.githubusercontent.com/7114874/119611543-cdc95500-be35-11eb-9588-9f0e0be3001f.png)
-> 2. 운동
-> 3. 감정일기
-> 4. 로그인(카카오, 구글 OAuth)
+1. 일정과 D-Day
+2. 운동
+3. 감정일기
+4. 로그인(카카오, 구글 OAuth)
 
 ### 업데이트 내용 
