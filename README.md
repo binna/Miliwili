@@ -16,15 +16,18 @@
 
 <br>
 
-### 완성된 REST API
-> [스웨거로_만든_프로젝트_구경하러가기](https://shine94.kr/swagger-ui.html)
+### REST API
+> [스웨거로_만든_프로젝트로_이동](https://shine94.kr/swagger-ui.html)
 
 <br>
 
 ### 기능
 1. 일정과 D-Day
+
 2. 운동
+
 3. 감정일기
+
 4. 로그인(카카오, 구글 OAuth)
 
 <br>
