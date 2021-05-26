@@ -33,7 +33,7 @@
 <br>
 
 ### 구글스토어 
-> 구글 스토어에 "밀리윌리"를 검색하시면
+> 구글스토어에 "밀리윌리"를 검색하시면
 
 ![image](https://user-images.githubusercontent.com/7114874/119633221-7aaecc80-be4c-11eb-8475-d2529e26692c.png)
 
