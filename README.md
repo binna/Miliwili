@@ -33,7 +33,13 @@
 <br>
 
 ### 구글스토어 
+> 구글 스토어에 "밀리윌리"를 검색하시면
 
+![image](https://user-images.githubusercontent.com/7114874/119632782-168c0880-be4c-11eb-9727-25a144b28933.png)
+
+> "설치"가 가능합니다!
+
+![image](https://user-images.githubusercontent.com/7114874/119632978-420ef300-be4c-11eb-996a-d0fbac8bb2f2.png)
 
 <br>
 
