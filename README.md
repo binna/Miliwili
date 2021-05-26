@@ -46,10 +46,9 @@
 
 <br>
 
-### 구백 다운로드 달성!
-![image](https://user-images.githubusercontent.com/7114874/119635825-045f9980-be4f-11eb-9ea1-582265dda473.png)
-
+### 천 다운로드 달성!
+![image](https://user-images.githubusercontent.com/7114874/119636860-06762800-be50-11eb-9b70-6da73da6a8da.png)
 
 <br>
 
-### 업데이트 내용 
+### 업데이트 내용
