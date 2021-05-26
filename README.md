@@ -4,3 +4,7 @@
 > 하루동안의 개인 정비 시간을 활용하여 자기개발에 도움이 될 수 있는 프로그램을 만들었습니다.
 
 ![image](https://user-images.githubusercontent.com/7114874/119609679-f439c100-be32-11eb-93f3-42bb12bbf8bf.png)
+
+<br>
+# 기술스택
+> Java, Spring Boot, MySQL, JPA, AWS RDS, AWS EC2, SSH, JWT, OAuth
