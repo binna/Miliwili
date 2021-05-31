@@ -499,6 +499,30 @@ public class CalendarController {
         }
     }
 
+    /**
+     * D-Day 다이어리 삭제 API
+     * [DELETE] /calendars/ddays/ddays-diary/:diaryId
+     *
+     * @return BaseResponse<Void>
+     * @Token X-ACCESS-TOKEN
+     * @PathVariable Long diaryId
+     * @Auther shine
+     */
+    @ApiOperation(value = "D-Day 다이어리 삭제", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ResponseBody
+    @DeleteMapping("/calendars/ddays/ddays-diary/{diaryId}")
+    public BaseResponse<Void> deleteDDayDiary(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                              @PathVariable Long diaryId) {
+        try {
+            calendarService.deleteDDayDiary(diaryId);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 
     /**
      * 준비물 준비 완료 -> 미완료, 미완료 -> 완료로 처리 API
@@ -517,6 +541,30 @@ public class CalendarController {
         try {
             WorkRes todolist = calendarService.updateDDayWork(workId);
             return new BaseResponse<>(SUCCESS, todolist);
+        } catch (BaseException exception) {
+            logger.warn(exception.getStatus().toString());
+            logger.warn(Validation.getPrintStackTrace(exception));
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 할당량 완료 -> 미완료, 미완료 -> 완료로 처리
+     * [PATCH] /app/calendars/ddays/ddays-targetAmount/:targetAmountId
+     *
+     * @return
+     * @Token X-ACCESS-TOKEN
+     * @PathVariable Long goalId
+     * @Auther shine
+     */
+    @ApiOperation(value = "할당량 완료 -> 미완료, 미완료 -> 완료로 처리", notes = "X-ACCESS-TOKEN jwt 필요")
+    @ResponseBody
+    @PatchMapping("/calendars/ddays/ddays-targetAmount/{targetAmountId}")
+    public BaseResponse<TargetAmountRes> updateTargetAmount(@RequestHeader("X-ACCESS-TOKEN") String token,
+                                                            @PathVariable Long targetAmountId) {
+        try {
+            TargetAmountRes targetAmount = calendarService.updateTargetAmount(targetAmountId);
+            return new BaseResponse<>(SUCCESS, targetAmount);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().toString());
             logger.warn(Validation.getPrintStackTrace(exception));

@@ -33,6 +33,7 @@ public class CalendarProvider {
     private final DDaySelectRepository ddaySelectRepository;
     private final DDayWorkRepository ddayWorkRepository;
     private final DDayDiaryRepository ddayDiaryRepository;
+    private final TargetAmountRepository targetAmountRepository;
     private final PlanVacationRepository planVacationRepository;
     private final JwtService jwtService;
 
@@ -90,15 +91,15 @@ public class CalendarProvider {
     }
 
     /**
-     * ddayId로 디데이 다이어리 조회
+     * ddayDiaryId 디데이 다이어리 조회
      *
-     * @param ddayId
+     * @param ddayDiaryId
      * @return DDayDiary
      * @throws BaseException
      * @Auther shine
      */
-    public DDayDiary retrieveDDayDiaryById(Long ddayId) throws BaseException {
-        return ddayDiaryRepository.findById(ddayId)
+    public DDayDiary retrieveDDayDiaryById(Long ddayDiaryId) throws BaseException {
+        return ddayDiaryRepository.findById(ddayDiaryId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_DIARY));
     }
 
@@ -113,6 +114,19 @@ public class CalendarProvider {
     public DDayWork retrieveDDayWorkById(Long workId) throws BaseException {
         return ddayWorkRepository.findById(workId)
                 .orElseThrow(() -> new BaseException(NOT_FOUND_WORK));
+    }
+
+    /**
+     * targetAmountId로 할당량 조회
+     *
+     * @param targetAmountId
+     * @return TargetAmount
+     * @throws BaseException
+     * @Auther shine
+     */
+    public TargetAmount retrieveTargetAmountById(Long targetAmountId) throws BaseException {
+        return targetAmountRepository.findById(targetAmountId)
+                .orElseThrow(() -> new BaseException(NOT_FOUND_TARGET_AMOUNT));
     }
 
     /**
@@ -394,11 +408,25 @@ public class CalendarProvider {
      * @Auther shine
      */
     public DDayDiaryRes changeDDayDiaryToDDayDiaryRes(DDayDiary diary) {
+        if (Objects.isNull(diary.getTargetAmount()))
+            return DDayDiaryRes.builder()
+                    .diaryId(diary.getId())
+                    .date(diary.getDate().format(DateTimeFormatter.ISO_DATE))
+                    .title(diary.getDate().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")))
+                    .content(diary.getContent())
+                    .build();
         return DDayDiaryRes.builder()
                 .diaryId(diary.getId())
                 .date(diary.getDate().format(DateTimeFormatter.ISO_DATE))
                 .title(diary.getDate().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")))
                 .content(diary.getContent())
+                .targetAmount(diary.getTargetAmount().stream().map(targetAmount -> {
+                    return TargetAmountRes.builder()
+                            .targetAmountId(targetAmount.getId())
+                            .content(targetAmount.getContent())
+                            .processingStatus(targetAmount.getProcessingStatus())
+                            .build();
+                }).collect(Collectors.toSet()))
                 .build();
     }
 

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Builder
 @AllArgsConstructor
@@ -29,6 +30,9 @@ public class DDayDiary {
     @ManyToOne
     @JoinColumn(name = "dday_id", nullable = false)
     private DDay dday;
+
+    @OneToMany(mappedBy = "ddayDiary", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<TargetAmount> targetAmount;
 
     @Override
     public String toString() {

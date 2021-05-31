@@ -14,7 +14,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static com.app.miliwili.config.BaseResponseStatus.*;
 
@@ -301,6 +304,7 @@ public class CalendarService {
 
     /**
      * D-Day 삭제
+     *
      * @param ddayId
      * @throws BaseException
      * @Auther shine
@@ -372,27 +376,48 @@ public class CalendarService {
         }
 
         diary.setContent(parameters.getContent());
+        setTargetAmount(parameters, diary);
 
         try {
             DDayDiary savedDiary = ddayDiaryRepository.save(diary);
-
-            if (diary.getDday().getDdayType().equals("자격증") || diary.getDday().getDdayType().equals("수능")) {
-                List<TargetAmount> targetAmounts = new ArrayList<>();
-                for (TargetAmountReq targetAmount : parameters.getTargetAmount()) {
-                    targetAmounts.add(TargetAmount.builder()
-                            .content(targetAmount.getContent())
-                            .ddayDiary(diary)
-                            .build());
-                }
-                targetAmountRepository.saveAll(targetAmounts);
-            }
-
             return calendarProvider.changeDDayDiaryToDDayDiaryRes(savedDiary);
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new BaseException(FAILED_TO_PATCH_DIARY);
         }
     }
 
+    /**
+     * D-Day 다이어리 삭제
+     *
+     * @param diaryId
+     * @throws BaseException
+     * @Auther shine
+     */
+    public void deleteDDayDiary(Long diaryId) throws BaseException {
+        DDayDiary diary = calendarProvider.retrieveDDayDiaryById(diaryId);
+
+        if (diary.getDday().getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
+        DDay dday = diary.getDday();
+        Set<DDayDiary> diaries = new HashSet<>();
+        for (DDayDiary target : dday.getDdayDiaries()) {
+            if (target.getId() != diaryId) {
+                diaries.add(target);
+            }
+        }
+        dday.getDdayDiaries().clear();
+        dday.getDdayDiaries().addAll(diaries);
+
+        try {
+            ddayRepository.save(dday);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(FAILED_TO_DELETE_DIARY);
+        }
+    }
 
     /**
      * 준비물 준비 완료 -> 미완료, 미완료 -> 완료로 처리
@@ -423,6 +448,36 @@ public class CalendarService {
             throw new BaseException(FAILED_TO_PATCH_WORK);
         }
     }
+
+    /**
+     *  할당량 완료 -> 미완료, 미완료 -> 완료로 처리
+     *
+     * @param targetAmountId
+     * @return TargetAmountRes
+     * @throws BaseException
+     */
+    public TargetAmountRes updateTargetAmount(Long targetAmountId) throws BaseException {
+        TargetAmount targetAmount = calendarProvider.retrieveTargetAmountById(targetAmountId);
+
+        if (targetAmount.getDdayDiary().getDday().getUserInfo().getId() != jwtService.getUserId()) {
+            throw new BaseException(DO_NOT_AUTH_USER);
+        }
+
+        setTargetAmountToggleProcessingStatus(targetAmount);
+
+        try {
+            TargetAmount savedTargetAmount = targetAmountRepository.save(targetAmount);
+            return TargetAmountRes.builder()
+                    .targetAmountId(savedTargetAmount.getId())
+                    .content(savedTargetAmount.getContent())
+                    .processingStatus(savedTargetAmount.getProcessingStatus())
+                    .build();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new BaseException(FAILED_TO_PATCH_TARGET_AMOUNT);
+        }
+    }
+
 
     /**
      * 회원 삭제시, 회원별 일정 삭제
@@ -566,22 +621,28 @@ public class CalendarService {
         }
     }
 
+    private void setTargetAmountToggleProcessingStatus(TargetAmount targetAmount) {
+        if (targetAmount.getProcessingStatus().equals("T")) {
+            targetAmount.setProcessingStatus("F");
+            return;
+        }
+        targetAmount.setProcessingStatus("T");
+    }
+
     private void setDDayWorkToggleProcessingStatus(DDayWork work) {
         if (work.getProcessingStatus().equals("T")) {
             work.setProcessingStatus("F");
+            return;
         }
-        if (work.getProcessingStatus().equals("F")) {
-            work.setProcessingStatus("T");
-        }
+        work.setProcessingStatus("T");
     }
 
     private void setPlanWorkToggleProcessingStatus(PlanWork work) {
         if (work.getProcessingStatus().equals("T")) {
             work.setProcessingStatus("F");
+            return;
         }
-        if (work.getProcessingStatus().equals("F")) {
-            work.setProcessingStatus("T");
-        }
+        work.setProcessingStatus("T");
     }
     
     private void setPlanVacationStatusN(Plan plan) {
@@ -699,6 +760,21 @@ public class CalendarService {
         if (Objects.nonNull(push) && push.equals("T")) {
             plan.setPush(push);
             plan.setPushDeviceToken(pushDeviceToken);
+        }
+    }
+
+    private void setTargetAmount(PatchDDayDiaryReq parameters, DDayDiary diary) {
+        if (Objects.nonNull(parameters.getTargetAmount())
+                && (diary.getDday().getDdayType().equals("자격증") || diary.getDday().getDdayType().equals("수능"))) {
+            Set<TargetAmount> targetAmounts = new HashSet<>();
+            for (TargetAmountReq targetAmount : parameters.getTargetAmount()) {
+                targetAmounts.add(TargetAmount.builder()
+                        .content(targetAmount.getContent())
+                        .ddayDiary(diary)
+                        .build());
+            }
+            diary.getTargetAmount().clear();
+            diary.getTargetAmount().addAll(targetAmounts);
         }
     }
 }
