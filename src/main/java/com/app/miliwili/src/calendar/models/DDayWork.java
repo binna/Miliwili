@@ -1,6 +1,5 @@
 package com.app.miliwili.src.calendar.models;
 
-import com.app.miliwili.config.BaseEntity;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -14,7 +13,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "ddayWork")
-public class DDayWork extends BaseEntity {
+public class DDayWork {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

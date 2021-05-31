@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @Builder
@@ -14,5 +14,5 @@ public class DDayDiaryRes {
     private final String date;
     private final String title;
     private final String content;
-    private final List<TargetAmountRes> targetAmount;
+    private final Set<TargetAmountRes> targetAmount;
 }

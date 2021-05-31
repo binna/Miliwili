@@ -198,6 +198,9 @@ public enum BaseResponseStatus {
 
     NOT_FOUND_USER_MAIN(false, 3100, "해당 회원과 일치하는 메인 정보가 없습니다."),
 
+    NOT_FOUND_TARGET_AMOUNT(false, 3110, "존재하지 않는 할당량 입니다."),
+    FAILED_TO_PATCH_TARGET_AMOUNT(false, 3111, "할당량 수정에 실패하였습니다."),
+
 
     //vivi: 3500 ~
     FAILED_TO_GET_USER(false, 3500, "회원 정보 조회에 실패하였습니다."),
