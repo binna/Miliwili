@@ -81,7 +81,8 @@
 1. **일정과 D-Day** - shine
 2. **운동** - vivi
 3. **감정일기** - shine
-4. **로그인**(카카오 - shine, 구글 - vivi), **휴가 및 회원** - shine
+4. **로그인**(카카오 - shine, 구글 - vivi)
+5. **휴가 및 회원** - shine
 
 
 <br><br>
